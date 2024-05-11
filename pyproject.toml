@@ -19,6 +19,8 @@ numpy = "^1.26.4"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 requests-mock = "^1.12.1"
+sphinx = "^7.3.7"
+sphinx-rtd-theme = "^2.0.0"
 
 [build-system]
 requires = ["poetry-core"]
