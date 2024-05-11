@@ -1,9 +1,10 @@
 import pytest
+import os
 from py_alpaca_api.alpaca import PyAlpacaApi
 from py_alpaca_api.src.data_classes import AccountClass, AssetClass, OrderClass
 
-api_key = 'PKVJG5S58PTM6MQEQH9L'
-api_secret = 'YmWLk2WnQja1DCOlOGGUdeTRfWUX7k3zB34kobR6'
+api_key = os.environ.get('API_KEY')
+api_secret = os.environ.get('API_SECRET')
 
 @pytest.fixture
 def alpaca():
