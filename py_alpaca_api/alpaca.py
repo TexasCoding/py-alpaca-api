@@ -1,7 +1,9 @@
 import requests
 import json
 
-from py_alpaca_api.src.data_classes import AccountClass, AssetClass, OrderClass
+import pandas as pd
+
+from py_alpaca_api.src.data_classes import order_class_from_dict, asset_class_from_dict, account_class_from_dict
 
 # PyAlpacaApi class
 class PyAlpacaApi:
@@ -17,18 +19,70 @@ class PyAlpacaApi:
             raise ValueError('API Key is required')
         if not api_secret:
             raise ValueError('API Secret is required')
-        
+        # Set the API Key and Secret
         self.headers = {
             'APCA-API-KEY-ID': api_key,
             'APCA-API-SECRET-KEY': api_secret
         }
-        
         # Set the API URL's
         if api_paper:
             self.trade_url  = 'https://paper-api.alpaca.markets/v2'
         else:
             self.trade_url  = 'https://api.alpaca.markets/v2'
             self.data_url   = 'https://data.alpaca.markets/v2'
+
+    ########################################################
+    #\\\\\\\\\/////////  Get Order BY id \\\\\\\///////////#
+    ########################################################
+    def get_order_by_id(self, order_id: str, nested: bool = False):
+        '''
+        Get order information by order ID
+        order_id: Order ID to get information
+        nested: Include nested objects (default: False)
+        return: OrderClass object with order information
+        Exception: Exception if failed to get order information
+        '''
+        # Parameters for the request
+        params = {
+            'nested': nested
+        }
+        # Alpaca API URL for order information
+        url = f'{self.trade_url}/orders/{order_id}'
+        # Get request to Alpaca API for order information
+        response = requests.get(url, headers=self.headers, params=params)
+        # Check if response is successful
+        if response.status_code == 200:
+            # Convert JSON response to dictionary
+            res = json.loads(response.text)
+            # Return order information as an OrderClass object
+            return order_class_from_dict(res)
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise ValueError(f'Failed to get order information. Response: {res["message"]}')
+            
+    ########################################################
+    #\\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
+    ########################################################
+    def cancel_order_by_id(self, order_id: str):
+        '''
+        Cancel order by order ID
+        order_id: Order ID to cancel
+        return: Order cancellation message
+        Exception: Exception if failed to cancel order
+        '''
+        # Alpaca API URL for canceling an order
+        url = f'{self.trade_url}/orders/{order_id}'
+        # Delete request to Alpaca API for canceling an order
+        response = requests.delete(url, headers=self.headers)
+        # Check if response is successful
+        if response.status_code == 204:
+            # Convert JSON response to dictionary
+            return f"Order {order_id} has been cancelled"
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to cancel order {order_id}, Response: {res["message"]}')
 
     ########################################################
     #\\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
@@ -88,42 +142,7 @@ class PyAlpacaApi:
             # Convert JSON response to dictionary
             res = json.loads(response.text)
             # Return market order information as a MarketOrderClass object
-            return OrderClass(
-                id=str(res['id']) if res['id'] else '',
-                client_order_id=res['client_order_id'],
-                created_at=res['created_at'].split('.')[0].replace('T', ' ') if res['created_at'] else '',
-                updated_at=res['updated_at'].split('.')[0].replace('T', ' ') if res['updated_at'] else '',
-                submitted_at=res['submitted_at'].split('.')[0].replace('T', ' ') if res['submitted_at'] else '',
-                filled_at=res['filled_at'].split('.')[0].replace('T', ' ') if res['filled_at'] else '',
-                expired_at=res['expired_at'].split('.')[0].replace('T', ' ') if res['expired_at'] else '',
-                canceled_at=res['canceled_at'].split('.')[0].replace('T', ' ') if res['canceled_at'] else '',
-                failed_at=res['failed_at'].split('.')[0].replace('T', ' ') if res['failed_at'] else '',
-                replaced_at=res['replaced_at'].split('.')[0].replace('T', ' ') if res['replaced_at'] else '',
-                replaced_by=res['replaced_by'].split('.')[0].replace('T', ' ') if res['replaced_by'] else '',
-                replaces=str(res['replaces']) if res['replaces'] else '',
-                asset_id=str(res['asset_id']) if res['asset_id'] else '',
-                symbol=str(res['symbol']) if res['symbol'] else '',
-                asset_class=str(res['asset_class']) if res['asset_class'] else '',
-                notional=float(res['notional']) if res['notional'] else 0,
-                qty=float(res['qty']) if res['qty'] else 0,
-                filled_qty=float(res['filled_qty']) if res['filled_qty'] else 0,
-                filled_avg_price=float(res['filled_avg_price']) if res['filled_avg_price'] else 0,
-                order_class=str(res['order_class']) if res['order_class'] else '',
-                order_type=str(res['order_type']) if res['order_type'] else '',
-                type=str(res['type']) if res['type'] else '',
-                side=str(res['side']) if res['side'] else '',
-                time_in_force=str(res['time_in_force']) if res['time_in_force'] else '',
-                limit_price=float(res['limit_price']) if res['limit_price'] else 0,
-                stop_price=float(res['stop_price']) if res['stop_price'] else 0,
-                status=str(res['status']) if res['status'] else '',
-                extended_hours=bool(res['extended_hours']),
-                legs=object(res['legs']) if res['legs'] else {},
-                trail_percent=float(res['trail_percent']) if res['trail_percent'] else 0,
-                trail_price=float(res['trail_price']) if res['trail_price'] else 0,
-                hwm=float(res['hwm']) if res['hwm'] else 0,
-                subtag=str(res['subtag']) if res['subtag'] else '',
-                source=str(res['source']) if res['source'] else ''
-            )
+            return order_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
@@ -149,20 +168,7 @@ class PyAlpacaApi:
             # Convert JSON response to dictionary
             res = json.loads(response.text)
             # Return asset information as an AssetClass object
-            return AssetClass(
-                id=str(res['id']) if res['id'] else '',
-                asset_class=str(res['class']) if res['class'] else '',
-                easy_to_borrow=bool(res['easy_to_borrow']),
-                exchange=str(res['exchange']) if res['exchange'] else '',
-                fractionable=bool(res['fractionable']),
-                maintenance_margin_requirement=float(res['maintenance_margin_requirement']) if res['maintenance_margin_requirement'] else 0,
-                marginable=bool(res['marginable']),
-                name=str(res['name']) if res['name'] else '',
-                shortable=bool(res['shortable']),
-                status=str(res['status']) if res['status'] else '',
-                symbol=str(res['symbol']) if res['symbol'] else '',
-                tradable=bool(res['tradable'])
-            )
+            return asset_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
             raise ValueError(f'Failed to get asset information. Response: {response.text}')
@@ -191,50 +197,7 @@ class PyAlpacaApi:
             # Convert JSON response to dictionary
             res = json.loads(response.text)
             # Return account information as an AccountClass object
-            return AccountClass(
-                id=str(res['id']) if res['id'] else '',
-                admin_configurations=object(res['admin_configurations']) if res['admin_configurations'] else {},
-                user_configurations=object(res['user_configurations']) if res['user_configurations'] else {},
-                account_number=str(res['account_number']),
-                status=str(res['status']) if res['status'] else '',
-                crypto_status=str(res['crypto_status']) if res['crypto_status'] else '',
-                options_approved_level=int(res['options_approved_level']) if res['options_approved_level'] else None,
-                options_trading_level=int(res['options_trading_level']) if res['options_trading_level'] else None,
-                currency=str(res['currency']) if res['currency'] else '',
-                buying_power=float(res['buying_power']) if res['buying_power'] else None,
-                regt_buying_power=float(res['regt_buying_power']) if res['regt_buying_power'] else None,
-                daytrading_buying_power=float(res['daytrading_buying_power']) if res['daytrading_buying_power'] else None,
-                effective_buying_power=float(res['effective_buying_power']) if res['effective_buying_power'] else None,
-                non_marginable_buying_power=float(res['non_marginable_buying_power']) if res['non_marginable_buying_power'] else None,
-                options_buying_power=float(res['options_buying_power']) if res['options_buying_power'] else None,
-                bod_dtbp=float(res['bod_dtbp']) if res['bod_dtbp'] else None,
-                cash=float(res['cash']) if res['cash'] else None,
-                accrued_fees=float(res['accrued_fees']) if res['accrued_fees'] else None,
-                pending_transfer_in=float(res['pending_transfer_in']) if res['pending_transfer_in'] else None,
-                portfolio_value=float(res['portfolio_value']) if res['portfolio_value'] else None,
-                pattern_day_trader=bool(res['pattern_day_trader']),
-                trading_blocked=bool(res['trading_blocked']),
-                transfers_blocked=bool(res['transfers_blocked']),
-                account_blocked=bool(res['account_blocked']),
-                created_at=res['created_at'].split('.')[0].replace('T', ' ') if res['created_at'] else None,
-                trade_suspended_by_user=bool(res['trade_suspended_by_user']),
-                multiplier=int(res['multiplier']) if res['multiplier'] else None,
-                shorting_enabled=bool(res['shorting_enabled']),
-                equity=float(res['equity']) if res['equity'] else None,
-                last_equity=float(res['last_equity']) if res['last_equity'] else None,
-                long_market_value=float(res['long_market_value']) if res['long_market_value'] else None,
-                short_market_value=float(res['short_market_value']) if res['short_market_value'] else None,
-                position_market_value=float(res['position_market_value']) if res['position_market_value'] else None,
-                initial_margin=float(res['initial_margin']) if res['initial_margin'] else None,
-                maintenance_margin=float(res['maintenance_margin']) if res['maintenance_margin'] else None,
-                last_maintenance_margin=float(res['last_maintenance_margin']) if res['last_maintenance_margin'] else None,
-                sma=float(res['sma']) if res['sma'] else None,
-                daytrade_count=int(res['daytrade_count']) if res['daytrade_count'] else None,
-                balance_asof=str(res['balance_asof']) if res['balance_asof'] else '',
-                crypto_tier=int(res['crypto_tier']) if res['crypto_tier'] else None,
-                intraday_adjustments=int(res['intraday_adjustments']) if res['intraday_adjustments'] else None,
-                pending_reg_taf_fees=float(res['pending_reg_taf_fees']) if res['pending_reg_taf_fees'] else None
-            )
+            return account_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
             raise Exception(f'Failed to get account information. Response: {response.text}')
