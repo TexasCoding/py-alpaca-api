@@ -21,7 +21,30 @@ pytest = "^8.2.0"
 requests-mock = "^1.12.1"
 sphinx = "^7.3.7"
 sphinx-rtd-theme = "^2.0.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+
+
+[tool.poetry.group.test.dependencies]
+flake8 = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 79
+exclude = '''
+/(
+\.git
+| \.hg
+| \.mypy_cache
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+| dist
+| docs
+)/
+'''

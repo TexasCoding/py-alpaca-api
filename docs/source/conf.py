@@ -1,23 +1,31 @@
 # Configuration file for the Sphinx documentation builder.
 #
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../..'))
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Py-Alpaca-API'
+project = 'Py Alpaca API'
 copyright = '2024, TexasCoding'
 author = 'TexasCoding'
 release = '0.2.2'
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = []
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx'
+]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = []
 
 
 
