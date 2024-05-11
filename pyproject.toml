@@ -3,7 +3,11 @@ name = "py-alpaca-api"
 version = "0.2.0"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
+license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/TexasCoding/py-alpaca-api"
+repository = "https://github.com/TexasCoding/py-alpaca-api"
+keywords = ["alpaca", "python"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
