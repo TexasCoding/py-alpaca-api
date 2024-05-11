@@ -2,6 +2,43 @@ from dataclasses import dataclass
 from datetime import datetime
 
 @dataclass
+class OrderClass:
+    id: str
+    client_order_id: str
+    created_at: datetime
+    updated_at: datetime
+    submitted_at: datetime
+    filled_at: datetime
+    expired_at: datetime
+    canceled_at: datetime
+    failed_at: datetime
+    replaced_at: datetime
+    replaced_by: str
+    replaces: str
+    asset_id: str
+    symbol: str
+    asset_class: str
+    notional: float
+    qty: float
+    filled_qty: float
+    filled_avg_price: float
+    order_class: str
+    order_type: str
+    type: str
+    side: str
+    time_in_force: str
+    limit_price: float
+    stop_price: float
+    status: str
+    extended_hours: bool
+    legs: object
+    trail_percent: float
+    trail_price: float
+    hwm: float
+    subtag: str
+    source: str
+
+@dataclass
 class AssetClass:
     id: str
     asset_class: str

@@ -1,7 +1,7 @@
 import requests
 import json
 
-from py_alpaca_api.src.data_classes import AccountClass, AssetClass
+from py_alpaca_api.src.data_classes import AccountClass, AssetClass, OrderClass
 
 # PyAlpacaApi class
 class PyAlpacaApi:
@@ -30,13 +30,109 @@ class PyAlpacaApi:
             self.trade_url  = 'https://api.alpaca.markets/v2'
             self.data_url   = 'https://data.alpaca.markets/v2'
 
+    ########################################################
+    #\\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
+    ########################################################
+    def cancel_all_orders(self):
+        '''
+        Cancel all orders
+        return: Number of orders cancelled
+        '''
+        # Alpaca API URL for canceling all orders
+        url = f'{self.trade_url}/orders'
+        # Delete request to Alpaca API for canceling all orders
+        response = requests.delete(url, headers=self.headers)
+        # Check if response is successful
+        res = json.loads(response.text)
+        return f"{len(res)} orders have been cancelled"
 
+    ########################################################
+    #\\\\\\\\\\\\\\\\  Submit Market Order ////////////////#
+    ########################################################
+    def market_order(self, symbol: str, qty: float=None, notional: float=None, side: str='buy', time_in_force: str = 'day', extended_hours: bool = False):
+        '''
+        Submit a market order
+        symbol: Asset symbol to buy/sell
+        qty: Quantity of asset to buy/sell (default: None)
+        notional: Notional value of asset to buy/sell (default: None)
+        side: Order side (buy/sell) (default: buy)
+        time_in_force: Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+        extended_hours: Extended hours trading (default: False)
+        return: MarketOrderClass object with
+        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price, 
+                order_class, order_type
+        Exception: Exception if failed to submit market order
+        '''
+        # Alpaca API URL for submitting market order
+        url = f'{self.trade_url}/orders'
+        # Market order payload
+        payload = {
+            'symbol': symbol,
+            'qty': qty if qty else None,
+            'notional': round(notional, 2) if notional else None,
+            'side': side if side=='buy' else 'sell',
+            'type': 'market',
+            'time_in_force': time_in_force,
+            'extended_hours': extended_hours
+        }
+        # Post request to Alpaca API for submitting market order
+        response = requests.post(url, headers=self.headers, json=payload)
+        # Check if response is successful
+        if response.status_code == 200:
+            # Convert JSON response to dictionary
+            res = json.loads(response.text)
+            # Return market order information as a MarketOrderClass object
+            return OrderClass(
+                id=res['id'],
+                client_order_id=res['client_order_id'],
+                created_at=res['created_at'].split('.')[0].replace('T', ' ') if res['created_at'] else None,
+                updated_at=res['updated_at'].split('.')[0].replace('T', ' ') if res['updated_at'] else None,
+                submitted_at=res['submitted_at'].split('.')[0].replace('T', ' ') if res['submitted_at'] else None,
+                filled_at=res['filled_at'].split('.')[0].replace('T', ' ') if res['filled_at'] else None,
+                expired_at=res['expired_at'].split('.')[0].replace('T', ' ') if res['expired_at'] else None,
+                canceled_at=res['canceled_at'].split('.')[0].replace('T', ' ') if res['canceled_at'] else None,
+                failed_at=res['failed_at'].split('.')[0].replace('T', ' ') if res['failed_at'] else None,
+                replaced_at=res['replaced_at'].split('.')[0].replace('T', ' ') if res['replaced_at'] else None,
+                replaced_by=res['replaced_by'].split('.')[0].replace('T', ' ') if res['replaced_by'] else None,
+                replaces=res['replaces'],
+                asset_id=res['asset_id'],
+                symbol=res['symbol'],
+                asset_class=res['asset_class'],
+                notional=float(res['notional']) if res['notional'] else None,
+                qty=float(res['qty']) if res['qty'] else None,
+                filled_qty=float(res['filled_qty']) if res['filled_qty'] else None,
+                filled_avg_price=float(res['filled_avg_price']) if res['filled_avg_price'] else None,
+                order_class=res['order_class'],
+                order_type=res['order_type'],
+                type=res['type'],
+                side=res['side'],
+                time_in_force=res['time_in_force'],
+                limit_price=float(res['limit_price']) if res['limit_price'] else None,
+                stop_price=float(res['stop_price']) if res['stop_price'] else None,
+                status=res['status'],
+                extended_hours=bool(res['extended_hours']),
+                legs=res['legs'],
+                trail_percent=float(res['trail_percent']) if res['trail_percent'] else None,
+                trail_price=float(res['trail_price']) if res['trail_price'] else None,
+                hwm=float(res['hwm']) if res['hwm'] else None,
+                subtag=res['subtag'],
+                source=res['source']
+            )
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to submit market order. Code: {response.status_code}, Response: {res["message"]}')
+        
+    #####################################################
+    #\\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
+    #####################################################
     def get_asset(self, symbol: str):
         '''
         Get asset information
         symbol: Asset symbol
         return: AssetClass object with
         values: id, class, exchange, symbol, status, tradable, marginable, shortable, easy_to_borrow, fractionable
+        Execption: ValueError if failed to get asset information
         '''
         # Alpaca API URL for asset information
         url = f'{self.trade_url}/assets/{symbol}'
@@ -50,16 +146,16 @@ class PyAlpacaApi:
             return AssetClass(
                 id=res['id'],
                 asset_class=res['class'],
-                easy_to_borrow=res['easy_to_borrow'],
+                easy_to_borrow=bool(res['easy_to_borrow']),
                 exchange=res['exchange'],
-                fractionable=res['fractionable'],
-                maintenance_margin_requirement=res['maintenance_margin_requirement'],
-                marginable=res['marginable'],
+                fractionable=bool(res['fractionable']),
+                maintenance_margin_requirement=float(res['maintenance_margin_requirement']) if res['maintenance_margin_requirement'] else None,
+                marginable=bool(res['marginable']),
                 name=res['name'],
-                shortable=res['shortable'],
+                shortable=bool(res['shortable']),
                 status=res['status'],
                 symbol=res['symbol'],
-                tradable=res['tradable']
+                tradable=bool(res['tradable'])
             )
         # If response is not successful, raise an exception
         else:
@@ -78,6 +174,7 @@ class PyAlpacaApi:
                 pattern_day_trader, trading_blocked, transfers_blocked, account_blocked, created_at, trade_suspended_by_user, multiplier, 
                 shorting_enabled, equity, last_equity, long_market_value, short_market_value, position_market_value, initial_margin, 
                 maintenance_margin, last_maintenance_margin, sma, daytrade_count, balance_asof, crypto_tier, intraday_adjustments, pending_reg_taf_fees  
+        Exception: Exception if failed to get account information
         '''
         # Alpaca API URL for account information
         url = f'{self.trade_url}/account'
@@ -92,45 +189,45 @@ class PyAlpacaApi:
                 id=res['id'],
                 admin_configurations=res['admin_configurations'],
                 user_configurations=res['user_configurations'],
-                account_number=res['account_number'],
-                status=res['status'],
+                account_number=str(res['account_number']),
+                status=str(res['status']),
                 crypto_status=res['crypto_status'],
-                options_approved_level=res['options_approved_level'],
-                options_trading_level=res['options_trading_level'],
+                options_approved_level=int(res['options_approved_level']) if res['options_approved_level'] else None,
+                options_trading_level=int(res['options_trading_level']) if res['options_trading_level'] else None,
                 currency=res['currency'],
-                buying_power=res['buying_power'],
-                regt_buying_power=res['regt_buying_power'],
-                daytrading_buying_power=res['daytrading_buying_power'],
-                effective_buying_power=res['effective_buying_power'],
-                non_marginable_buying_power=res['non_marginable_buying_power'],
-                options_buying_power=res['options_buying_power'],
-                bod_dtbp=res['bod_dtbp'],
-                cash=res['cash'],
-                accrued_fees=res['accrued_fees'],
-                pending_transfer_in=res['pending_transfer_in'],
-                portfolio_value=res['portfolio_value'],
-                pattern_day_trader=res['pattern_day_trader'],
-                trading_blocked=res['trading_blocked'],
-                transfers_blocked=res['transfers_blocked'],
-                account_blocked=res['account_blocked'],
-                created_at=res['created_at'],
-                trade_suspended_by_user=res['trade_suspended_by_user'],
-                multiplier=res['multiplier'],
-                shorting_enabled=res['shorting_enabled'],
-                equity=res['equity'],
-                last_equity=res['last_equity'],
-                long_market_value=res['long_market_value'],
-                short_market_value=res['short_market_value'],
-                position_market_value=res['position_market_value'],
-                initial_margin=res['initial_margin'],
-                maintenance_margin=res['maintenance_margin'],
-                last_maintenance_margin=res['last_maintenance_margin'],
-                sma=res['sma'],
-                daytrade_count=res['daytrade_count'],
+                buying_power=float(res['buying_power']) if res['buying_power'] else None,
+                regt_buying_power=float(res['regt_buying_power']) if res['regt_buying_power'] else None,
+                daytrading_buying_power=float(res['daytrading_buying_power']) if res['daytrading_buying_power'] else None,
+                effective_buying_power=float(res['effective_buying_power']) if res['effective_buying_power'] else None,
+                non_marginable_buying_power=float(res['non_marginable_buying_power']) if res['non_marginable_buying_power'] else None,
+                options_buying_power=float(res['options_buying_power']) if res['options_buying_power'] else None,
+                bod_dtbp=float(res['bod_dtbp']) if res['bod_dtbp'] else None,
+                cash=float(res['cash']) if res['cash'] else None,
+                accrued_fees=float(res['accrued_fees']) if res['accrued_fees'] else None,
+                pending_transfer_in=float(res['pending_transfer_in']) if res['pending_transfer_in'] else None,
+                portfolio_value=float(res['portfolio_value']) if res['portfolio_value'] else None,
+                pattern_day_trader=bool(res['pattern_day_trader']),
+                trading_blocked=bool(res['trading_blocked']),
+                transfers_blocked=bool(res['transfers_blocked']),
+                account_blocked=bool(res['account_blocked']),
+                created_at=res['created_at'].split('.')[0].replace('T', ' ') if res['created_at'] else None,
+                trade_suspended_by_user=bool(res['trade_suspended_by_user']),
+                multiplier=int(res['multiplier']) if res['multiplier'] else None,
+                shorting_enabled=bool(res['shorting_enabled']),
+                equity=float(res['equity']) if res['equity'] else None,
+                last_equity=float(res['last_equity']) if res['last_equity'] else None,
+                long_market_value=float(res['long_market_value']) if res['long_market_value'] else None,
+                short_market_value=float(res['short_market_value']) if res['short_market_value'] else None,
+                position_market_value=float(res['position_market_value']) if res['position_market_value'] else None,
+                initial_margin=float(res['initial_margin']) if res['initial_margin'] else None,
+                maintenance_margin=float(res['maintenance_margin']) if res['maintenance_margin'] else None,
+                last_maintenance_margin=float(res['last_maintenance_margin']) if res['last_maintenance_margin'] else None,
+                sma=float(res['sma']) if res['sma'] else None,
+                daytrade_count=int(res['daytrade_count']) if res['daytrade_count'] else None,
                 balance_asof=res['balance_asof'],
-                crypto_tier=res['crypto_tier'],
-                intraday_adjustments=res['intraday_adjustments'],
-                pending_reg_taf_fees=res['pending_reg_taf_fees']
+                crypto_tier=int(res['crypto_tier']) if res['crypto_tier'] else None,
+                intraday_adjustments=int(res['intraday_adjustments']) if res['intraday_adjustments'] else None,
+                pending_reg_taf_fees=float(res['pending_reg_taf_fees']) if res['pending_reg_taf_fees'] else None
             )
         # If response is not successful, raise an exception
         else:

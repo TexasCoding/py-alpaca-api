@@ -1,6 +1,6 @@
 import pytest
 from py_alpaca_api.alpaca import PyAlpacaApi
-from py_alpaca_api.src.data_classes import AccountClass, AssetClass
+from py_alpaca_api.src.data_classes import AccountClass, AssetClass, OrderClass
 
 api_key = 'PKVJG5S58PTM6MQEQH9L'
 api_secret = 'YmWLk2WnQja1DCOlOGGUdeTRfWUX7k3zB34kobR6'
@@ -13,6 +13,9 @@ def alpaca():
 def alpaca_wrong_keys():
     return PyAlpacaApi(api_key='api_key', api_secret='api_secret', api_paper=True)
 
+#########################################
+##### Test cases for PyAlpacaApi ########
+#########################################
 def test_alpaca_key_exceptions(alpaca):
     with pytest.raises(ValueError):
         alpaca = PyAlpacaApi(api_key='', api_secret=api_secret, api_paper=True)
@@ -22,7 +25,37 @@ def test_alpaca_key_exceptions(alpaca):
 def test_get_account_wrong_keys(alpaca_wrong_keys):
     with pytest.raises(Exception):
         account = alpaca_wrong_keys.get_account()
+###########################################
+# Test cases for PyAlpacaApi.market_order #
+###########################################
+def test_qty_market_order(alpaca):
+    order = alpaca.market_order(symbol='AAPL', qty=0.01, side='buy')
+    assert isinstance(order, OrderClass)
+    assert order.status == 'accepted'
+    assert order.qty == 0.01
 
+def test_notional_market_order(alpaca):
+    order = alpaca.market_order(symbol='AAPL', notional=2.00, side='buy')
+    assert isinstance(order, OrderClass)
+    assert order.status == 'accepted'
+    assert order.notional == 2.00
+
+def test_fake_value_market_order(alpaca):
+    with pytest.raises(Exception):
+        alpaca.market_order(symbol='FAKESYM', notional=2.00, side='buy')
+
+def test_no_money_value_market_order(alpaca):
+    with pytest.raises(Exception):
+        alpaca.market_order(symbol='AAPL', qty=200.00, side='buy')
+###########################################
+# Test cases for PyAlpacaApi.limit_order #
+###########################################
+def test_cancel_all_orders(alpaca):
+    account = alpaca.cancel_all_orders()
+    assert 'orders have been cancelled' in account
+########################################
+# Test cases for PyAlpacaApi.get_asset #
+########################################
 def test_get_asset_invalid_symbol(alpaca):
     with pytest.raises(ValueError):
         asset = alpaca.get_asset('INVALID')
@@ -45,7 +78,9 @@ def test_get_asset_attributes(alpaca):
     assert hasattr(asset, 'status')
     assert hasattr(asset, 'symbol')
     assert hasattr(asset, 'tradable')
-
+##########################################
+# Test cases for PyAlpacaApi.get_account #
+##########################################
 def test_get_account(alpaca):
     account = alpaca.get_account()
     assert isinstance(account, AccountClass)
