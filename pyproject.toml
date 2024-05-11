@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "py-alpaca-api"
+version = "0.1.0"
+description = ""
+authors = ["TexasCoding <jeff10278@me.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+requests = "^2.31.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+requests-mock = "^1.12.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
