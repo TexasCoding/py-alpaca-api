@@ -24,9 +24,7 @@ def alpaca():
 
 @pytest.fixture
 def alpaca_wrong_keys():
-    return PyAlpacaApi(
-        api_key="api_key", api_secret="api_secret", api_paper=True
-    )
+    return PyAlpacaApi(api_key="api_key", api_secret="api_secret", api_paper=True)
 
 
 @pytest.fixture
@@ -53,9 +51,7 @@ def test_get_account_wrong_keys(alpaca_wrong_keys):
 # Test cases for PyAlpacaApi.get_stock_historical_data #
 ########################################################
 def test_get_stock_historical_data_1d(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="1d"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="1d")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -70,9 +66,7 @@ def test_get_stock_historical_data_1d(alpaca):
 
 
 def test_get_stock_historical_data_1w(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="1w"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="1w")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -87,9 +81,7 @@ def test_get_stock_historical_data_1w(alpaca):
 
 
 def test_get_stock_historical_data_1m(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="1m"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="1m")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -104,9 +96,7 @@ def test_get_stock_historical_data_1m(alpaca):
 
 
 def test_get_stock_historical_data_5m(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="5m"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="5m")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -121,9 +111,7 @@ def test_get_stock_historical_data_5m(alpaca):
 
 
 def test_get_stock_historical_data_15m(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="15m"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="15m")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -138,9 +126,7 @@ def test_get_stock_historical_data_15m(alpaca):
 
 
 def test_get_stock_historical_data_30m(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="30m"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="30m")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -155,9 +141,7 @@ def test_get_stock_historical_data_30m(alpaca):
 
 
 def test_get_stock_historical_data_1h(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="1h"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="1h")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -172,9 +156,7 @@ def test_get_stock_historical_data_1h(alpaca):
 
 
 def test_get_stock_historical_data_4h(alpaca):
-    stock_data = alpaca.get_stock_historical_data(
-        symbol="AAPL", start=month_ago, end=previous_day, timeframe="4h"
-    )
+    stock_data = alpaca.get_stock_historical_data(symbol="AAPL", start=month_ago, end=previous_day, timeframe="4h")
     assert not stock_data.empty
     assert stock_data["symbol"][0] == "AAPL"
     assert isinstance(stock_data["close"][0], float)
@@ -249,9 +231,7 @@ def test_no_money_value_market_order(alpaca):
 # Test cases for PyAlpacaApi.limit_order #
 ###########################################
 def test_limit_order_with_qty(alpaca):
-    order = alpaca.limit_order(
-        symbol="AAPL", qty=0.1, side="buy", limit_price=200.00
-    )
+    order = alpaca.limit_order(symbol="AAPL", qty=0.1, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
     assert order.type == "limit"
@@ -260,9 +240,7 @@ def test_limit_order_with_qty(alpaca):
 
 
 def test_limit_order_with_notional(alpaca):
-    order = alpaca.limit_order(
-        symbol="AAPL", notional=2.00, side="buy", limit_price=200.00
-    )
+    order = alpaca.limit_order(symbol="AAPL", notional=2.00, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
     assert order.type == "limit"
@@ -272,17 +250,13 @@ def test_limit_order_with_notional(alpaca):
 
 def test_limit_order_with_fake_symbol(alpaca):
     with pytest.raises(Exception):
-        alpaca.limit_order(
-            symbol="FAKESYM", notional=2.00, side="buy", limit_price=200.00
-        )
+        alpaca.limit_order(symbol="FAKESYM", notional=2.00, side="buy", limit_price=200.00)
     alpaca.cancel_all_orders()
 
 
 def test_limit_order_with_no_money(alpaca):
     with pytest.raises(Exception):
-        alpaca.limit_order(
-            symbol="AAPL", qty=2000, side="buy", limit_price=200.00
-        )
+        alpaca.limit_order(symbol="AAPL", qty=2000, side="buy", limit_price=200.00)
     alpaca.cancel_all_orders()
 
 
@@ -290,29 +264,23 @@ def test_limit_order_with_no_money(alpaca):
 # Test cases for PyAlpacaApi.stop_order #
 ###########################################
 def test_stop_order_with_qty(alpaca):
-    order = alpaca.stop_order(
-        symbol="AAPL", qty=0.1, side="buy", stop_price=200.00
-    )
+    order = alpaca.stop_order(symbol="AAPL", qty=1, side="buy", stop_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
     assert order.type == "stop"
-    assert order.qty == 0.1
+    assert order.qty == 1
     alpaca.cancel_all_orders()
 
 
 def test_stop_order_with_fake_symbol(alpaca):
     with pytest.raises(Exception):
-        alpaca.stop_order(
-            symbol="FAKESYM", notional=2.00, side="buy", stop_price=200.00
-        )
+        alpaca.stop_order(symbol="FAKESYM", notional=2.00, side="buy", stop_price=200.00)
     alpaca.cancel_all_orders()
 
 
 def test_stop_order_with_no_money(alpaca):
     with pytest.raises(Exception):
-        alpaca.stop_order(
-            symbol="AAPL", qty=2000, side="buy", stop_price=200.00
-        )
+        alpaca.stop_order(symbol="AAPL", qty=2000, side="buy", stop_price=200.00)
     alpaca.cancel_all_orders()
 
 

@@ -108,9 +108,7 @@ class PyAlpacaApi:
                 timeframe = "1Month"
             case _:
                 # Raise exception if invalid timeframe is provided
-                raise ValueError(
-                    'Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1m"'
-                )
+                raise ValueError('Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1m"')
         # Parameters for historical stock data request
         params = {
             "timeframe": timeframe,  # Timeframe for historical data, default: 1d
@@ -138,9 +136,7 @@ class PyAlpacaApi:
         # Add symbol column to DataFrame
         bar_data_df.insert(0, "symbol", symbol)
         # Reformat date column
-        bar_data_df["t"] = pd.to_datetime(
-            bar_data_df["t"].replace("[A-Za-z]", " ", regex=True)
-        )
+        bar_data_df["t"] = pd.to_datetime(bar_data_df["t"].replace("[A-Za-z]", " ", regex=True))
         # Rename columns for consistency
         bar_data_df.rename(
             columns={
@@ -201,9 +197,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise ValueError(
-                f'Failed to get order information. Response: {res["message"]}'
-            )
+            raise ValueError(f'Failed to get order information. Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
@@ -226,9 +220,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to cancel order {order_id}, Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to cancel order {order_id}, Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
@@ -251,9 +243,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to cancel orders. Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Market Order ////////////////#
@@ -303,9 +293,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to submit market order. Code: {response.status_code}, Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to submit market order. Code: {response.status_code}, Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Limit Order /////////////////#
@@ -340,15 +328,9 @@ class PyAlpacaApi:
         payload = {
             "symbol": symbol,  # Asset symbol to buy/sell
             "limit_price": limit_price,  # Limit price for the order
-            "qty": (
-                qty if qty else None
-            ),  # Check if qty is provided, if not, set to None
-            "notional": (
-                round(notional, 2) if notional else None
-            ),  # Round notional to 2 decimal places, if notional is provided
-            "side": (
-                side if side == "buy" else "sell"
-            ),  # Check if side is buy or sell
+            "qty": (qty if qty else None),  # Check if qty is provided, if not, set to None
+            "notional": (round(notional, 2) if notional else None),  # Round notional to 2 decimal places, if notional is provided
+            "side": (side if side == "buy" else "sell"),  # Check if side is buy or sell
             "type": "limit",  # Order type is limit
             "time_in_force": time_in_force,  # Time in force options, default: day
             "extended_hours": extended_hours,  # Extended hours trading, default: False
@@ -364,9 +346,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Stop Order /////////////////#
@@ -400,9 +380,7 @@ class PyAlpacaApi:
             "symbol": symbol,  # Asset symbol to buy/sell
             "stop_price": stop_price,  # Stop price for the order
             "qty": qty,  # Quantity of asset to buy/sell
-            "side": (
-                side if side == "buy" else "sell"
-            ),  # Check if side is buy or sell
+            "side": (side if side == "buy" else "sell"),  # Check if side is buy or sell
             "type": "stop",  # Order type is stop
             "time_in_force": time_in_force,  # Time in force options, default: day
             "extended_hours": extended_hours,  # Extended hours trading, default: False
@@ -418,9 +396,7 @@ class PyAlpacaApi:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}')
 
     #####################################################
     # \\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
@@ -445,9 +421,7 @@ class PyAlpacaApi:
             return asset_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise ValueError(
-                f"Failed to get asset information. Response: {response.text}"
-            )
+            raise ValueError(f"Failed to get asset information. Response: {response.text}")
 
     ########################################################
     # \\\\\\\\\\\\\  Get Account Information ///////////////#
@@ -477,6 +451,4 @@ class PyAlpacaApi:
             return account_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise Exception(
-                f"Failed to get account information. Response: {response.text}"
-            )
+            raise Exception(f"Failed to get account information. Response: {response.text}")
