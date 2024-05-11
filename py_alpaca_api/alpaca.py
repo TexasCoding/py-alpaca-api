@@ -117,7 +117,7 @@ class PyAlpacaApi:
                 stop_price=float(res['stop_price']) if res['stop_price'] else 0,
                 status=res['status'],
                 extended_hours=bool(res['extended_hours']),
-                legs=res['legs'],
+                legs=object(res['legs']) if res['legs'] else {},
                 trail_percent=float(res['trail_percent']) if res['trail_percent'] else 0,
                 trail_price=float(res['trail_price']) if res['trail_price'] else 0,
                 hwm=float(res['hwm']) if res['hwm'] else 0,
