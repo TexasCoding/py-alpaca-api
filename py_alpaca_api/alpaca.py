@@ -43,8 +43,14 @@ class PyAlpacaApi:
         # Delete request to Alpaca API for canceling all orders
         response = requests.delete(url, headers=self.headers)
         # Check if response is successful
-        res = json.loads(response.text)
-        return f"{len(res)} orders have been cancelled"
+        if response.status_code == 207:
+            # Convert JSON response to dictionary
+            res = json.loads(response.text)
+            return f"{len(res)} orders have been cancelled"
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
 
     ########################################################
     #\\\\\\\\\\\\\\\\  Submit Market Order ////////////////#
@@ -83,7 +89,7 @@ class PyAlpacaApi:
             res = json.loads(response.text)
             # Return market order information as a MarketOrderClass object
             return OrderClass(
-                id=res['id'],
+                id=str(res['id']) if res['id'] else '',
                 client_order_id=res['client_order_id'],
                 created_at=res['created_at'].split('.')[0].replace('T', ' ') if res['created_at'] else None,
                 updated_at=res['updated_at'].split('.')[0].replace('T', ' ') if res['updated_at'] else None,
@@ -94,18 +100,18 @@ class PyAlpacaApi:
                 failed_at=res['failed_at'].split('.')[0].replace('T', ' ') if res['failed_at'] else None,
                 replaced_at=res['replaced_at'].split('.')[0].replace('T', ' ') if res['replaced_at'] else None,
                 replaced_by=res['replaced_by'].split('.')[0].replace('T', ' ') if res['replaced_by'] else None,
-                replaces=res['replaces'],
-                asset_id=res['asset_id'],
-                symbol=res['symbol'],
-                asset_class=res['asset_class'],
+                replaces=str(res['replaces']) if res['replaces'] else '',
+                asset_id=str(res['asset_id']) if res['asset_id'] else '',
+                symbol=str(res['symbol']) if res['symbol'] else '',
+                asset_class=str(res['asset_class']) if res['asset_class'] else '',
                 notional=float(res['notional']) if res['notional'] else None,
                 qty=float(res['qty']) if res['qty'] else None,
                 filled_qty=float(res['filled_qty']) if res['filled_qty'] else None,
                 filled_avg_price=float(res['filled_avg_price']) if res['filled_avg_price'] else None,
-                order_class=res['order_class'],
+                order_class=str(res['order_class']) if res['order_class'] else '',
                 order_type=res['order_type'],
-                type=res['type'],
-                side=res['side'],
+                type=str(res['type']),
+                side=str(res['side']),
                 time_in_force=res['time_in_force'],
                 limit_price=float(res['limit_price']) if res['limit_price'] else None,
                 stop_price=float(res['stop_price']) if res['stop_price'] else None,
