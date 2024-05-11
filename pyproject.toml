@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-alpaca-api"
-version = "0.2.0"
+version = "0.2.1"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
 license = "MIT"
@@ -13,6 +13,7 @@ keywords = ["alpaca", "python"]
 python = "^3.12"
 pandas = "^2.2.2"
 requests = "^2.31.0"
+numpy = "^1.26.4"
 
 
 [tool.poetry.group.dev.dependencies]
