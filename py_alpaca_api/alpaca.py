@@ -109,20 +109,20 @@ class PyAlpacaApi:
                 filled_qty=float(res['filled_qty']) if res['filled_qty'] else 0,
                 filled_avg_price=float(res['filled_avg_price']) if res['filled_avg_price'] else 0,
                 order_class=str(res['order_class']) if res['order_class'] else '',
-                order_type=res['order_type'],
-                type=str(res['type']),
-                side=str(res['side']),
+                order_type=str(res['order_type']) if res['order_type'] else '',
+                type=str(res['type']) if res['type'] else '',
+                side=str(res['side']) if res['side'] else '',
                 time_in_force=res['time_in_force'],
                 limit_price=float(res['limit_price']) if res['limit_price'] else 0,
                 stop_price=float(res['stop_price']) if res['stop_price'] else 0,
-                status=res['status'],
+                status=str(res['status']) if res['status'] else '',
                 extended_hours=bool(res['extended_hours']),
                 legs=object(res['legs']) if res['legs'] else {},
                 trail_percent=float(res['trail_percent']) if res['trail_percent'] else 0,
                 trail_price=float(res['trail_price']) if res['trail_price'] else 0,
                 hwm=float(res['hwm']) if res['hwm'] else 0,
-                subtag=res['subtag'],
-                source=res['source']
+                subtag=str(res['subtag']) if res['subtag'] else '',
+                source=str(res['source']) if res['source'] else ''
             )
         # If response is not successful, raise an exception
         else:
