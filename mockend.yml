@@ -1,4 +1,4 @@
 models:
   Account:
-    data: [{id: 'DKFJLKDJFLKJ'}]
+    [{id: 'DKFJLKDJFLKJ'}]
       
