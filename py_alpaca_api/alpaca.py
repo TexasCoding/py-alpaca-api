@@ -6,6 +6,7 @@ import requests
 from .src.data_classes import (
     account_class_from_dict,
     asset_class_from_dict,
+    clock_class_from_dict,
     order_class_from_dict,
     position_class_from_dict,
 )
@@ -57,6 +58,23 @@ class PyAlpacaApi:
             self.trade_url = "https://api.alpaca.markets/v2"
 
         self.data_url = "https://data.alpaca.markets/v2"
+
+    ########################################################
+    # \\\\\\\\\\\\\\\\\ Market Clock //////////////////////#
+    ########################################################
+    def market_clock(self):
+        # Alpaca API URL for market clock
+        url = f"{self.trade_url}/clock"
+        # Get request to Alpaca API for market clock
+        response = requests.get(url, headers=self.headers)
+        # Check if response is successful
+        if response.status_code == 200:
+            # Return market clock status
+            return clock_class_from_dict(json.loads(response.text))
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to get market clock. Response: {res["message"]}')
 
     ############################
     # Get Stock Historical Data

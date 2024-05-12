@@ -4,6 +4,28 @@ from datetime import datetime
 
 @dataclass
 ############################################
+# Data Class for Clock
+############################################
+class ClockClass:
+    """Clock class data structure.
+
+    Attributes:
+    ----------
+
+    timestamp: datetime
+    is_open: bool
+    next_open: datetime
+    next_close: datetime
+    """  # noqa
+
+    market_time: datetime
+    is_open: bool
+    next_open: datetime
+    next_close: datetime
+
+
+@dataclass
+############################################
 # Data Class for Position
 ############################################
 class PositionClass:
@@ -268,6 +290,30 @@ class AccountClass:
     crypto_tier: int
     intraday_adjustments: int
     pending_reg_taf_fees: float
+
+
+############################################
+# Data Class Clock Conversion Functions
+############################################
+def clock_class_from_dict(data_dict):
+    """Converts a dictionary to a ClockClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the clock data.
+
+    Returns:
+    --------
+    ClockClass
+        A ClockClass object.
+    """  # noqa
+    return ClockClass(
+        market_time=(data_dict["timestamp"].split(".")[0].replace("T", " ") if data_dict["timestamp"] else ""),
+        is_open=bool(data_dict["is_open"]),
+        next_open=(data_dict["next_open"].replace("T", " ").replace("-04:00", "") if data_dict["next_open"] else ""),
+        next_close=(data_dict["next_close"].replace("-04:00", "").replace("T", " ") if data_dict["next_close"] else ""),
+    )
 
 
 ############################################
