@@ -45,6 +45,4 @@ repos:
           # https://flake8.pycqa.org/en/latest/user/error-codes.html
           - "--ignore=E203,E266,W503,F403"
 
-hooks:
-- id: poetry-export
-  args: ["--dev", "-f", "requirements.txt", "-o", "requirements.txt"]
+

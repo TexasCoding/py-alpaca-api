@@ -38,7 +38,7 @@
 
 ##  Overview
 
-The py-alpaca-api project is a Python library that simplifies interaction with the Alpaca API. It provides a robust interface, encapsulated in the `PyAlpacaApi` class, enabling developers to access Alpaca trading functionalities effortlessly. By utilizing data classes for orders, assets, and accounts, the project abstracts away complexities, enhancing flexibility in processing API responses. With clear metadata management through Poetry, this project serves as a valuable tool for those looking to integrate Alpaca trading capabilities seamlessly into their applications.
+The py-alpaca-api project is a Python library that simplifies interaction with the Alpaca API. It provides a robust interface, encapsulated in the `PyAlpacaApi` class, enabling developers to access Alpaca Market API trading functionalities effortlessly. By utilizing data classes for orders, assets, and accounts, the project abstracts away complexities, enhancing flexibility in processing API responses. With clear metadata management through Poetry, this project serves as a valuable tool for those looking to integrate Alpaca trading capabilities seamlessly into their applications.
 
 ---
 
@@ -132,6 +132,11 @@ The py-alpaca-api project is a Python library that simplifies interaction with t
 > ```
 >
 > 3. Install the dependencies:
+> Recommended way is to use poetry, to install all dependencies including dev
+> ```console
+> $ poetry install
+> ```
+> Using pip, this does not include -dev dependencies:
 > ```console
 > $ pip install -r requirements.txt
 > ```
@@ -140,9 +145,15 @@ The py-alpaca-api project is a Python library that simplifies interaction with t
 
 <h4>From <code>source</code></h4>
 
-> Run py-alpaca-api using the command below:
-> ```console
-> $ python main.py
+> Include PyAlpacaAPI in your app
+> ```python
+> from py_alpaca_api import PyAlpacaAPI
+>
+> alpaca = PyAlpacaAPI(api_key='ALPACA_API_KEY', api_secret='ALPACA_SECRET_KEY', api_paper=True)
+> asset = alpaca.get_asset('AAPL')
+> 
+> market_order = alpaca.market_order(symbol=asset.symbol, notional=200.23, side='buy')
+> print(market_order.status)
 > ```
 
 ###  Tests
@@ -156,9 +167,7 @@ The py-alpaca-api project is a Python library that simplifies interaction with t
 
 ##  Project Roadmap
 
-- [X] `► INSERT-TASK-1`
-- [ ] `► INSERT-TASK-2`
-- [ ] `► ...`
+- [X] `► Adding all functionality from Alpaca's API`
 
 ---
 
@@ -209,13 +218,13 @@ Contributions are welcome! Here are several ways you can contribute:
 
 ##  License
 
-This project is protected under the [SELECT-A-LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+This project is protected under the [MIT](https://choosealicense.com/licenses/mit/) License. For more details, refer to the [LICENSE](https://github.com/TexasCoding/py-alpaca-api/blob/master/LICENSE) file.
 
 ---
 
 ##  Acknowledgments
 
-- List any resources, contributors, inspiration, etc. here.
+
 
 [**Return**](#-overview)
 
