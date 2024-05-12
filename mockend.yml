@@ -1,65 +1,48 @@
 models:
   Account:
-    id: string: [5, 10]
-    admin_configurations: {}
-    user_configurations: {}
-    account_number: string: [5, 10]
-    status: active
-    crypto_status: active
-    options_approved_level: int: [0, 3]
-    options_trading_level: int: [0, 3]
-    currency: USD
-    buying_power: float: [1000, 10000]
-    regt_buying_power: float: [1000, 10000]
-    day_trade_buying_power: float: [1000, 10000]
-    effective_buying_power: float: [1000, 10000]
-    non_marginable_buying_power: float: [1000, 10000]
-    options_buying_power: float: [1000, 10000]
-    bod_dtbp: float: [1000, 10000]
-    cash: float: [1000, 10000]
-    accured_fees: float: [1000, 10000]
-    pending_transfer_in: float: [1000, 10000]
-    portfolio_value: float: [1000, 10000]
-    pattern_day_trader: bool
-    trading_blocked: bool
-    transfers_blocked: bool
-    account_blocked: bool
-    created_at: dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]
-    trade_suspended_by_user: bool
-    multiplier: float: [1, 10]
-    shorting_enabled: bool
-    equity: float: [1000, 10000]
-    last_equity: float: [1000, 10000]
-    long_market_value: float: [1000, 10000]
-    short_market_value: float: [1000, 10000]
-    position_market_value: float: [1000, 10000]
-    initial_margin: float: [1000, 10000]
-    maintenance_margin: float: [1000, 10000]
-    last_maintenance_margin: float: [1000, 10000]
-    sma: float: [1000, 10000]
-    day_trade_count: int: [0, 10]
-    last_maintenance_margin: float: [1000, 10000]
-    sma: float: [1000, 10000]
-    day_trade_count: int: [0, 10]
-    balance_asof: dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]
-    cryto_tier: int: [0, 3]
-    intraday_adjustments: int: [0, 3]
-    pending_reg_taf_fees: float: [1000, 10000]
-  Post:
-    hasMany: [Comment]
     fake:
-      _count: 10
-      cover: { imageURL: [1920, 1080] }
-      title: { loremWords: [5, 20] }
-      body: { loremParagraphs: [10, 100] }
-      category: { oneOfString: [one, two, three] }
-      isDraft: { bool: 20 }
-      views: { int: [0, 1000] }
-      createdAt: { dateTime: [2010-01-01T00:00:00Z, 2020-12-31T23:59:59Z] }
-  Comment:
-    belongsTo: [Post]
-    fake:
-      _count: 25
-      email: email
-      body: { loremParagraphs: [10, 100] }
-      createdAt: { dateTime: [2010-01-01T00:00:00Z, 2020-12-31T23:59:59Z] }
+      id: {string: [5, 10]}
+      admin_configurations: {}
+      user_configurations: {}
+      account_number: {string: [5, 10]}
+      status: active
+      crypto_status: active
+      options_approved_level: {int: [0, 3]}
+      options_trading_level: {int: [0, 3]}
+      currency: USD
+      buying_power: {{float: [1000, 10000]}}
+      regt_buying_power: {float: [1000, 10000]}
+      day_trade_buying_power: {float: [1000, 10000]}
+      effective_buying_power: {float: [1000, 10000]}
+      non_marginable_buying_power: {float: [1000, 10000]}
+      options_buying_power: {float: [1000, 10000]}
+      bod_dtbp: {float: [1000, 10000]}
+      cash: {float: [1000, 10000]}
+      accured_fees: {float: [1000, 10000]}
+      pending_transfer_in: {float: [1000, 10000]}
+      portfolio_value: {float: [1000, 10000]}
+      pattern_day_trader: bool
+      trading_blocked: bool
+      transfers_blocked: bool
+      account_blocked: bool
+      created_at: {dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]}
+      trade_suspended_by_user: bool
+      multiplier: float: [1, 10]
+      shorting_enabled: bool
+      equity: {float: [1000, 10000]}
+      last_equity: {float: [1000, 10000]}
+      long_market_value: {float: [1000, 10000]}
+      short_market_value: {float: [1000, 10000]}
+      position_market_value: {float: [1000, 10000]}
+      initial_margin: {float: [1000, 10000]}
+      maintenance_margin: {float: [1000, 10000]}
+      last_maintenance_margin: {float: [1000, 10000]}
+      sma: {float: [1000, 10000]}
+      day_trade_count: {int: [0, 10]}
+      last_maintenance_margin: {float: [1000, 10000]}
+      sma: {float: [1000, 10000]}
+      day_trade_count: {int: [0, 10]}
+      balance_asof: {dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]}
+      cryto_tier: int: [0, 3]
+      intraday_adjustments: int: [0, 3]
+      pending_reg_taf_fees: {float: [1000, 10000]}
