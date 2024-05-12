@@ -1,6 +1,5 @@
 models:
   Account:
-    data:
       id: DKFJLKDJ
       admin_configurations: {}
       user_configurations: {}
