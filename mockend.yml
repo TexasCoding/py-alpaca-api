@@ -1,4 +1,10 @@
 models:
   Account:
-    id: string: uuid
+    fake:
+      id: "random.uuid"
+      name: "name.findName"
+      email: "internet.email"
+      password: "internet.password"
+      createdAt: "date.past"
+      updatedAt: "date.recent"
       
