@@ -451,7 +451,70 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
     ########################################################
     def close_position(self, symbol_or_id: str, qty: float = None, percentage: int = None):
-        pass
+        """Close a position by symbol or asset ID
+
+        Parameters:
+        -----------
+        symbol_or_id:   Asset symbol or asset ID to close position
+                        A valid asset symbol or asset ID string required
+
+        qty:            Quantity to close position (default: None)
+                        Quantity to close position (optional) float
+
+        percentage:     Percentage to close position (default: None)
+                        Percentage to close position (optional) int
+
+        Returns:
+        --------
+        str:            Position closing confirmation message
+
+        Raises:
+        -------
+        ValueError:
+            ValueError if quantity or percentage is not provided
+
+        ValueError:
+            ValueError if both quantity and percentage are provided
+
+        ValueError:
+            ValueError if percentage is not between 0 and 100
+
+        ValueError:
+            ValueError if symbol or asset_id is not provided
+
+        Exception:
+            Exception if failed to close position
+
+        Example:
+        --------
+        >>> close_position(symbol_or_id="AAPL", qty=10)
+        'Position AAPL has been closed'
+        """  # noqa
+
+        # Check if quantity or percentage is provided
+        if not qty and not percentage:
+            raise ValueError("Quantity or percentage is required.")
+        # Check if both quantity and percentage are provided
+        if qty and percentage:
+            raise ValueError("Quantity or percentage is required, not both.")
+        # Check if percentage is between 0 and 100
+        if percentage and (percentage < 0 or percentage > 100):
+            raise ValueError("Percentage must be between 0 and 100.")
+        # Check if symbol or asset_id is provided
+        if not symbol_or_id:
+            raise ValueError("Symbol or asset_id is required.")
+        # Url for closing position
+        url = f"{self.trade_url}/positions/{symbol_or_id}"
+        # Parameters for the request
+        params = {"qty": qty, "percentage": percentage}
+        # Delete request to Alpaca API for closing position
+        response = requests.delete(url, headers=self.headers, params=params)
+        # Check if response is successful
+        if response.status_code == 200:
+            return f"Position {symbol_or_id} has been closed"
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to close position. Response: {res["message"]}')
 
     #########################################################
     # \\\\\\\\\/////////  Get Order BY id \\\\\\\///////////#
