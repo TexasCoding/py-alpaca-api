@@ -228,7 +228,63 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\\ Get Positions /////////////////////#
     ########################################################
     def get_positions(self):
-        pass
+        # Url for positions
+        url = f"{self.trade_url}/positions"
+        # Get request to Alpaca API for positions
+        response = requests.get(url, headers=self.headers)
+        # Check if response is successful
+        if response.status_code != 200:
+            # Raise exception if response is not successful
+            raise Exception(response.text)
+        # Normalize JSON response and convert to DataFrame
+        pos_data_df = pd.json_normalize(json.loads(response.text))
+        # Check if DataFrame is empty
+        if pos_data_df.empty:
+            # Return empty DataFrame if no positions
+            return pos_data_df
+        # Rename columns for consistency
+        pos_data_df.rename(
+            columns={
+                "unrealized_pl": "profit_dol",
+                "unrealized_plpc": "profit_pct",
+                "unrealized_intraday_pl": "intraday_profit_dol",
+                "unrealized_intraday_plpc": "intraday_profit_pct",
+            },
+            inplace=True,
+        )
+        # Calculate portfolio percentage
+        asset_sum = pos_data_df["market_value"].sum()
+        pos_data_df["portfolio_pct"] = pos_data_df["market_value"] / asset_sum
+        # Convert columns to appropriate data types
+        pos_data_df = pos_data_df.astype(
+            {
+                "asset_id": "str",
+                "symbol": "str",
+                "exchange": "str",
+                "asset_class": "str",
+                "qty": "float",
+                "qty_available": "float",
+                "side": "str",
+                "market_value": "float",
+                "cost_basis": "float",
+                "profit_dol": "float",
+                "profit_pct": "float",
+                "intraday_profit_dol": "float",
+                "intraday_profit_pct": "float",
+                "portfolio_pct": "float",
+                "current_price": "float",
+                "lastday_price": "float",
+                "change_today": "float",
+                "asset_marginable": "bool",
+            }
+        )
+        # Round columns to appropriate decimal places
+        round_2 = ["profit_dol", "intraday_profit_dol", "market_value"]
+        pos_data_df[round_2] = pos_data_df[round_2].apply(lambda x: pd.Series.round(x, 2))
+        round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct", "change_today", "portfolio_pct"]
+        pos_data_df[round_4] = pos_data_df[round_4].apply(lambda x: pd.Series.round(x, 4))
+
+        return pos_data_df
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Get Position //////////////////////#

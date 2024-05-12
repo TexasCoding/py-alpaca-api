@@ -26,6 +26,7 @@ class PositionClass:
     profit_pct: float
     intraday_profit_dol: float
     intraday_profit_pct: float
+    portfolio_pct: float
     current_price: float
     lastday_price: float
     change_today: float
@@ -46,6 +47,7 @@ class PositionClass:
     profit_pct: float
     intraday_profit_dol: float
     intraday_profit_pct: float
+    portfolio_pct: float
     current_price: float
     lastday_price: float
     change_today: float
