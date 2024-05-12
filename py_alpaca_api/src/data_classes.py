@@ -3,6 +3,59 @@ from datetime import datetime
 
 
 @dataclass
+############################################
+# Data Class for Position
+############################################
+class PositionClass:
+    """Position class data structure.
+
+    Attributes:
+    ------------
+
+    asset_id: str
+    symbol: str
+    exchange: str
+    asset_class: str
+    avg_entry_price: float
+    qty: float
+    qty_available: float
+    side: str
+    market_value: float
+    cost_basis: float
+    profit_dol: float
+    profit_pct: float
+    intraday_profit_dol: float
+    intraday_profit_pct: float
+    current_price: float
+    lastday_price: float
+    change_today: float
+    asset_marginable: bool
+    """  # noqa
+
+    asset_id: str
+    symbol: str
+    exchange: str
+    asset_class: str
+    avg_entry_price: float
+    qty: float
+    qty_available: float
+    side: str
+    market_value: float
+    cost_basis: float
+    profit_dol: float
+    profit_pct: float
+    intraday_profit_dol: float
+    intraday_profit_pct: float
+    current_price: float
+    lastday_price: float
+    change_today: float
+    asset_marginable: bool
+
+
+@dataclass
+############################################
+# Data Class for Order
+############################################
 class OrderClass:
     """Order class data structure.
 
@@ -82,6 +135,9 @@ class OrderClass:
 
 
 @dataclass
+############################################
+# Data Class for Asset
+############################################
 class AssetClass:
     """Asset class data structure.
 
@@ -117,6 +173,9 @@ class AssetClass:
 
 
 @dataclass
+############################################
+# Data Class for Account
+############################################
 class AccountClass:
     """Account class data structure.
 
@@ -211,6 +270,47 @@ class AccountClass:
     pending_reg_taf_fees: float
 
 
+############################################
+# Data Class Position Conversion Functions
+############################################
+def position_class_from_dict(data_dict):
+    """Converts a dictionary to a PositionClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the position data.
+
+    Returns:
+    --------
+    PositionClass
+        A PositionClass object.
+    """  # noqa
+    return PositionClass(
+        asset_id=str(data_dict["asset_id"]) if data_dict["asset_id"] else "",
+        symbol=str(data_dict["symbol"]) if data_dict["symbol"] else "",
+        exchange=str(data_dict["exchange"]) if data_dict["exchange"] else "",
+        asset_class=(str(data_dict["asset_class"]) if data_dict["asset_class"] else ""),
+        avg_entry_price=(float(data_dict["avg_entry_price"]) if data_dict["avg_entry_price"] else 0),
+        qty=(float(data_dict["qty"]) if data_dict["qty"] else 0),
+        qty_available=(float(data_dict["qty_available"]) if data_dict["qty_available"] else 0),
+        side=str(data_dict["side"]) if data_dict["side"] else "",
+        market_value=(float(data_dict["market_value"]) if data_dict["market_value"] else 0),
+        cost_basis=(float(data_dict["cost_basis"]) if data_dict["cost_basis"] else 0),
+        profit_dol=(float(data_dict["profit_dol"]) if data_dict["profit_dol"] else 0),
+        profit_pct=(float(data_dict["profit_pct"]) if data_dict["profit_pct"] else 0),
+        intraday_profit_dol=(float(data_dict["intraday_profit_dol"]) if data_dict["intraday_profit_dol"] else 0),
+        intraday_profit_pct=(float(data_dict["intraday_profit_pct"]) if data_dict["intraday_profit_pct"] else 0),
+        current_price=(float(data_dict["current_price"]) if data_dict["current_price"] else 0),
+        lastday_price=(float(data_dict["lastday_price"]) if data_dict["lastday_price"] else 0),
+        change_today=(float(data_dict["change_today"]) if data_dict["change_today"] else 0),
+        asset_marginable=bool(data_dict["asset_marginable"]),
+    )
+
+
+############################################
+# Data Class Account Conversion Functions
+############################################
 def account_class_from_dict(data_dict):
     """Converts a dictionary to an AccountClass object.
 
@@ -270,6 +370,9 @@ def account_class_from_dict(data_dict):
     )
 
 
+############################################
+# Data Class Asset Conversion Functions
+############################################
 def asset_class_from_dict(data_dict):
     """Converts a dictionary to an AssetClass object.
 
@@ -299,6 +402,9 @@ def asset_class_from_dict(data_dict):
     )
 
 
+############################################
+# Data Class Order Conversion Functions
+############################################
 def order_class_from_dict(data_dict):
     """Converts a dictionary to an OrderClass object.
 
