@@ -229,8 +229,6 @@ class AccountClass:
     """  # noqa
 
     id: str
-    admin_configurations: object
-    user_configurations: object
     account_number: str
     status: str
     crypto_status: str
@@ -329,8 +327,6 @@ def account_class_from_dict(data_dict):
     """  # noqa
     return AccountClass(
         id=str(data_dict["id"]) if data_dict["id"] else "",
-        admin_configurations=(object(data_dict["admin_configurations"]) if data_dict["admin_configurations"] else {}),
-        user_configurations=(object(data_dict["user_configurations"]) if data_dict["user_configurations"] else {}),
         account_number=str(data_dict["account_number"]),
         status=str(data_dict["status"]) if data_dict["status"] else "",
         crypto_status=(str(data_dict["crypto_status"]) if data_dict["crypto_status"] else ""),

@@ -333,8 +333,6 @@ def test_get_account(alpaca):
 def test_get_account_attributes(alpaca):
     account = alpaca.get_account()
     assert hasattr(account, "id")
-    assert hasattr(account, "admin_configurations")
-    assert hasattr(account, "user_configurations")
     assert hasattr(account, "account_number")
     assert hasattr(account, "status")
     assert hasattr(account, "crypto_status")
