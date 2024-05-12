@@ -3,7 +3,103 @@ from datetime import datetime
 
 
 @dataclass
+############################################
+# Data Class for Position
+############################################
+class PositionClass:
+    """Position class data structure.
+
+    Attributes:
+    ------------
+
+    asset_id: str
+    symbol: str
+    exchange: str
+    asset_class: str
+    avg_entry_price: float
+    qty: float
+    qty_available: float
+    side: str
+    market_value: float
+    cost_basis: float
+    profit_dol: float
+    profit_pct: float
+    intraday_profit_dol: float
+    intraday_profit_pct: float
+    portfolio_pct: float
+    current_price: float
+    lastday_price: float
+    change_today: float
+    asset_marginable: bool
+    """  # noqa
+
+    asset_id: str
+    symbol: str
+    exchange: str
+    asset_class: str
+    avg_entry_price: float
+    qty: float
+    qty_available: float
+    side: str
+    market_value: float
+    cost_basis: float
+    profit_dol: float
+    profit_pct: float
+    intraday_profit_dol: float
+    intraday_profit_pct: float
+    portfolio_pct: float
+    current_price: float
+    lastday_price: float
+    change_today: float
+    asset_marginable: bool
+
+
+@dataclass
+############################################
+# Data Class for Order
+############################################
 class OrderClass:
+    """Order class data structure.
+
+    Attributes:
+    ----------
+
+    id: str
+    client_order_id: str
+    created_at: datetime
+    updated_at: datetime
+    submitted_at: datetime
+    filled_at: datetime
+    expired_at: datetime
+    canceled_at: datetime
+    failed_at: datetime
+    replaced_at: datetime
+    replaced_by: str
+    replaces: str
+    asset_id: str
+    symbol: str
+    asset_class: str
+    notional: float
+    qty: float
+    filled_qty: float
+    filled_avg_price: float
+    order_class: str
+    order_type: str
+    type: str
+    side: str
+    time_in_force: str
+    limit_price: float
+    stop_price: float
+    status: str
+    extended_hours: bool
+    legs: object
+    trail_percent: float
+    trail_price: float
+    hwm: float
+    subtag: str
+    source: str
+    """  # noqa
+
     id: str
     client_order_id: str
     created_at: datetime
@@ -41,7 +137,29 @@ class OrderClass:
 
 
 @dataclass
+############################################
+# Data Class for Asset
+############################################
 class AssetClass:
+    """Asset class data structure.
+
+    Attributes:
+    ----------
+
+    id: str
+    asset_class: str
+    easy_to_borrow: bool
+    exchange: str
+    fractionable: bool
+    maintenance_margin_requirement: float
+    marginable: bool
+    name: str
+    shortable: bool
+    status: str
+    symbol: str
+    tradable: bool
+    """  # noqa
+
     id: str
     asset_class: str
     easy_to_borrow: bool
@@ -57,7 +175,59 @@ class AssetClass:
 
 
 @dataclass
+############################################
+# Data Class for Account
+############################################
 class AccountClass:
+    """Account class data structure.
+
+    Attributes:
+    ----------
+
+    id: str
+    admin_configurations: object
+    user_configurations: object
+    account_number: str
+    status: str
+    crypto_status: str
+    options_approved_level: int
+    options_trading_level: int
+    currency: str
+    buying_power: float
+    regt_buying_power: float
+    daytrading_buying_power: float
+    effective_buying_power: float
+    non_marginable_buying_power: float
+    options_buying_power: float
+    bod_dtbp: float
+    cash: float
+    accrued_fees: float
+    pending_transfer_in: float
+    portfolio_value: float
+    pattern_day_trader: bool
+    trading_blocked: bool
+    transfers_blocked: bool
+    account_blocked: bool
+    created_at: datetime
+    trade_suspended_by_user: bool
+    multiplier: int
+    shorting_enabled: bool
+    equity: float
+    last_equity: float
+    long_market_value: float
+    short_market_value: float
+    position_market_value: float
+    initial_margin: float
+    maintenance_margin: float
+    last_maintenance_margin: float
+    sma: float
+    daytrade_count: int
+    balance_asof: str
+    crypto_tier: int
+    intraday_adjustments: int
+    pending_reg_taf_fees: float
+    """  # noqa
+
     id: str
     admin_configurations: object
     user_configurations: object
@@ -102,7 +272,61 @@ class AccountClass:
     pending_reg_taf_fees: float
 
 
+############################################
+# Data Class Position Conversion Functions
+############################################
+def position_class_from_dict(data_dict):
+    """Converts a dictionary to a PositionClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the position data.
+
+    Returns:
+    --------
+    PositionClass
+        A PositionClass object.
+    """  # noqa
+    return PositionClass(
+        asset_id=str(data_dict["asset_id"]) if data_dict["asset_id"] else "",
+        symbol=str(data_dict["symbol"]) if data_dict["symbol"] else "",
+        exchange=str(data_dict["exchange"]) if data_dict["exchange"] else "",
+        asset_class=(str(data_dict["asset_class"]) if data_dict["asset_class"] else ""),
+        avg_entry_price=(float(data_dict["avg_entry_price"]) if data_dict["avg_entry_price"] else 0),
+        qty=(float(data_dict["qty"]) if data_dict["qty"] else 0),
+        qty_available=(float(data_dict["qty_available"]) if data_dict["qty_available"] else 0),
+        side=str(data_dict["side"]) if data_dict["side"] else "",
+        market_value=(float(data_dict["market_value"]) if data_dict["market_value"] else 0),
+        cost_basis=(float(data_dict["cost_basis"]) if data_dict["cost_basis"] else 0),
+        profit_dol=(float(data_dict["profit_dol"]) if data_dict["profit_dol"] else 0),
+        profit_pct=(float(data_dict["profit_pct"]) if data_dict["profit_pct"] else 0),
+        intraday_profit_dol=(float(data_dict["intraday_profit_dol"]) if data_dict["intraday_profit_dol"] else 0),
+        intraday_profit_pct=(float(data_dict["intraday_profit_pct"]) if data_dict["intraday_profit_pct"] else 0),
+        portfolio_pct=(float(data_dict["portfolio_pct"]) if data_dict["portfolio_pct"] else 0),
+        current_price=(float(data_dict["current_price"]) if data_dict["current_price"] else 0),
+        lastday_price=(float(data_dict["lastday_price"]) if data_dict["lastday_price"] else 0),
+        change_today=(float(data_dict["change_today"]) if data_dict["change_today"] else 0),
+        asset_marginable=bool(data_dict["asset_marginable"]),
+    )
+
+
+############################################
+# Data Class Account Conversion Functions
+############################################
 def account_class_from_dict(data_dict):
+    """Converts a dictionary to an AccountClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the account data.
+
+    Returns:
+    --------
+    AccountClass
+        An AccountClass object.
+    """  # noqa
     return AccountClass(
         id=str(data_dict["id"]) if data_dict["id"] else "",
         admin_configurations=(object(data_dict["admin_configurations"]) if data_dict["admin_configurations"] else {}),
@@ -149,7 +373,22 @@ def account_class_from_dict(data_dict):
     )
 
 
+############################################
+# Data Class Asset Conversion Functions
+############################################
 def asset_class_from_dict(data_dict):
+    """Converts a dictionary to an AssetClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the asset data.
+
+    Returns:
+    --------
+    AssetClass
+        An AssetClass object.
+    """  # noqa
     return AssetClass(
         id=str(data_dict["id"]) if data_dict["id"] else "",
         asset_class=str(data_dict["class"]) if data_dict["class"] else "",
@@ -166,7 +405,22 @@ def asset_class_from_dict(data_dict):
     )
 
 
+############################################
+# Data Class Order Conversion Functions
+############################################
 def order_class_from_dict(data_dict):
+    """Converts a dictionary to an OrderClass object.
+
+    Parameters:
+    -----------
+    data_dict: dict
+        A dictionary containing the order data.
+
+    Returns:
+    --------
+    OrderClass
+        An OrderClass object.
+    """  # noqa
     return OrderClass(
         id=str(data_dict["id"]) if data_dict["id"] else "",
         client_order_id=data_dict["client_order_id"],
