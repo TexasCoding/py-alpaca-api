@@ -28,7 +28,7 @@ models:
         account_blocked: bool
         created_at: {dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]}
         trade_suspended_by_user: bool
-        multiplier: float: [1, 10]
+        multiplier: {float: [1, 10]}
         shorting_enabled: bool
         equity: {float: [1000, 10000]}
         last_equity: {float: [1000, 10000]}
@@ -44,6 +44,6 @@ models:
         sma: {float: [1000, 10000]}
         day_trade_count: {int: [0, 10]}
         balance_asof: {dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]}
-        cryto_tier: int: [0, 3]
-        intraday_adjustments: int: [0, 3]
+        cryto_tier: {int: [0, 3]}
+        intraday_adjustments: {int: [0, 3]}
         pending_reg_taf_fees: {float: [1000, 10000]}
