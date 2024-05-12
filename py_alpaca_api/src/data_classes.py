@@ -303,6 +303,7 @@ def position_class_from_dict(data_dict):
         profit_pct=(float(data_dict["profit_pct"]) if data_dict["profit_pct"] else 0),
         intraday_profit_dol=(float(data_dict["intraday_profit_dol"]) if data_dict["intraday_profit_dol"] else 0),
         intraday_profit_pct=(float(data_dict["intraday_profit_pct"]) if data_dict["intraday_profit_pct"] else 0),
+        portfolio_pct=(float(data_dict["portfolio_pct"]) if data_dict["portfolio_pct"] else 0),
         current_price=(float(data_dict["current_price"]) if data_dict["current_price"] else 0),
         lastday_price=(float(data_dict["lastday_price"]) if data_dict["lastday_price"] else 0),
         change_today=(float(data_dict["change_today"]) if data_dict["change_today"] else 0),
