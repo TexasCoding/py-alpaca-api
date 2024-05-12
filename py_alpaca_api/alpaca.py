@@ -13,12 +13,32 @@ from .src.data_classes import (
 # PyAlpacaApi class
 class PyAlpacaApi:
     def __init__(self, api_key: str, api_secret: str, api_paper: bool = True):
-        """
-        PyAlpacaApi class constructor
-        api_key: Alpaca API Key, required
-        api_secret: Alpaca API Secret, required
-        api_paper: Use Alpaca Paper Trading API (default: True)
-        """
+        """Initialize PyAlpacaApi class
+
+        Parameters:
+        -----------
+        api_key:    Alpaca API Key
+                    A valid Alpaca API Key string required
+
+        api_secret: Alpaca API Secret
+                    A valid Alpaca API Secret string required
+
+        api_paper:  Alpaca Paper Trading
+                    Alpaca Paper Trading (default: True) bool
+
+        Raises:
+        -------
+        ValueError:
+            ValueError if API Key is not provided
+
+        ValueError:
+            ValueError if API Secret is not provided
+
+        Example:
+        --------
+        >>> PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+        PyAlpacaApi()
+        """  # noqa
         # Check if API Key and Secret are provided
         if not api_key:
             raise ValueError("API Key is required")
@@ -56,29 +76,69 @@ class PyAlpacaApi:
         sort="asc",
         adjustment="raw",
     ):
-        """
-        Get historical stock data for a given symbol
-        symbol: Stock symbol to get historical data
-        start: Start date for historical data (YYYY-MM-DD)
-        end: End date for historical data (YYYY-MM-DD)
-        timeframe: Timeframe for historical data (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1m)
-        feed: Data feed source (iex, sip, tops, last, hist) (default: iex)
-        currency: Currency for historical data (default: USD)
-        limit: Limit number of data points (default: 1000)
-        sort: Sort order (asc, desc) (default: asc)
+        """Get historical stock data for a given symbol
+
+        Parameters:
+        -----------
+        symbol:     Stock symbol
+                    A valid stock symbol (e.g., AAPL) string required
+
+        start:      Start date for historical data
+                    A valid start date string in the format "YYYY-MM-DD" required
+
+        end:        End date for historical data
+                    A valid end date string in the format "YYYY-MM-DD" required
+
+        timeframe:  Timeframe for historical data
+                    (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1m) (default: 1d) (optional)
+
+        feed:       Data feed source
+                    (iex, sip, tops, last, hist) (default: iex) (optional)
+
+        currency:   Currency for historical data (default: USD)
+                    Supported currencies: USD, CAD, EUR, GBP, JPY, AUD, CNY, HKD
+
+        limit:      Limit number of data points (default: 1000)
+                    Maximum number of data points to return (optional) int
+
+        sort:       Sort order (asc, desc) (default: asc)
+
         adjustment: Adjustment for historical data (raw, split, dividends) (default: raw)
-        return: Historical stock data as a DataFrame
-        Exception: ValueError if failed to get asset information
-        ValueError: ValueError if symbol is not a stock
-        ValueError: ValueError if invalid timeframe
-        ValueError: ValueError if no data available for symbol
-        """
+
+        Returns:
+        --------
+        DataFrame:  Historical stock data as a DataFrame with columns:
+                    symbol, date, open, high, low, close, volume, trade_count, vwap
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to get historical stock data
+
+        ValueError:
+            ValueError if symbol is not a stock
+
+        ValueError:
+            ValueError if invalid timeframe
+
+        ValueError:
+            ValueError if no data available for symbol
+
+        Example:
+        --------
+        >>> get_stock_historical_data(symbol="AAPL", start="2021-01-01", end="2021-12-31", timeframe="1d")
+            symbol  close   high    low     trade_count open    date        volume      vwap
+        0   AAPL    132.69  133.61  132.16  1           133.52  2021-01-04  100620780   132.69
+
+        >>> get_stock_historical_data(symbol="FAKESYMBOL", start="2021-01-01", end="2021-12-31", timeframe="1d")
+        ValueError: Failed to get asset information. Response: {"code":40410001,"message":"symbol not found: FAKESYMBOL"}
+        """  # noqa
         # Get asset information for the symbol
         try:
             asset = self.get_asset(symbol)
         # Raise exception if failed to get asset information
         except Exception as e:
-            raise ValueError(f"Error getting asset: {e}")
+            raise ValueError(e)
         else:
             # Check if asset is a stock
             if asset.asset_class != "us_equity":
@@ -175,13 +235,34 @@ class PyAlpacaApi:
     # \\\\\\\\\/////////  Get Order BY id \\\\\\\///////////#
     #########################################################
     def get_order_by_id(self, order_id: str, nested: bool = False):
-        """
-        Get order information by order ID
-        order_id: Order ID to get information
-        nested: Include nested objects (default: False)
-        return: OrderClass object with order information
-        Exception: Exception if failed to get order information
-        """
+        """Get order information by order ID
+
+        Parameters:
+        -----------
+        order_id:   Order ID to get information
+                    A valid order ID string required
+
+        nested:     Include nested information (default: False)
+                    Include nested information in the response (optional) bool
+
+        Returns:
+        --------
+        OrderClass: Order information as an OrderClass object with values:
+                    id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price,
+                    order_class, order_type
+
+        Raises:
+        -------
+        ValueError: 
+            ValueError if failed to get order information
+        
+        Example:
+        --------
+        >>> get_order_by_id(order_id="ORDER_ID")
+        OrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+        """  # noqa
         # Parameters for the request
         params = {"nested": nested}
         # Alpaca API URL for order information
@@ -203,12 +284,27 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
     ########################################################
     def cancel_order_by_id(self, order_id: str):
-        """
-        Cancel order by order ID
-        order_id: Order ID to cancel
-        return: Order cancellation message
-        Exception: Exception if failed to cancel order
-        """
+        """Cancel order by order ID
+
+        Parameters:
+        -----------
+        order_id:   Order ID to cancel
+                    A valid order ID string required
+
+        Returns:
+        --------
+        str:        Order cancellation confirmation message
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to cancel order
+
+        Example:
+        --------
+        >>> cancel_order_by_id(order_id="ORDER_ID")
+        'Order ORDER_ID has been cancelled'
+        """  # noqa
         # Alpaca API URL for canceling an order
         url = f"{self.trade_url}/orders/{order_id}"
         # Delete request to Alpaca API for canceling an order
@@ -226,11 +322,17 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
     ########################################################
     def cancel_all_orders(self):
-        """
-        Cancel all orders
-        return: Number of orders cancelled
-        Exception: Exception if failed to cancel orders
-        """
+        """Cancel all orders
+
+        Returns:
+        --------
+        str:        Order cancellation confirmation message
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to cancel all orders
+        """  # noqa
         # Alpaca API URL for canceling all orders
         url = f"{self.trade_url}/orders"
         # Delete request to Alpaca API for canceling all orders
@@ -257,19 +359,53 @@ class PyAlpacaApi:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ):
-        """
-        Submit a market order
-        symbol: Asset symbol to buy/sell
-        qty: Quantity of asset to buy/sell (default: None)
-        notional: Notional value of asset to buy/sell (default: None)
-        side: Order side (buy/sell) (default: buy)
-        time_in_force: Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+        """Submit a market order
+
+        Parameters:
+        -----------
+        symbol:         Asset symbol to buy/sell
+                        A valid asset symbol string required
+        
+        qty:            Quantity of asset to buy/sell (default: None)
+                        Quantity of asset to buy/sell (optional) float
+
+        notional:       Notional value of asset to buy/sell (default: None)
+                        Notional value of asset to buy/sell (optional) float
+                    
+        side:           Order side (buy/sell) (default: buy)
+                        Order side (buy/sell) (optional) str
+                    
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+                        Time in force options (optional) str
+
         extended_hours: Extended hours trading (default: False)
-        return: MarketOrderClass object with
-        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price,
-                order_class, order_type
-        Exception: Exception if failed to submit market order
-        """
+                        Extended hours trading (optional) bool
+
+        Returns:
+        --------
+        MarketOrderClass: Market order information as a MarketOrderClass object with
+                            values: id, client_order_id, created_at, submitted_at, asset_id, symbol, \
+                            asset_class, notional, qty, filled_qty, filled_avg_price, order_class, \
+                            order_type , limit_price, stop_price, filled_qty, filled_avg_price, \
+                            status, type, side, time_in_force, extended_hours
+
+        Raises:
+        -------
+        Exception: 
+            Exception if failed to submit market order
+
+        Example:
+        --------
+        >>> market_order(symbol="AAPL", qty=10)
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+
+        >>> market_order(symbol="AAPL", notional=1000)
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+        """  # noqa
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload
@@ -308,20 +444,58 @@ class PyAlpacaApi:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ):
-        """
-        Submit a limit order
-        symbol: Asset symbol to buy/sell
-        limit_price: Limit price for the order
-        qty: Quantity of asset to buy/sell (default: None)
-        notional: Notional value of asset to buy/sell (default: None)
-        side: Order side (buy/sell) (default: buy)
-        time_in_force: Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+        """Submit a Limit Order
+
+        Parameters:
+        -----------
+        symbol:         Asset symbol to buy/sell
+                        A valid asset symbol string required
+
+        limit_price:    Limit price for the order
+                        Limit price for the order float required
+                
+        qty:            Quantity of asset to buy/sell (default: None)
+                        Quantity of asset to buy/sell (optional) float
+
+        notional:       Notional value of asset to buy/sell (default: None)
+                        Notional value of asset to buy/sell (optional) float
+
+        side:           Order side (buy/sell) (default: buy)
+                        Order side (buy/sell) (optional) str
+
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+                        Time in force options (optional) str
+
         extended_hours: Extended hours trading (default: False)
-        return: MarketOrderClass object with
-        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price,
-                order_class, order_type, limit_price, stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
-        Exception: Exception if failed to submit limit order
-        """
+                        Extended hours trading (optional) bool
+
+        Returns:
+        --------
+        MarketOrderClass: Market order information as a MarketOrderClass object with
+                            values: id, client_order_id, created_at, submitted_at, asset_id, symbol, \
+                            asset_class, notional, qty, filled_qty, filled_avg_price, order_class, \
+                            order_type , limit_price, stop_price, filled_qty, filled_avg_price, \
+                            status, type, side, time_in_force, extended_hours
+        
+        Raises:
+        -------
+        Exception: 
+            Exception if failed to submit limit order
+        
+        Example:
+        --------
+        >>> limit_order(symbol="AAPL", limit_price=100, qty=10)
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='limit', \
+                limit_price=100.0, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
+
+        >>> limit_order(symbol="AAPL", limit_price=100, notional=1000)
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='limit', \
+                limit_price=100.0, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
+        """  # noqa
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload
@@ -360,19 +534,54 @@ class PyAlpacaApi:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ):
-        """
-        Submit a Stop Order
-        symbol: Asset symbol to buy/sell
-        stop_price: Stop price for the order
-        qty: Quantity of asset to buy/sell
-        side: Order side (buy/sell) (default: buy)
-        time_in_force: Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
-        extended_hours: Extended hours trading (default: False)
-        return: MarketOrderClass object with
-        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price,
-                order_class, order_type, limit_price, stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
-        Exception: Exception if failed to submit stop order
-        """
+        """Submit a Stop Order
+
+        Parameters:
+        -----------
+        symbol:         Asset symbol to buy/sell
+                        A valid asset symbol string required
+
+        stop_price:     Stop price for the order
+                        Stop price for the order float required
+
+        qty:            Quantity of asset to buy/sell
+                        Quantity of asset to buy/sell float required
+
+        side:           Order side (buy/sell) (default: buy)
+                        Order side (buy/sell) (optional) str
+
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day) 
+                        Time in force options (optional) str
+
+        extended_hours: Extended hours trading (default: False) 
+                        Extended hours trading (optional) bool
+
+        Returns:
+        --------
+        MarketOrderClass: Market order information as a MarketOrderClass object with
+                            values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, 
+                            notional, qty, filled_qty, filled_avg_price, order_class, order_type , limit_price, 
+                            stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
+
+        Raises: 
+        -------
+        Exception: 
+            Exception if failed to submit stop order
+
+        Example:    
+        --------
+        >>> stop_order(symbol="AAPL", stop_price=100, qty=10)
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='stop', \
+                limit_price=None, stop_price=100.0, status='new', side='buy', time_in_force='day', extended_hours=False)
+
+        >>> stop_order(symbol="AAPL", stop_price=100, qty=10, side="sell")
+        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
+                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='stop', \
+                limit_price=None, stop_price=100.0, status='new', side='sell', time_in_force='day', extended_hours=False)
+        """  # noqa
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload
@@ -402,13 +611,30 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
     #####################################################
     def get_asset(self, symbol: str):
-        """
-        Get asset information
-        symbol: Asset symbol
-        return: AssetClass object with
-        values: id, class, exchange, symbol, status, tradable, marginable, shortable, easy_to_borrow, fractionable
-        Execption: ValueError if failed to get asset information
-        """
+        """Get asset information by symbol
+
+        Parameters:
+        -----------
+        symbol:     Asset symbol to get information
+                    A valid asset symbol string required
+
+        Returns:
+        --------
+        AssetClass: Asset information as an AssetClass object with values:
+                    id, class, exchange, symbol, status, tradable, marginable, shortable, easy_to_borrow
+                
+        Raises:
+        -------
+        ValueError: 
+            ValueError if failed to get asset information
+
+        Example:
+        --------
+        >>> get_asset(symbol="AAPL")
+        AssetClass(id='ASSET_ID', class='us_equity', exchange='NASDAQ', symbol='AAPL', status='active', \
+                    tradable=True, marginable=True, shortable=True, easy_to_borrow=True)
+
+        """  # noqa
         # Alpaca API URL for asset information
         url = f"{self.trade_url}/assets/{symbol}"
         # Get request to Alpaca API for asset information
@@ -427,18 +653,37 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\  Get Account Information ///////////////#
     ########################################################
     def get_account(self):
-        """
-        Get account information
-        return: AccountClass object with account information
-        values: id, admin_configurations, user_configurations, account_number, status, crypto_status, options_approved_level,
-                options_trading_level, currency, buying_power, regt_buying_power, daytrading_buying_power, effective_buying_power,
-                non_marginable_buying_power, options_buying_power, bod_dtbp, cash, accrued_fees, pending_transfer_in, portfolio_value,
-                pattern_day_trader, trading_blocked, transfers_blocked, account_blocked, created_at, trade_suspended_by_user, multiplier,
-                shorting_enabled, equity, last_equity, long_market_value, short_market_value, position_market_value, initial_margin,
-                maintenance_margin, last_maintenance_margin, sma, daytrade_count, balance_asof, crypto_tier, intraday_adjustments,
-                pending_reg_taf_fees
-        Exception: Exception if failed to get account information
-        """
+        """Get account information
+
+        Returns:
+        --------
+        AccountClass: Account information as an AccountClass object with values:
+                    id, account_number, status, currency, cash, cash_withdrawable, buying_power, regt_buying_power, daytrading_buying_power,
+                    portfolio_value, pattern_day_trader, trading_blocked, transfers_blocked, account_blocked, created_at, trade_suspended_by_user,
+                    multiplier, shorting_enabled, equity, last_equity, long_market_value, short_market_value, equity_previous_close, \
+                    long_portfolio_value, short_portfolio_value, initial_margin, maintenance_margin, last_maintenance_margin, sma, daytrade_count, \
+                    last_maintenance_margin, sma_held_for_orders, sma_held_for_positions, sma_held_for_options, created_at, updated_at
+
+        Raises:
+        -------
+        Exception: 
+            Exception if failed to get account information
+
+        Example:
+        --------
+        >>> get_account()
+        AccountClass(id='ACCOUNT_ID', account_number='ACCOUNT_NUMBER', status='ACTIVE', currency='USD', cash=1000.0, \
+                    cash_withdrawable=1000.0, buying_power=1000.0, regt_buying_power=1000.0, \
+                    daytrading_buying_power=1000.0, portfolio_value=1000.0, pattern_day_trader=False, \
+                    trading_blocked=False, transfers_blocked=False, account_blocked=False, \
+                    created_at='2021-10-01T00:00:00Z', trade_suspended_by_user=False, multiplier=1.0, \
+                    shorting_enabled=True, equity=1000.0, last_equity=1000.0, long_market_value=0.0, \
+                    short_market_value=0.0, equity_previous_close=1000.0, long_portfolio_value=0.0, \
+                    short_portfolio_value=0.0, initial_margin=0.0, maintenance_margin=0.0, last_maintenance_margin=0.0, \
+                    sma=0.0, daytrade_count=0, last_maintenance_margin=0.0, sma_held_for_orders=0.0, \
+                    sma_held_for_positions=0.0, sma_held_for_options=0.0, created_at='2021-10-01T00:00:00Z', \
+                    updated_at='2021-10-01T00:00:00Z')
+        """  # noqa
         # Alpaca API URL for account information
         url = f"{self.trade_url}/account"
         # Get request to Alpaca API for account information
