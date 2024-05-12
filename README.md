@@ -143,9 +143,8 @@ The py-alpaca-api project is a Python library that simplifies interaction with t
 
 ###  Usage
 
-<h4>From <code>source</code></h4>
+<h4>Include PyAlpacaAPI In Your App</h4>
 
-> Include PyAlpacaAPI in your app
 > ```python
 > from py_alpaca_api import PyAlpacaAPI
 >
