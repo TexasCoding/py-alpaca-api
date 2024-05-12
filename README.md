@@ -146,13 +146,16 @@ The py-alpaca-api project is a Python library that simplifies interaction with t
 <h4>Include PyAlpacaAPI In Your App</h4>
 
 > ```python
-> from py_alpaca_api import PyAlpacaAPI
+> from py_alpaca_api.alpaca import PyAlpacaApi
 >
-> alpaca = PyAlpacaAPI(api_key='ALPACA_API_KEY', api_secret='ALPACA_SECRET_KEY', api_paper=True)
+> api_key = 'your_api_key'
+> api_secret = 'your_api_secret'
+>
+> alpaca = PyAlpacaApi(api_key=api_key, api_secret=api_secret, api_paper=True)
+>
 > asset = alpaca.get_asset('AAPL')
-> 
-> market_order = alpaca.market_order(symbol=asset.symbol, notional=200.23, side='buy')
-> print(market_order.status)
+>
+> print(asset)
 > ```
 
 ###  Tests

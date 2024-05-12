@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import requests
 
-from py_alpaca_api.src.data_classes import (
+from .src.data_classes import (
     account_class_from_dict,
     asset_class_from_dict,
     order_class_from_dict,
