@@ -20,14 +20,14 @@ models:
       accured_fees: 989.00
       pending_transfer_in: 989.00
       portfolio_value: 989.00
-      pattern_day_trader: False
-      trading_blocked: False
-      transfers_blocked: False
-      account_blocked: False
+      pattern_day_trader: bool
+      trading_blocked: bool
+      transfers_blocked: bool
+      account_blocked: bool
       created_at: "2023-01-01 00:00:00"
-      trade_suspended_by_user: False
+      trade_suspended_by_user: bool
       multiplier: 1
-      shorting_enabled: False
+      shorting_enabled: bool
       equity: 989.00
       last_equity: 989.00
       long_market_value: 989.00
