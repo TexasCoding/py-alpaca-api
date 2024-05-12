@@ -1,7 +1,7 @@
 models:
   Account:
     fake:
-      _count: 1
+      _count: 0
       account_number: {string: [10, 20]}
       status: oneOfString["active", "closed", "suspended"]
       crypto_status: oneOfString["active", "closed", "suspended"]
