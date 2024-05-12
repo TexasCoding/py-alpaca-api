@@ -1,4 +1,4 @@
 models:
   Account:
-    id: 'DKFJLKDJFLKJ'
+    id: string: uuid
       
