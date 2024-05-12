@@ -1,5 +1,6 @@
 models:
   Account:
+    count: 1
     data: [
       {
         id: 'DKFJLKDJFLKJ',
@@ -43,7 +44,7 @@ models:
         balance_asof: '2023-01-01 00:00:00',
         cryto_tier: 1,
         intraday_adjustments: 1,
-        pending_reg_taf_fees: 2.00
+        pending_reg_taf_fees: 2.00,
       }
     ]
       
