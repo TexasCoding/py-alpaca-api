@@ -40,6 +40,8 @@
 
 The py-alpaca-api project is a Python library that simplifies interaction with the Alpaca API. It provides a robust interface, encapsulated in the `PyAlpacaApi` class, enabling developers to access Alpaca Market API trading functionalities effortlessly. By utilizing data classes for orders, assets, and accounts, the project abstracts away complexities, enhancing flexibility in processing API responses. With clear metadata management through Poetry, this project serves as a valuable tool for those looking to integrate Alpaca trading capabilities seamlessly into their applications.
 
+This project is still in development. New functionality will be added and updated daily. Hopefully this project will help make communicating with Alpaca Markets API, much easier for some. Any input or help would be appreciated.
+
 ---
 
 ##  Features
