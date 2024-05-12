@@ -381,9 +381,9 @@ class PyAlpacaApi:
                     intraday_profit_pct=0.0, portfolio_pct=1.0, current_price=100.0, lastday_price=100.0, change_today=0.0, asset_marginable=True)
         """  # noqa
         # Check if symbol or symbol_dict is provided
-        # if not symbol or not symbol_dict:
-        #     # Raise ValueError if symbol or symbol_dict is not provided
-        #     raise ValueError("Symbol or symbol_dict is required.")
+        if not symbol and not symbol_dict:
+            # Raise ValueError if symbol or symbol_dict is not provided
+            raise ValueError("Symbol or symbol_dict is required.")
         # Check if both symbol and symbol_dict are provided
         if symbol and symbol_dict:
             # Raise ValueError if both symbol and symbol_dict are provided
