@@ -1,7 +1,7 @@
 models:
   Account:
     data:
-      id: {string: [5, 10]}
+      id: string: [5, 10]
       admin_configurations: {}
       user_configurations: {}
       account_number: {string: [5, 10]}
