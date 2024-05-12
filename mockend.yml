@@ -28,7 +28,7 @@ models:
         account_blocked: bool
         created_at: {dateTime: [2023-01-01 00:00:00, 2024-05-12 23:59:59]}
         trade_suspended_by_user: bool
-        multiplier: {float: [1, 10]}
+        multiplier: {int: [1, 3]}
         shorting_enabled: bool
         equity: {float: [1000, 10000]}
         last_equity: {float: [1000, 10000]}
