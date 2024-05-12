@@ -229,24 +229,25 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\\ Get Positions /////////////////////#
     ########################################################
     def get_positions(self):
-        """Get positions information
+        """Get account positions, including cash
 
         Returns:
         --------
-        DataFrame:  Positions information as a DataFrame with columns:
+        DataFrame:  Account positions as a DataFrame with columns:
                     asset_id, symbol, exchange, asset_class, qty, qty_available, side, market_value, cost_basis, profit_dol, profit_pct,
                     intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price, change_today, asset_marginable
 
         Raises:
         -------
         Exception:
-            Exception if failed to get positions information
+            Exception if failed to get account positions
 
         Example:
         --------
         >>> get_positions()
-            asset_id    symbol  exchange    asset_class qty qty_available    side    market_value    cost_basis  profit_dol  profit_pct  intraday_profit_dol intraday_profit_pct portfolio_pct   current_price   lastday_price   change_today    asset_marginable
-        0   ASSET_ID    AAPL    NASDAQ      us_equity   10  10              long    1000.0          1000.0      0.0         0.0         0.0                 0.0                 1.0             100.0           100.0           0.0             True
+            asset_id    symbol  exchange    asset_class qty qty_available   side    market_value    cost_basis  profit_dol  profit_pct  intraday_profit_dol intraday_profit_pct portfolio_pct   current_price   lastday_price   change_today    asset_marginable
+        0   ""          Cash    ""          ""          0   0               ""      1000.0          0.0         0.0         0.0         0.0                 0.0                 1.0             1.0             1.0             0.0             False
+        1   ASSET_ID    AAPL    NASDAQ      us_equity   10  10              long    1000.0          1000.0      0.0         0.0         0.0                 0.0                 0.0             100.0           100.0           0.0             True
         """  # noqa
 
         # Url for positions
@@ -258,11 +259,34 @@ class PyAlpacaApi:
             # Raise exception if response is not successful
             raise Exception(response.text)
         # Normalize JSON response and convert to DataFrame
-        pos_data_df = pd.json_normalize(json.loads(response.text))
-        # Check if DataFrame is empty
-        if pos_data_df.empty:
-            # Return empty DataFrame if no positions
-            return pos_data_df
+        res_data_df = pd.json_normalize(json.loads(response.text))
+        # Create DataFrame for Cash position
+        pos_data_df = pd.DataFrame(
+            {
+                "asset_id": "",
+                "symbol": "Cash",
+                "exchange": "",
+                "asset_class": "",
+                "qty": 0,
+                "qty_available": 0,
+                "side": "",
+                "market_value": self.get_account().cash,
+                "cost_basis": 0,
+                "unrealized_pl": 0,
+                "unrealized_plpc": 0,
+                "unrealized_intraday_pl": 0,
+                "unrealized_intraday_plpc": 0,
+                "current_price": 0,
+                "lastday_price": 0,
+                "change_today": 0,
+                "asset_marginable": False,
+            },
+            index=[0],
+        )
+        # If response is not empty, concatenate DataFrames
+        if not res_data_df.empty:
+            # Return DataFrame if no positions
+            pos_data_df = pd.concat([pos_data_df, res_data_df], ignore_index=True)
         # Rename columns for consistency
         pos_data_df.rename(
             columns={
@@ -301,8 +325,9 @@ class PyAlpacaApi:
         )
         # Round columns to appropriate decimal places
         round_2 = ["profit_dol", "intraday_profit_dol", "market_value"]
+        round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct"]
+
         pos_data_df[round_2] = pos_data_df[round_2].apply(lambda x: pd.Series.round(x, 2))
-        round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct", "change_today", "portfolio_pct"]
         pos_data_df[round_4] = pos_data_df[round_4].apply(lambda x: pd.Series.round(x, 4))
 
         return pos_data_df
