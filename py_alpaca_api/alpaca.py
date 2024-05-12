@@ -409,7 +409,43 @@ class PyAlpacaApi:
     # \\\\\\\\\\\\\\\\ Close All Positions ////////////////#
     ########################################################
     def close_all_positions(self, cancel_orders: bool = False):
-        pass
+        """Close all positions
+
+        Parameters:
+        -----------
+        cancel_orders:  Cancel open orders (default: False)
+                        Cancel open orders before closing positions (optional) bool
+
+        Returns:
+        --------
+        str:            Position closing confirmation message
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to close positions
+
+        Example:
+        --------
+        >>> close_all_positions()
+        '2 positions have been closed'
+        """  # noqa
+        # Url for positions
+        url = f"{self.trade_url}/positions"
+        # Parameters for the request
+        params = {"cancel_orders": cancel_orders}
+        # Delete request to Alpaca API for closing all positions
+        response = requests.delete(url, headers=self.headers, params=params)
+        # Check if response is successful
+        if response.status_code == 207:
+            # Convert JSON response to dictionary
+            res = json.loads(response.text)
+            # Return text message
+            return f"{len(res)} positions have been closed"
+        # If response is not successful, raise an exception
+        else:
+            res = json.loads(response.text)
+            raise Exception(f'Failed to close positions. Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
