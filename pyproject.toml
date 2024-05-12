@@ -24,6 +24,8 @@ black = "^24.4.2"
 isort = "^5.13.2"
 pre-commit = "^3.7.1"
 ipykernel = "^6.29.4"
+pytest-mock = "^3.14.0"
+pytest-mock-server = "^0.3.0"
 
 
 [tool.poetry.group.test.dependencies]
