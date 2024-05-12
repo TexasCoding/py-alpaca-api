@@ -19,15 +19,23 @@ numpy = "^1.26.4"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.0"
 requests-mock = "^1.12.1"
-sphinx = "^7.3.7"
-sphinx-rtd-theme = "^2.0.0"
 black = "^24.4.2"
 isort = "^5.13.2"
 pre-commit = "^3.7.1"
+ipykernel = "^6.29.4"
 
 
 [tool.poetry.group.test.dependencies]
 flake8 = "^7.0.0"
+
+
+[tool.poetry.group.doc.dependencies]
+sphinx = "^7.3.7"
+sphinx-autobuild = "^2024.4.16"
+myst-parser = "^3.0.1"
+nbsphinx = "^0.9.4"
+sphinx-autoapi = "^3.0.0"
+sphinx-rtd-theme = "^2.0.0"
 
 [tool.black]
 line-length = 79
