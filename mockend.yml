@@ -39,9 +39,6 @@ models:
       last_maintenance_margin: 989.00
       sma: 989.00
       day_trade_count: 1
-      last_maintenance_margin: 989.00
-      sma: 989.00
-      day_trade_count: 1
       balance_asof: 2023-01-01 00:00:00
       cryto_tier: 1
       intraday_adjustments: 1
