@@ -30,15 +30,6 @@ def test_alpaca_key_exceptions(alpaca):
         PyAlpacaApi(api_key=api_key, api_secret="", api_paper=True)
 
 
-def test_market_clock(alpaca):
-    clock = alpaca.market_clock()
-    assert isinstance(clock, ClockClass)
-    assert isinstance(clock.market_time, datetime)
-    assert isinstance(clock.next_open, datetime)
-    assert isinstance(clock.next_close, datetime)
-    assert isinstance(clock.is_open, bool)
-
-
 ########################################
 # Test cases for PyAlpacaApi.get_asset #
 ########################################
@@ -62,3 +53,15 @@ def test_get_asset_attributes(alpaca):
     assert isinstance(asset.status, str)
     assert isinstance(asset.symbol, str)
     assert isinstance(asset.tradable, bool)
+
+
+def test_market_clock_success(alpaca):
+    clock = alpaca.market_clock()
+    assert isinstance(clock, ClockClass)
+    assert isinstance(clock.market_time, datetime)
+    assert isinstance(clock.next_open, datetime)
+    assert isinstance(clock.next_close, datetime)
+    assert isinstance(clock.is_open, bool)
+
+
+########################################
