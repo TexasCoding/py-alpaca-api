@@ -317,6 +317,7 @@ class PyAlpacaApi:
             inplace=True,
         )
         # Calculate portfolio percentage
+        pos_data_df["market_value"] = pos_data_df["market_value"].astype(float)
         asset_sum = pos_data_df["market_value"].sum()
         pos_data_df["portfolio_pct"] = pos_data_df["market_value"] / asset_sum
         # Convert columns to appropriate data types
@@ -420,8 +421,26 @@ class PyAlpacaApi:
         if response.status_code != 200:
             # Raise exception if response is not successful
             raise ValueError(response.text)
+
+        res_dict = json.loads(response.text)
+
+        equity = self.get_account().equity
+        res_dict["portfolio_pct"] = round(float(res_dict["market_value"]) / equity, 4)
+
+        res_dict["profit_dol"] = round(float(res_dict["unrealized_pl"]), 2)
+        del res_dict["unrealized_pl"]
+
+        res_dict["profit_pct"] = round(float(res_dict["unrealized_plpc"]), 4)
+        del res_dict["unrealized_plpc"]
+
+        res_dict["intraday_profit_dol"] = round(float(res_dict["unrealized_intraday_pl"]), 2)
+        del res_dict["unrealized_intraday_pl"]
+
+        res_dict["intraday_profit_pct"] = round(float(res_dict["unrealized_intraday_plpc"]), 4)
+        del res_dict["unrealized_intraday_plpc"]
+
         # Return position information as a PositionClass object
-        return position_class_from_dict(json.loads(response.text))
+        return position_class_from_dict(res_dict)
 
     ########################################################
     # \\\\\\\\\\\\\\\\ Close All Positions ////////////////#

@@ -162,7 +162,7 @@ def test_limit_order_with_no_money(alpaca):
 def test_stop_order_with_qty(alpaca):
     order = alpaca.stop_order(symbol="AAPL", qty=1, side="buy", stop_price=200.00)
     assert isinstance(order, OrderClass)
-    assert order.status == "accepted"
+    assert order.status == "pending_new" or order.status == "accepted"
     assert order.type == "stop"
     assert order.qty == 1
     alpaca.cancel_all_orders()

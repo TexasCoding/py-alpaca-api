@@ -344,6 +344,7 @@ def position_class_from_dict(data_dict):
     PositionClass
         A PositionClass object.
     """  # noqa
+
     return PositionClass(
         asset_id=str(data_dict["asset_id"] if data_dict["asset_id"] else ""),
         symbol=str(data_dict["symbol"] if data_dict["symbol"] else ""),
