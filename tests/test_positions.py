@@ -16,17 +16,17 @@ def alpaca():
 
 
 def test_get_positions_and_cash_row_exists(alpaca):
-    positions = alpaca.get_positions()
+    positions = alpaca.position.get_all()
     assert isinstance(positions, pd.DataFrame)
     assert positions[positions["symbol"] == "Cash"].shape[0] == 1
-    assert positions[positions["symbol"] == "Cash"].iloc[0]["market_value"] == alpaca.get_account().cash
+    assert positions[positions["symbol"] == "Cash"].iloc[0]["market_value"] == alpaca.account.get().cash
 
 
 def test_get_positions_and_position_by_symbol(alpaca):
-    positions = alpaca.get_positions()
+    positions = alpaca.position.get_all()
     assert isinstance(positions, pd.DataFrame)
     for i, position in positions[positions["symbol"] != "Cash"].iterrows():
-        cur_position = alpaca.get_position(symbol=position["symbol"])
+        cur_position = alpaca.position.get(symbol=position["symbol"])
         assert isinstance(cur_position, PositionClass)
         assert isinstance(cur_position.asset_id, str)
         assert isinstance(cur_position.exchange, str)
@@ -48,10 +48,10 @@ def test_get_positions_and_position_by_symbol(alpaca):
 
 
 def test_get_positions_and_position_by_symbol_dict(alpaca):
-    positions = alpaca.get_positions()
+    positions = alpaca.position.get_all()
     assert isinstance(positions, pd.DataFrame)
     for i, position in positions[positions["symbol"] != "Cash"].iterrows():
-        cur_position = alpaca.get_position(symbol_dict=position.squeeze().to_dict())
+        cur_position = alpaca.position.get(symbol_dict=position.squeeze().to_dict())
         assert isinstance(cur_position, PositionClass)
         assert isinstance(cur_position.asset_id, str)
         assert isinstance(cur_position.exchange, str)
@@ -94,7 +94,7 @@ def test_get_position_by_symbol_dict(alpaca):
         "change_today": 0.0,
         "asset_marginable": True,
     }
-    position = alpaca.get_position(symbol_dict=position_dict)
+    position = alpaca.position.get(symbol_dict=position_dict)
     assert position.symbol == "AAPL"
     assert isinstance(position, PositionClass)
     assert isinstance(position.asset_id, str)

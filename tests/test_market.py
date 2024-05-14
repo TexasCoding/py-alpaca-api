@@ -1,8 +1,10 @@
 import os
+from datetime import datetime
 
 import pytest
 
 from py_alpaca_api.alpaca import PyAlpacaApi
+from py_alpaca_api.src.data_classes import ClockClass
 
 # The following keys are for testing purposes only
 # You should never hardcode your keys in your code
@@ -18,11 +20,13 @@ def alpaca():
     return PyAlpacaApi(api_key=api_key, api_secret=api_secret, api_paper=True)
 
 
-#########################################
-##### Test cases for PyAlpacaApi ########
-#########################################
-def test_alpaca_key_exceptions(alpaca):
-    with pytest.raises(ValueError):
-        PyAlpacaApi(api_key="", api_secret=api_secret, api_paper=True)
-    with pytest.raises(ValueError):
-        PyAlpacaApi(api_key=api_key, api_secret="", api_paper=True)
+def test_market_clock_success(alpaca):
+    clock = alpaca.market.clock()
+    assert isinstance(clock, ClockClass)
+    assert isinstance(clock.market_time, datetime)
+    assert isinstance(clock.next_open, datetime)
+    assert isinstance(clock.next_close, datetime)
+    assert isinstance(clock.is_open, bool)
+
+
+########################################

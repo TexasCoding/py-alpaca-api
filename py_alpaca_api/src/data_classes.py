@@ -295,7 +295,7 @@ class AccountClass:
 ############################################
 # Data Class Clock Conversion Functions
 ############################################
-def clock_class_from_dict(data_dict):
+def clock_class_from_dict(data_dict: dict) -> ClockClass:
     """Converts a dictionary to a ClockClass object.
 
     Parameters:
@@ -331,7 +331,7 @@ def clock_class_from_dict(data_dict):
 ############################################
 # Data Class Position Conversion Functions
 ############################################
-def position_class_from_dict(data_dict):
+def position_class_from_dict(data_dict: dict) -> PositionClass:
     """Converts a dictionary to a PositionClass object.
 
     Parameters:
@@ -371,7 +371,7 @@ def position_class_from_dict(data_dict):
 ############################################
 # Data Class Account Conversion Functions
 ############################################
-def account_class_from_dict(data_dict):
+def account_class_from_dict(data_dict: dict) -> AccountClass:
     """Converts a dictionary to an AccountClass object.
 
     Parameters:
@@ -435,7 +435,7 @@ def account_class_from_dict(data_dict):
 ############################################
 # Data Class Asset Conversion Functions
 ############################################
-def asset_class_from_dict(data_dict):
+def asset_class_from_dict(data_dict: dict) -> AssetClass:
     """Converts a dictionary to an AssetClass object.
 
     Parameters:
@@ -467,7 +467,7 @@ def asset_class_from_dict(data_dict):
 ############################################
 # Data Class Order Conversion Functions
 ############################################
-def order_class_from_dict(data_dict):
+def order_class_from_dict(data_dict: dict) -> OrderClass:
     """Converts a dictionary to an OrderClass object.
 
     Parameters:
