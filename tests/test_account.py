@@ -25,11 +25,11 @@ def alpaca_wrong_keys():
 ##########################################
 def test_get_account_wrong_keys(alpaca_wrong_keys):
     with pytest.raises(Exception):
-        alpaca_wrong_keys.get_account()
+        alpaca_wrong_keys.account.get()
 
 
 def test_get_account(alpaca):
-    account = alpaca.get_account()
+    account = alpaca.account.get()
     assert isinstance(account, AccountClass)
     assert isinstance(account.id, str)
     assert isinstance(account.account_number, str)
@@ -74,7 +74,7 @@ def test_get_account(alpaca):
 
 
 def test_get_account_attributes(alpaca):
-    account = alpaca.get_account()
+    account = alpaca.account.get()
     assert hasattr(account, "id")
     assert hasattr(account, "account_number")
     assert hasattr(account, "status")
