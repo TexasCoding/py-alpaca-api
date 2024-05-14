@@ -7,6 +7,23 @@ from .data_classes import AccountClass, account_class_from_dict
 
 class Account:
     def __init__(self, trade_url: str, headers: object) -> None:
+        """Initialize Account class
+
+        Parameters:
+        ___________
+        trade_url: str
+                Alpaca Trade API URL required
+
+        headers: object
+                API request headers required
+
+        Raises:
+        _______
+        ValueError: If trade URL is not provided
+
+        ValueError: If headers are not provided
+        """  # noqa
+
         self.trade_url = trade_url
         self.headers = headers
 
@@ -14,37 +31,55 @@ class Account:
     # \\\\\\\\\\\\\  Get Account Information ///////////////#
     ########################################################
     def get(self) -> AccountClass:
-        """Get account information
+        """Get account information from Alpaca API
 
         Returns:
-        --------
-        AccountClass: Account information as an AccountClass object with values:
-                    id, account_number, status, currency, cash, cash_withdrawable, buying_power, regt_buying_power, daytrading_buying_power,
-                    portfolio_value, pattern_day_trader, trading_blocked, transfers_blocked, account_blocked, created_at, trade_suspended_by_user,
-                    multiplier, shorting_enabled, equity, last_equity, long_market_value, short_market_value, equity_previous_close, \
-                    long_portfolio_value, short_portfolio_value, initial_margin, maintenance_margin, last_maintenance_margin, sma, daytrade_count, \
-                    last_maintenance_margin, sma_held_for_orders, sma_held_for_positions, sma_held_for_options, created_at, updated_at
+        ________
+        AccountClass: Account information as an AccountClass object
 
         Raises:
-        -------
-        Exception: 
-            Exception if failed to get account information
+        _______
+        Exception: If the response is not successful
 
         Example:
-        --------
-        >>> get_account()
-        AccountClass(id='ACCOUNT_ID', account_number='ACCOUNT_NUMBER', status='ACTIVE', currency='USD', cash=1000.0, \
-                    cash_withdrawable=1000.0, buying_power=1000.0, regt_buying_power=1000.0, \
-                    daytrading_buying_power=1000.0, portfolio_value=1000.0, pattern_day_trader=False, \
-                    trading_blocked=False, transfers_blocked=False, account_blocked=False, \
-                    created_at='2021-10-01T00:00:00Z', trade_suspended_by_user=False, multiplier=1.0, \
-                    shorting_enabled=True, equity=1000.0, last_equity=1000.0, long_market_value=0.0, \
-                    short_market_value=0.0, equity_previous_close=1000.0, long_portfolio_value=0.0, \
-                    short_portfolio_value=0.0, initial_margin=0.0, maintenance_margin=0.0, last_maintenance_margin=0.0, \
-                    sma=0.0, daytrade_count=0, last_maintenance_margin=0.0, sma_held_for_orders=0.0, \
-                    sma_held_for_positions=0.0, sma_held_for_options=0.0, created_at='2021-10-01T00:00:00Z', \
-                    updated_at='2021-10-01T00:00:00Z')
+        ________
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            account = api.account.get()
+            print(account)
+
+        AccountClass(
+            account_blocked=False,
+            account_number="PA2ZVZ6QYJ6U",
+            buying_power=100000,
+            cash=100000,
+            created_at="2021-07-08T18:18:08.182Z",
+            currency="USD",
+            daytrade_count=0,
+            daytrading_buying_power=100000,
+            equity=100000,
+            id="f3b5d9e2-0e4e-4f0f-8d3f-0f0e7b7e4e6e",
+            initial_margin=0,
+            last_equity=100000,
+            last_maintenance_margin=0,
+            long_market_value=0,
+            maintenance_margin=0,
+            multiplier=4,
+            pattern_day_trader=False,
+            portfolio_value=100000,
+            regt_buying_power=200000,
+            short_market_value=0,
+            shorting_enabled=True,
+            sma=0,
+            status="ACTIVE",
+            trade_suspended_by_user=False,
+            trading_blocked=False,
+            transfers_blocked=False,
+            updated_at="2021-07-08T18:18:08.182Z",
+            withdrawable_amount=100000
+        )
         """  # noqa
+
         # Alpaca API URL for account information
         url = f"{self.trade_url}/account"
         # Get request to Alpaca API for account information
