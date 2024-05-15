@@ -158,8 +158,130 @@ class Watchlist:
         else:
             raise Exception(response.text)
 
-    def update(self, watchlist_id: str = None, watchlist_name: str = None, symbols: object = []) -> object:
-        pass
+    ########################################################
+    # ///////////// Update a watchlist ////////////////////#
+    ########################################################
+    def update(self, watchlist_id: str = None, watchlist_name: str = None, name: str = "", symbols: str = "") -> WatchlistClass:
+        """Update a watchlist
+
+        Parameters:
+        -----------
+        watchlist_id: str
+            Watchlist ID (default: None) optional
+
+        watchlist_name: str
+            Watchlist name (default: None) optional
+
+        name: str, new name for the watchlist (default: "") optional
+
+        symbols: str, comma separated list of symbols, e.g. "AAPL, EVH" (default: "") optional
+
+        Returns:
+        --------
+        watchlist_class_from_dict: object
+            WatchlistClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                name='asdf',
+                assets=AssetClass(
+                    id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                    asset_class='us_equity',
+                    exchange='NASDAQ',
+                    symbol='AAPL',
+                    status='active',
+                    tradable=True,
+                    marginable=True,
+                    shortable=True,
+                    easy_to_borrow=True,
+                    fractionable=True
+                ),
+                AssetClass(
+                    id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                    asset_class='us_equity',
+                    exchange='NASDAQ',
+                    symbol='EVH',
+                    status='active',
+                    tradable=True,
+                    marginable=True,
+                    shortable=True,
+                    easy_to_borrow=True,
+                    fractionable=True
+                ),
+                created_at='2021-09-21T16:39:52.000000Z',
+                updated_at='2021-09-21T16:39:52.000000Z'
+            )
+
+        Example:
+        --------
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
+        >>> alpaca = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+        >>> alpaca.watchlist.update(watchlist_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d', name='asdf', symbols="AAPL, EVH")
+        WatchlistClass(
+            id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            name='asdf',
+            assets=AssetClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                asset_class='us_equity',
+                exchange='NASDAQ',
+                symbol='AAPL',
+                status='active',
+                tradable=True,
+                marginable=True,
+                shortable=True,
+                easy_to_borrow=True,
+                fractionable=True
+            ),
+            AssetClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                asset_class='us_equity',
+                exchange='NASDAQ',
+                symbol='EVH',
+                status='active',
+                tradable=True,
+                marginable=True,
+                shortable=True,
+                easy_to_borrow=True,
+                fractionable=True
+            ),
+        )
+        """  # noqa
+
+        if watchlist_id and watchlist_name:
+            raise ValueError("Watchlist ID or Name is required, not both.")
+
+        if watchlist_id:
+            watchlist = self.get(watchlist_id=watchlist_id)
+        else:
+            watchlist = self.get(watchlist_name=watchlist_name)
+
+        if watchlist_id:
+            url = f"{self.trade_url}/watchlists/{watchlist_id}"
+
+        elif watchlist_name:
+            if not name:
+                name = self.get(watchlist_name=watchlist_name).name
+            url = f"{self.trade_url}/watchlists:by_name"
+        else:
+            raise ValueError("Watchlist ID or Name is required")
+
+        if not name:
+            name = watchlist.name
+
+        if not symbols:
+            symbols = ",".join([o.symbol for o in watchlist.assets])
+        else:
+            symbols.replace(" ", "").split(",")
+
+        payload = {"name": name, "symbols": symbols}
+        response = requests.put(url, headers=self.headers, json=payload)
+
+        res = json.loads(response.text)
+
+        if response.status_code == 200:
+            return watchlist_class_from_dict(res)
+        else:
+            raise Exception(response.text)
 
     ########################################################
     # ///////////// Delete a watchlist ////////////////////#
