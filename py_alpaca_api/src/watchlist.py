@@ -10,6 +10,9 @@ class Watchlist:
         self.trade_url = trade_url
         self.headers = headers
 
+    ########################################################
+    # //////////////// Get a  watchlist ///////////////////#
+    ########################################################
     def get(self, watchlist_id: str = None, watchlist_name: str = None) -> WatchlistClass:
 
         if watchlist_id and watchlist_name:
@@ -33,6 +36,9 @@ class Watchlist:
         else:
             raise Exception(response.text)
 
+    ########################################################
+    # ///////////// Get all watchlists ////////////////////#
+    ########################################################
     def get_all(self) -> list[WatchlistClass]:
         """Get all watchlists
 
@@ -82,7 +88,7 @@ class Watchlist:
             raise Exception(response.text)
 
     ########################################################
-    # ///////////// Create a new watchlist /////////////////#
+    # ///////////// Create a new watchlist ////////////////#
     ########################################################
     def create(self, name: str, symbols: str = "") -> WatchlistClass:
         """Create a new watchlist
@@ -155,6 +161,9 @@ class Watchlist:
     def update(self, watchlist_id: str = None, watchlist_name: str = None, symbols: object = []) -> object:
         pass
 
+    ########################################################
+    # ///////////// Delete a watchlist ////////////////////#
+    ########################################################
     def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> str:
 
         if watchlist_id and watchlist_name:
@@ -176,12 +185,66 @@ class Watchlist:
         else:
             raise Exception(response.text)
 
-    def add_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> object:
-        pass
+    ########################################################
+    # ///////////// Add Asset to  watchlist ///////////////#
+    ########################################################
+    def add_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+        if watchlist_id and watchlist_name:
+            raise ValueError("Watchlist ID or Name is required, not both.")
 
-    def remove_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> object:
-        pass
+        if not symbol:
+            raise ValueError("Symbol is required")
 
+        if watchlist_id:
+            url = f"{self.trade_url}/watchlists/{watchlist_id}"
+            payload = {"symbol": symbol}
+            response = requests.post(url, headers=self.headers)
+        elif watchlist_name:
+            url = f"{self.trade_url}/watchlists:by_name"
+            params = {"name": watchlist_name}
+            payload = {"symbol": symbol}
+            response = requests.post(url, headers=self.headers, params=params, json=payload)
+        else:
+            raise ValueError("Watchlist ID or Name is required")
+
+        res = json.loads(response.text)
+
+        if response.status_code == 200:
+            return watchlist_class_from_dict(res)
+        else:
+            raise Exception(response.text)
+
+    ########################################################
+    # /////////// Remove a Asset from  watchlist //////////#
+    ########################################################
+    def remove_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+        if watchlist_id and watchlist_name:
+            raise ValueError("Watchlist ID or Name is required, not both.")
+
+        if not symbol:
+            raise ValueError("Symbol is required")
+
+        if watchlist_id:
+            url = f"{self.trade_url}/watchlists/{watchlist_id}"
+        elif watchlist_name:
+            watchlist_id = self.get(watchlist_name=watchlist_name).id
+        else:
+            raise ValueError("Watchlist ID or Name is required")
+
+        url = f"{self.trade_url}/watchlists/{watchlist_id}/{symbol}"
+
+        response = requests.delete(url, headers=self.headers)
+
+        res = json.loads(response.text)
+
+        if response.status_code == 200:
+            return watchlist_class_from_dict(res)
+        else:
+            raise Exception(response.text)
+
+    ########################################################
+    # /////////// Get Assets from a watchlist /////////////#
+    ########################################################
     def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list[str]:
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
