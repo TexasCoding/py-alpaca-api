@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from .data_classes import watchlist_class_from_dict
+from .data_classes import WatchlistClass, watchlist_class_from_dict
 
 
 class Watchlist:
@@ -10,7 +10,7 @@ class Watchlist:
         self.trade_url = trade_url
         self.headers = headers
 
-    def get(self, watchlist_id: str = None, watchlist_name: str = None) -> watchlist_class_from_dict:
+    def get(self, watchlist_id: str = None, watchlist_name: str = None) -> WatchlistClass:
 
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
@@ -33,7 +33,7 @@ class Watchlist:
         else:
             raise Exception(response.text)
 
-    def get_all(self) -> object:
+    def get_all(self) -> list[WatchlistClass]:
         """Get all watchlists
 
         Returns:
@@ -71,18 +71,20 @@ class Watchlist:
         res = json.loads(response.text)
 
         watchlists = []
-        for watchlist in res:
-            watchlists.append(self.get(watchlist_id=watchlist["id"]))
 
         if response.status_code == 200:
-            return watchlists if response.text else []
+            if res:
+                for watchlist in res:
+                    watchlists.append(self.get(watchlist_id=watchlist["id"]))
+
+            return watchlists
         else:
             raise Exception(response.text)
 
     ########################################################
     # ///////////// Create a new watchlist /////////////////#
     ########################################################
-    def create(self, name: str, symbols: str = "") -> watchlist_class_from_dict:
+    def create(self, name: str, symbols: str = "") -> WatchlistClass:
         """Create a new watchlist
 
         Parameters:
@@ -153,11 +155,44 @@ class Watchlist:
     def update(self, watchlist_id: str = None, watchlist_name: str = None, symbols: object = []) -> object:
         pass
 
-    def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> object:
-        pass
+    def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> str:
+
+        if watchlist_id and watchlist_name:
+            raise ValueError("Watchlist ID or Name is required, not both.")
+
+        if watchlist_id:
+            url = f"{self.trade_url}/watchlists/{watchlist_id}"
+
+            response = requests.delete(url, headers=self.headers)
+        elif watchlist_name:
+            url = f"{self.trade_url}/watchlists:by_name"
+            params = {"name": watchlist_name}
+            response = requests.delete(url, headers=self.headers, params=params)
+        else:
+            raise ValueError("Watchlist ID or Name is required")
+
+        if response.status_code == 204:
+            return f"Watchlist {watchlist_id if watchlist_id else watchlist_name} deleted successfully."
+        else:
+            raise Exception(response.text)
 
     def add_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> object:
         pass
 
     def remove_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> object:
         pass
+
+    def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list[str]:
+        if watchlist_id and watchlist_name:
+            raise ValueError("Watchlist ID or Name is required, not both.")
+
+        if watchlist_id:
+            watchlist = self.get(watchlist_id=watchlist_id)
+        elif watchlist_name:
+            watchlist = self.get(watchlist_name=watchlist_name)
+        else:
+            raise ValueError("Watchlist ID or Name is required")
+
+        symbols = [o.symbol for o in watchlist.assets]
+
+        return symbols
