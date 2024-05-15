@@ -246,35 +246,41 @@ class Watchlist:
             ),
         )
         """  # noqa
-
+        # Check if both watchlist_id and watchlist_name are provided and raise an error if they are
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
-
+        # Check if watchlist_id is provided
         if watchlist_id:
+            # Get the watchlist
             watchlist = self.get(watchlist_id=watchlist_id)
         else:
+            # Get the watchlist by name, if watchlist_id is not provided
             watchlist = self.get(watchlist_name=watchlist_name)
-
+        # Check if name is provided, if not use the name from the watchlist
         if watchlist_id:
             url = f"{self.trade_url}/watchlists/{watchlist_id}"
-
+        # Check if watchlist_name is provided. If name is not provided, use the name from the watchlist
         elif watchlist_name:
-            if not name:
-                name = self.get(watchlist_name=watchlist_name).name
+            # Get the watchlist by name
             url = f"{self.trade_url}/watchlists:by_name"
+        # Raise an error if neither watchlist_id nor watchlist_name is provided
         else:
             raise ValueError("Watchlist ID or Name is required")
-
-        if not name:
-            name = watchlist.name
-
-        if not symbols:
-            symbols = ",".join([o.symbol for o in watchlist.assets])
+        # Check if name is provided, if not use the name from the watchlist
+        if name != "":
+            name = name
         else:
-            symbols.replace(" ", "").split(",")
+            name = watchlist.name
+        # Check if symbols is provided, if not use the symbols from the watchlist
+        if symbols != "":
+            symbols = symbols.replace(" ", "").split(",")
+        else:
+            symbols = ",".join([o.symbol for o in watchlist.assets])
 
+        # Create the payload
         payload = {"name": name, "symbols": symbols}
-        response = requests.put(url, headers=self.headers, json=payload)
+        # Send the request, if 200 return the WatchlistClass object
+        response = requests.put(url, headers=self.headers, json=payload, params={"name": watchlist_name} if watchlist_name else None)
 
         res = json.loads(response.text)
 
