@@ -9,6 +9,29 @@ from .data_classes import PositionClass, position_class_from_dict
 
 class Position:
     def __init__(self, trade_url: str, headers: object, account: Account) -> None:
+        """Initialize Position class
+
+        Parameters:
+        ___________
+        trade_url: str
+                Alpaca Trade API URL required
+
+        headers: object
+                API request headers required
+
+        account: Account
+                Account object required
+
+        Raises:
+        _______
+        ValueError: If trade URL is not provided
+
+        ValueError: If headers are not provided
+
+        ValueError: If account is not provided
+
+        """  # noqa
+
         self.trade_url = trade_url
         self.headers = headers
         self.account = account
@@ -17,25 +40,33 @@ class Position:
     # \\\\\\\\\\\\\\\\\ Get Positions /////////////////////#
     ########################################################
     def get_all(self) -> pd.DataFrame:
-        """Get account positions, including cash
+        """Get all positions information from Alpaca API
 
         Returns:
         --------
-        DataFrame:  Account positions as a DataFrame with columns:
-                    asset_id, symbol, exchange, asset_class, qty, qty_available, side, market_value, cost_basis, profit_dol, profit_pct,
-                    intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price, change_today, asset_marginable
+        pd.DataFrame:   All positions information as a DataFrame with columns:
+                    asset_id, symbol, exchange, asset_class, avg_entry_price, qty, qty_available, side, market_value, cost_basis,
+                    profit_dol, profit_pct, intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price,
+                    change_today, asset_marginable
 
         Raises:
         -------
-        Exception:
-            Exception if failed to get account positions
+        Exception: If failed to get positions information
 
         Example:
         --------
-        >>> get_positions()
-            asset_id    symbol  exchange    asset_class qty qty_available   side    market_value    cost_basis  profit_dol  profit_pct  intraday_profit_dol intraday_profit_pct portfolio_pct   current_price   lastday_price   change_today    asset_marginable
-        0   ""          Cash    ""          ""          0   0               ""      1000.0          0.0         0.0         0.0         0.0                 0.0                 1.0             1.0             1.0             0.0             False
-        1   ASSET_ID    AAPL    NASDAQ      us_equity   10  10              long    1000.0          1000.0      0.0         0.0         0.0                 0.0                 0.0             100.0           100.0           0.0             True
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            positions = api.position.get_all()
+            print(positions)
+
+        asset_id symbol exchange asset_class  avg_entry_price  qty  qty_available  side  market_value  cost_basis  profit_dol  profit_pct  \
+        0           Cash  Cash         Cash          0.0000  0.0            0.0  Cash       10000.0         0.0         0.0      0.000
+        1  ASSET_ID   AAPL   NASDAQ   us_equity        100.0000  10.0           10.0  long       1000.0      1000.0         0.0      0.000
+
+        intraday_profit_dol  intraday_profit_pct  portfolio_pct  current_price  lastday_price  change_today  asset_marginable
+        0                  0.0                0.000         1.0000            0.0            0.0           0.0             False
+        1                  0.0                0.000         0.1000          100.0          100.0           0.0              True
         """  # noqa
 
         # Url for positions
@@ -127,48 +158,61 @@ class Position:
     # \\\\\\\\\\\\\\\\\ Get Position //////////////////////#
     ########################################################
     def get(self, symbol: str = None, symbol_dict: dict = None) -> PositionClass:
-        """Get position information by symbol or symbol dictionary
+        """Get position information by symbol or asset ID
 
         Parameters:
         -----------
-        symbol:     Asset symbol to get position information
-                    A valid asset symbol string (e.g., AAPL, or asset_id) optional, not required if symbol_dict is provided
+        symbol:         Asset symbol to get position information
+                        A valid asset symbol string (optional) str
 
-        symbol_dict: Position information dictionary
-                    A valid position information dictionary optional, not required if symbol is provided
+        symbol_dict:    Asset symbol dictionary to get position information
+                        A valid asset symbol dictionary (optional) dict
 
         Returns:
         --------
-        PositionClass: Position information as a PositionClass object with values:
-                    asset_id, symbol, exchange, asset_class, qty, qty_available, side, market_value, cost_basis, profit_dol, profit_pct,
-                    intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price, change_today, asset_marginable
+        PositionClass:  Position information as a PositionClass object with attributes:
+                    asset_id, symbol, exchange, asset_class, avg_entry_price, qty, qty_available, side, market_value, cost_basis,
+                    profit_dol, profit_pct, intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price,
+                    change_today, asset_marginable
 
         Raises:
         -------
-        ValueError:
-            ValueError if symbol or symbol_dict is not provided
+        ValueError:     ValueError if symbol or symbol_dict is not provided
 
-        ValueError:
-            ValueError if both symbol and symbol_dict are provided
+        ValueError:     ValueError if both symbol and symbol_dict are provided
 
-        ValueError:
-            ValueError if failed to get position information
+        Exception:      Exception if failed to get position information
 
         Example:
         --------
-        >>> get_position(symbol="AAPL")
-        PositionClass(asset_id='ASSET_ID', symbol='AAPL', exchange='NASDAQ', asset_class='us_equity', qty=10.0, qty_available=10.0, \
-                    side='long', market_value=1000.0, cost_basis=1000.0, profit_dol=0.0, profit_pct=0.0, intraday_profit_dol=0.0, \
-                    intraday_profit_pct=0.0, portfolio_pct=1.0, current_price=100.0, lastday_price=100.0, change_today=0.0, asset_marginable=True)
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            position = api.position.get(symbol="AAPL")
+            print(position)
 
-        >>> get_position(symbol_dict={"asset_id": "ASSET_ID", "symbol": "AAPL", "exchange": "NASDAQ", "asset_class": "us_equity", \
-                    "qty": 10.0, "qty_available": 10.0, "side": "long", "market_value": 1000.0, "cost_basis": 1000.0, "profit_dol": 0.0, \
-                    "profit_pct": 0.0, "intraday_profit_dol": 0.0, "intraday_profit_pct": 0.0, "portfolio_pct": 1.0, "current_price": 100.0, \
-                    "lastday_price": 100.0, "change_today": 0.0, "asset_marginable": True})
-        PositionClass(asset_id='ASSET_ID', symbol='AAPL', exchange='NASDAQ', asset_class='us_equity', qty=10.0, qty_available=10.0, \
-                    side='long', market_value=1000.0, cost_basis=1000.0, profit_dol=0.0, profit_pct=0.0, intraday_profit_dol=0.0, \
-                    intraday_profit_pct=0.0, portfolio_pct=1.0, current_price=100.0, lastday_price=100.0, change_today=0.0, asset_marginable=True)
+        PositionClass(
+            asset_id="375f6b6e-3b5f-4b2b-8f6b-2e6b2a6b2e6b",
+            symbol="AAPL",
+            exchange="NASDAQ",
+            asset_class="us_equity",
+            avg_entry_price=100.0,
+            qty=10.0,
+            qty_available=10.0,
+            side="long",
+            market_value=1000.0,
+            cost_basis=1000.0,
+            profit_dol=0.0,
+            profit_pct=0.0,
+            intraday_profit_dol=0.0,
+            intraday_profit_pct=0.0,
+            portfolio_pct=0.1,
+            current_price=100.0,
+            lastday_price=100.0,
+            change_today=0.0,
+            asset_marginable=True
+        )
         """  # noqa
+
         # Check if symbol or symbol_dict is provided
         if not symbol and not symbol_dict:
             # Raise ValueError if symbol or symbol_dict is not provided
@@ -216,27 +260,31 @@ class Position:
     # \\\\\\\\\\\\\\\\ Close All Positions ////////////////#
     ########################################################
     def close_all(self, cancel_orders: bool = False) -> str:
-        """Close all positions
+        """Close all positions from Alpaca API
 
         Parameters:
         -----------
         cancel_orders:  Cancel open orders (default: False)
-                        Cancel open orders before closing positions (optional) bool
+                        Cancel open orders (optional) bool
 
         Returns:
         --------
-        str:            Position closing confirmation message
+        str:            Text message for closing all positions confirmation
 
         Raises:
         -------
-        Exception:
-            Exception if failed to close positions
+        Exception:      Exception if failed to close positions
 
         Example:
         --------
-        >>> close_all_positions()
-        '2 positions have been closed'
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            message = api.position.close_all()
+            print(message)
+
+        '1 positions have been closed'
         """  # noqa
+
         # Url for positions
         url = f"{self.trade_url}/positions"
         # Parameters for the request
@@ -258,43 +306,42 @@ class Position:
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
     ########################################################
     def close(self, symbol_or_id: str, qty: float = None, percentage: int = None) -> str:
-        """Close a position by symbol or asset ID
+        """Close position by symbol or asset ID from Alpaca API
 
         Parameters:
         -----------
         symbol_or_id:   Asset symbol or asset ID to close position
                         A valid asset symbol or asset ID string required
 
-        qty:            Quantity to close position (default: None)
+        qty:            Quantity to close position (optional)
                         Quantity to close position (optional) float
 
-        percentage:     Percentage to close position (default: None)
+        percentage:     Percentage to close position (optional)
                         Percentage to close position (optional) int
 
         Returns:
         --------
-        str:            Position closing confirmation message
+        str:            Text message for closing position confirmation
 
         Raises:
         -------
-        ValueError:
-            ValueError if quantity or percentage is not provided
+        ValueError:     ValueError if quantity or percentage is not provided
 
-        ValueError:
-            ValueError if both quantity and percentage are provided
+        ValueError:     ValueError if both quantity and percentage are provided
 
-        ValueError:
-            ValueError if percentage is not between 0 and 100
+        ValueError:     ValueError if percentage is not between 0 and 100
 
-        ValueError:
-            ValueError if symbol or asset_id is not provided
+        ValueError:     ValueError if symbol or asset_id is not provided
 
-        Exception:
-            Exception if failed to close position
+        Exception:      Exception if failed to close position
 
         Example:
         --------
-        >>> close_position(symbol_or_id="AAPL", qty=10)
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            message = api.position.close(symbol_or_id="AAPL", qty=10)
+            print(message)
+
         'Position AAPL has been closed'
         """  # noqa
 

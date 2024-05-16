@@ -31,10 +31,15 @@ def alpaca_create_order(alpaca):
     return alpaca.order.market(symbol="AAPL", notional=2.25, side="buy")
 
 
+def delete_all_orders(alpaca):
+    alpaca.order.cancel_all()
+
+
 ################################################
 # Test cases for PyAlpacaApi.cancel_all #
 ################################################
 def test_cancel_all_orders(alpaca):
+    delete_all_orders(alpaca)
     test_count = 5
     for i in range(test_count):
         alpaca.order.market(symbol="AAPL", notional=2.00)
@@ -47,18 +52,21 @@ def test_cancel_all_orders(alpaca):
 # Test cases for PyAlpacaApi.cancel_by_id #
 #################################################
 def test_close_a_order_by_id(alpaca_create_order, alpaca):
+    delete_all_orders(alpaca)
     order = alpaca_create_order
     assert order.status == "accepted"
     canceled_order = alpaca.order.cancel_by_id(order.id)
     f"Order {order.id} has been canceled" in canceled_order
     order = alpaca.order.get_by_id(order.id)
     assert order.status == "canceled"
+    delete_all_orders(alpaca)
 
 
 ###########################################
 # Test cases for PyAlpacaApi.market #
 ###########################################
 def test_qty_market_order(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.market(symbol="AAPL", qty=0.01, side="buy")
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
@@ -68,6 +76,7 @@ def test_qty_market_order(alpaca):
 
 
 def test_notional_market_order(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.market(symbol="AAPL", notional=2.00, side="buy")
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
@@ -89,6 +98,7 @@ def test_no_money_value_market_order(alpaca):
 
 
 def test_order_instance(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.market(symbol="AAPL", qty=0.01, side="buy")
     assert isinstance(order, OrderClass)
     assert isinstance(order.id, str)
@@ -127,6 +137,7 @@ def test_order_instance(alpaca):
 # Test cases for PyAlpacaApi.limit #
 ###########################################
 def test_limit_order_with_qty(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.limit(symbol="AAPL", qty=0.1, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
@@ -136,6 +147,7 @@ def test_limit_order_with_qty(alpaca):
 
 
 def test_limit_order_with_notional(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.limit(symbol="AAPL", notional=2.00, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
@@ -160,6 +172,7 @@ def test_limit_order_with_no_money(alpaca):
 # Test cases for PyAlpacaApi.stop #
 ###########################################
 def test_stop_order_with_qty(alpaca):
+    delete_all_orders(alpaca)
     order = alpaca.order.stop(symbol="AAPL", qty=1, side="buy", stop_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "pending_new" or order.status == "accepted"

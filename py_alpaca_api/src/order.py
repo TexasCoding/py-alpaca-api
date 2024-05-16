@@ -7,6 +7,23 @@ from .data_classes import OrderClass, order_class_from_dict
 
 class Order:
     def __init__(self, trade_url: str, headers: object) -> None:
+        """Initialize Order class
+
+        Parameters:
+        ___________
+        trade_url: str
+                Alpaca Trade API URL required
+
+        headers: object
+                API request headers required
+
+        Raises:
+        _______
+        ValueError: If trade URL is not provided
+
+        ValueError: If headers are not provided
+        """  # noqa
+
         self.trade_url = trade_url
         self.headers = headers
 
@@ -21,27 +38,47 @@ class Order:
         order_id:   Order ID to get information
                     A valid order ID string required
 
-        nested:     Include nested information (default: False)
-                    Include nested information in the response (optional) bool
+        nested:     Include nested objects (default: False)
+                    Include nested objects (optional) bool
 
         Returns:
         --------
-        OrderClass: Order information as an OrderClass object with values:
-                    id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, notional, qty, filled_qty, filled_avg_price,
-                    order_class, order_type
+        OrderClass: Order information as an OrderClass object
 
         Raises:
         -------
-        ValueError: 
-            ValueError if failed to get order information
-        
+        ValueError: If failed to get order information
+
         Example:
         --------
-        >>> get_order_by_id(order_id="ORDER_ID")
-        OrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
-                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
-                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.get_by_id(order_id="ORDER_ID")
+            print(order)
+
+        OrderClass(
+            id="ORDER_ID",
+            client_order_id="CLIENT_ORDER_ID",
+            created_at="2021-10-01T00:00:00Z",
+            submitted_at="2021-10-01 00:00:00",
+            asset_id="ASSET_ID",
+            symbol="AAPL",
+            asset_class="us_equity",
+            notional=1000.0,
+            qty=10.0,
+            filled_qty=10.0,
+            filled_avg_price=100.0,
+            order_class="simple",
+            order_type="market",
+            limit_price=None,
+            stop_price=None,
+            status="new",
+            side="buy",
+            time_in_force="day",
+            extended_hours=False
+        )
         """  # noqa
+
         # Parameters for the request
         params = {"nested": nested}
         # Alpaca API URL for order information
@@ -76,14 +113,18 @@ class Order:
 
         Raises:
         -------
-        Exception:
-            Exception if failed to cancel order
+        Exception:  If failed to cancel order
 
         Example:
         --------
-        >>> cancel_order_by_id(order_id="ORDER_ID")
-        'Order ORDER_ID has been cancelled'
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.cancel_by_id(order_id="ORDER_ID")
+            print(order)
+
+        Order ORDER_ID has been cancelled
         """  # noqa
+
         # Alpaca API URL for canceling an order
         url = f"{self.trade_url}/orders/{order_id}"
         # Delete request to Alpaca API for canceling an order
@@ -109,9 +150,18 @@ class Order:
 
         Raises:
         -------
-        Exception:
-            Exception if failed to cancel all orders
+        Exception:  If failed to cancel all orders
+
+        Example:
+        --------
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.cancel_all()
+            print(order)
+
+        10 orders have been cancelled
         """  # noqa
+
         # Alpaca API URL for canceling all orders
         url = f"{self.trade_url}/orders"
         # Delete request to Alpaca API for canceling all orders
@@ -138,22 +188,22 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
-        """Submit a market order
+        """Submit a Market Order
 
         Parameters:
         -----------
         symbol:         Asset symbol to buy/sell
                         A valid asset symbol string required
-        
+
         qty:            Quantity of asset to buy/sell (default: None)
                         Quantity of asset to buy/sell (optional) float
 
         notional:       Notional value of asset to buy/sell (default: None)
                         Notional value of asset to buy/sell (optional) float
-                    
+
         side:           Order side (buy/sell) (default: buy)
                         Order side (buy/sell) (optional) str
-                    
+
         time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
                         Time in force options (optional) str
 
@@ -175,16 +225,17 @@ class Order:
 
         Example:
         --------
-        >>> market_order(symbol="AAPL", qty=10)
-        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
-                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
-                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.market(symbol="AAPL", qty=10)
+            print(order)
 
-        >>> market_order(symbol="AAPL", notional=1000)
         MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
                 submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
-                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market')
+                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='market', \
+                limit_price=None, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
         """  # noqa
+
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload
@@ -232,7 +283,7 @@ class Order:
 
         limit_price:    Limit price for the order
                         Limit price for the order float required
-                
+
         qty:            Quantity of asset to buy/sell (default: None)
                         Quantity of asset to buy/sell (optional) float
 
@@ -251,30 +302,39 @@ class Order:
         Returns:
         --------
         MarketOrderClass: Market order information as a MarketOrderClass object with
-                            values: id, client_order_id, created_at, submitted_at, asset_id, symbol, \
-                            asset_class, notional, qty, filled_qty, filled_avg_price, order_class, \
-                            order_type , limit_price, stop_price, filled_qty, filled_avg_price, \
-                            status, type, side, time_in_force, extended_hours
-        
+                            values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class, 
+                            notional, qty, filled_qty, filled_avg_price, order_class, order_type , limit_price, 
+                            stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
+
         Raises:
         -------
         Exception: 
             Exception if failed to submit limit order
-        
+
         Example:
         --------
-        >>> limit_order(symbol="AAPL", limit_price=100, qty=10)
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.limit(symbol="AAPL", limit_price=100, qty=10)
+            print(order)
+
         MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
                 submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
                 notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='limit', \
                 limit_price=100.0, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
 
-        >>> limit_order(symbol="AAPL", limit_price=100, notional=1000)
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.limit(symbol="AAPL", limit_price=100, notional=1000)
+            print(order)
+
         MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
                 submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
                 notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='limit', \
                 limit_price=100.0, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
+
         """  # noqa
+
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload
@@ -329,10 +389,10 @@ class Order:
         side:           Order side (buy/sell) (default: buy)
                         Order side (buy/sell) (optional) str
 
-        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day) 
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
                         Time in force options (optional) str
 
-        extended_hours: Extended hours trading (default: False) 
+        extended_hours: Extended hours trading (default: False)
                         Extended hours trading (optional) bool
 
         Returns:
@@ -342,25 +402,25 @@ class Order:
                             notional, qty, filled_qty, filled_avg_price, order_class, order_type , limit_price, 
                             stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
 
-        Raises: 
+        Raises:
         -------
         Exception: 
             Exception if failed to submit stop order
 
-        Example:    
+        Example:
         --------
-        >>> stop_order(symbol="AAPL", stop_price=100, qty=10)
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            order = api.order.stop(symbol="AAPL", stop_price=100, qty=10)
+            print(order)
+
         MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
                 submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
                 notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='stop', \
                 limit_price=None, stop_price=100.0, status='new', side='buy', time_in_force='day', extended_hours=False)
 
-        >>> stop_order(symbol="AAPL", stop_price=100, qty=10, side="sell")
-        MarketOrderClass(id='ORDER_ID', client_order_id='CLIENT_ORDER_ID', created_at='2021-10-01T00:00:00Z', \
-                submitted_at='2021-10-01 00:00:00', asset_id='ASSET_ID', symbol='AAPL', asset_class='us_equity', \
-                notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='stop', \
-                limit_price=None, stop_price=100.0, status='new', side='sell', time_in_force='day', extended_hours=False)
         """  # noqa
+
         # Alpaca API URL for submitting market order
         url = f"{self.trade_url}/orders"
         # Market order payload

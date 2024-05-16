@@ -8,6 +8,28 @@ from .asset import Asset
 
 class History:
     def __init__(self, data_url: str, headers: object, asset: Asset) -> None:
+        """Initialize History class
+
+        Parameters:
+        ___________
+        data_url: str
+                Alpaca Data API URL required
+
+        headers: object
+                API request headers required
+
+        asset: Asset
+                Asset object required
+
+        Raises:
+        _______
+        ValueError: If data URL is not provided
+
+        ValueError: If headers are not provided
+
+        ValueError: If asset is not provided
+        """  # noqa
+
         self.data_url = data_url
         self.headers = headers
         self.asset = asset
@@ -27,63 +49,78 @@ class History:
         sort="asc",
         adjustment="raw",
     ) -> pd.DataFrame:
-        """Get historical stock data for a given symbol
+        """Get historical stock data from Alpaca API
 
         Parameters:
-        -----------
-        symbol:     Stock symbol
-                    A valid stock symbol (e.g., AAPL) string required
+        ___________
+        symbol: str
+                Stock symbol required
 
-        start:      Start date for historical data
-                    A valid start date string in the format "YYYY-MM-DD" required
+        start: str
+                Start date for historical data required, format: YYYY-MM-DD
 
-        end:        End date for historical data
-                    A valid end date string in the format "YYYY-MM-DD" required
+        end: str
+                End date for historical data required, format: YYYY-MM-DD
 
-        timeframe:  Timeframe for historical data
-                    (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1m) (default: 1d) (optional)
+        timeframe: str
+                Timeframe for historical data, default: 1d
+                Choices: "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", "1m"
 
-        feed:       Data feed source
-                    (iex, sip, tops, last, hist) (default: iex) (optional)
+        feed: str
+                Data feed source, default: iex
+                Choices: "iex", "sip", "otc"
 
-        currency:   Currency for historical data (default: USD)
-                    Supported currencies: USD, CAD, EUR, GBP, JPY, AUD, CNY, HKD
+        currency: str
+                Currency for historical data, default: USD
 
-        limit:      Limit number of data points (default: 1000)
-                    Maximum number of data points to return (optional) int
+        limit: int
+                Limit number of data points, default: 1000
+                The maximum number of data points to return in the response.
 
-        sort:       Sort order (asc, desc) (default: asc)
+        sort: str
+                Sort order, default: asc, Choices: "asc", "desc"
 
-        adjustment: Adjustment for historical data (raw, split, dividends) (default: raw)
+        adjustment: str
+                Adjustment for historical data, default: raw
+                Choices: "raw", "split", "dividend", "merger", "all"
 
         Returns:
-        --------
-        DataFrame:  Historical stock data as a DataFrame with columns:
-                    symbol, date, open, high, low, close, volume, trade_count, vwap
+        ________
+        pd.DataFrame: Historical stock data as a DataFrame
 
         Raises:
-        -------
-        Exception:
-            Exception if failed to get historical stock data
+        _______
+        ValueError: If the response is not successful
 
-        ValueError:
-            ValueError if symbol is not a stock
+        ValueError: If the asset is not a stock
 
-        ValueError:
-            ValueError if invalid timeframe
+        ValueError: If no data is available
 
-        ValueError:
-            ValueError if no data available for symbol
+        ValueError: If invalid timeframe is provided
 
         Example:
-        --------
-        >>> get_stock_historical_data(symbol="AAPL", start="2021-01-01", end="2021-12-31", timeframe="1d")
-            symbol  close   high    low     trade_count open    date        volume      vwap
-        0   AAPL    132.69  133.61  132.16  1           133.52  2021-01-04  100620780   132.69
+        ________
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            stock_data = api.history.get_stock_data(symbol="AAPL", start="2021-01-01", end="2021-12-31", timeframe="1d")
+            print(stock_data)
 
-        >>> get_stock_historical_data(symbol="FAKESYMBOL", start="2021-01-01", end="2021-12-31", timeframe="1d")
-        ValueError: Failed to get asset information. Response: {"code":40410001,"message":"symbol not found: FAKESYMBOL"}
+        symbol       date    open    high     low   close    volume  trade_count     vwap
+        AAPL    2021-01-04  133.52  133.61  126.76  129.41  143301887      1009115  130.914
+        AAPL    2021-01-05  128.89  131.74  128.43  131.01   97664898       678471  130.573
+        AAPL    2021-01-06  127.72  131.05  126.38  126.60  155087970      1135783  128.073
+        AAPL    2021-01-07  128.36  131.63  127.86  130.92  109578157       791297  129.918
+        AAPL    2021-01-08  132.43  132.63  130.23  132.05  105158245       743315  131.573
+        ...            ...     ...     ...     ...     ...        ...          ...      ...
+        AAPL    2021-12-23  176.69  177.36  175.55  177.36   30925200       123456  176.423
+        AAPL    2021-12-27  177.41  179.15  177.36  179.15   36254100       145236  178.423
+        AAPL    2021-12-28  179.15  179.25  177.36  177.36   30925200       123456  178.423
+        AAPL    2021-12-29  177.36  179.15  177.36  179.15   36254100       145236  178.423
+        AAPL    2021-12-30  179.15  179.25  177.36  177.36   30925200       123456  178.423
+
+        [252 rows x 9 columns]
         """  # noqa
+
         # Get asset information for the symbol
         try:
             asset = self.asset.get(symbol)

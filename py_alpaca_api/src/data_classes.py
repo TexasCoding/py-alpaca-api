@@ -292,6 +292,35 @@ class AccountClass:
     pending_reg_taf_fees: float
 
 
+@dataclass
+class WatchlistClass:
+    id: str
+    account_id: str
+    created_at: datetime
+    updated_at: datetime
+    name: str
+    assets: object
+
+
+def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
+    return WatchlistClass(
+        id=str(data_dict["id"] if data_dict["id"] else ""),
+        account_id=str(data_dict["account_id"] if data_dict["account_id"] else ""),
+        created_at=(
+            datetime.strptime(data_dict["created_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            if data_dict["created_at"]
+            else datetime.date(0, 0, 0)
+        ),
+        updated_at=(
+            datetime.strptime(data_dict["updated_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            if data_dict["updated_at"]
+            else datetime.date(0, 0, 0)
+        ),
+        name=str(data_dict["name"] if data_dict["name"] else ""),
+        assets=[asset_class_from_dict(sym) for sym in data_dict["assets"] if len(data_dict["assets"]) > 0] if data_dict["assets"] else None,
+    )
+
+
 ############################################
 # Data Class Clock Conversion Functions
 ############################################
