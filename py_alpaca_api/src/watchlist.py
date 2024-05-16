@@ -7,6 +7,16 @@ from .data_classes import WatchlistClass, watchlist_class_from_dict
 
 class Watchlist:
     def __init__(self, trade_url: str, headers: object) -> None:
+        """Initializes the Watchlist class
+
+        Parameters:
+        -----------
+        trade_url: str
+            The trade URL
+
+        headers: object
+            The headers object
+        """
         self.trade_url = trade_url
         self.headers = headers
 
@@ -293,6 +303,27 @@ class Watchlist:
     # ///////////// Delete a watchlist ////////////////////#
     ########################################################
     def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> str:
+        """Delete a watchlist
+
+        Parameters:
+        -----------
+        watchlist_id: str
+            Watchlist ID (default: None) optional
+
+        watchlist_name: str
+            Watchlist name (default: None) optional
+
+        Returns:
+        --------
+        str: Success message
+
+        Example:
+        --------
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
+        >>> alpaca = PyAlpacaApi(api
+        >>> alpaca.watchlist.delete(watchlist_name='asdf')
+        'Watchlist asdf deleted successfully.'
+        """  # noqa
 
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
@@ -317,6 +348,64 @@ class Watchlist:
     # ///////////// Add Asset to  watchlist ///////////////#
     ########################################################
     def add_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+        """Add a Asset to a watchlist
+
+        Parameters:
+        -----------
+        watchlist_id: str
+            Watchlist ID (default: None) optional
+
+        watchlist_name: str
+            Watchlist name (default: None) optional
+
+        symbol: str
+            Symbol to add (default: "") optional
+
+        Returns:
+        --------
+        watchlist_class_from_dict: object
+            WatchlistClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                name='asdf',
+                assets=AssetClass(
+                    id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                    asset_class='us_equity',
+                    exchange='NASDAQ',
+                    symbol='AAPL',
+                    status='active',
+                    tradable=True,
+                    marginable=True,
+                    shortable=True,
+                    easy_to_borrow=True,
+                    fractionable=True
+                ),
+            )
+
+        Example:
+        --------
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
+        >>> alpaca = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+        >>> alpaca.watchlist.add_asset(watchlist_name='asdf', symbol='AAPL')
+        WatchlistClass(
+            id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            name='asdf',
+            assets=AssetClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                asset_class='us_equity',
+                exchange='NASDAQ',
+                symbol='AAPL',
+                status='active',
+                tradable=True,
+                marginable=True,
+                shortable=True,
+                easy_to_borrow=True,
+                fractionable=True
+            ),
+        )
+        """  # noqa
+
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
 
@@ -346,6 +435,77 @@ class Watchlist:
     # /////////// Remove a Asset from  watchlist //////////#
     ########################################################
     def remove_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+        """Remove a Asset from a watchlist
+
+        Parameters:
+        -----------
+        watchlist_id: str
+            Watchlist ID (default: None) optional
+
+        watchlist_name: str
+            Watchlist name (default: None) optional
+
+        symbol: str
+            Symbol to remove (default: "") optional
+
+        Returns:
+        --------
+        watchlist_class_from_dict: object
+            WatchlistClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                name='asdf',
+                assets=AssetClass(
+                    id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                    asset_class='us_equity',
+                    exchange='NASDAQ',
+                    symbol='AAPL',
+                    status='active',
+                    tradable=True,
+                    marginable=True,
+                    shortable=True,
+                    easy_to_borrow=True,
+                    fractionable=True
+                ),
+                AssetClass(
+                    id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                    asset_class='us_equity',
+                    exchange='NASDAQ',
+                    symbol='EVH',
+                    status='active',
+                    tradable=True,
+                    marginable=True,
+                    shortable=True,
+                    easy_to_borrow=True,
+                    fractionable=True
+                ),
+            )
+
+        Example:
+        --------
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
+        >>> alpaca = PyAlpacaApi(api
+        >>> alpaca.watchlist.remove_asset(watchlist_name='asdf', symbol='AAPL')
+        WatchlistClass(
+            id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            account_id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+            name='asdf',
+            assets=AssetClass(
+                id='d0c6a0e9-9d6d-4b0a-bd2c-375b0e0b5e3d',
+                asset_class='us_equity',
+                exchange='NASDAQ',
+                symbol='EVH',
+                status='active',
+                tradable=True,
+                marginable=True,
+                shortable=True,
+                easy_to_borrow=True,
+                fractionable=True
+            ),
+            created_at='2021-09-21T16:39:52.000000Z',
+            updated_at='2021-09-21T16:39:52.000000Z'
+        )
+        """  # noqa
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
 
@@ -374,6 +534,27 @@ class Watchlist:
     # /////////// Get Assets from a watchlist /////////////#
     ########################################################
     def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list[str]:
+        """Get assets from a watchlist
+
+        Parameters:
+        -----------
+        watchlist_id: str
+            Watchlist ID (default: None) optional
+
+        watchlist_name: str
+            Watchlist name (default: None) optional
+
+        Returns:
+        --------
+        list: List of symbols
+
+        Example:
+        --------
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
+        >>> alpaca = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+        >>> alpaca.watchlist.get_assets(watchlist_name='asdf')
+        ['AAPL', 'EVH']
+        """  # noqa
         if watchlist_id and watchlist_name:
             raise ValueError("Watchlist ID or Name is required, not both.")
 
