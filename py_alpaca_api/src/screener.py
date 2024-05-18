@@ -40,7 +40,94 @@ class Screener:
         self.headers = headers
         self.asset = asset
 
-    def gainers(self, timeframe: str = "1Day", start: str = prev_close, end: str = close) -> pd.DataFrame:
+    def losers(
+        self,
+        price_greater_than: float = 5.0,
+        change_less_than: float = -2.0,
+        volume_greater_than: int = 20000,
+        trade_count_greater_than: int = 2000,
+        total_losers_returned: int = 100,
+    ) -> pd.DataFrame:
+        """Get top losers for the day
+
+        Parameters:
+        ___________
+        price_greater_than: float
+                Price greater than optional, default is 5.0
+
+        change_less_than: float
+                Change less than optional, default is -2.0
+
+        volume_greater_than: int
+                Volume greater than optional, default is 20000
+
+        trade_count_greater_than: int
+                Trade count greater than optional, default is 2000
+
+        total_losers_returned: int
+                Total losers returned optional, default is 100
+
+        Returns:
+        _______
+        pd.DataFrame: Top losers for the day
+
+        Raises:
+        _______
+        ValueError: If failed to get top losers
+        """  # noqa
+        losers_df = self._get_percentages()
+
+        losers_df = losers_df[losers_df["price"] > price_greater_than]
+        losers_df = losers_df[losers_df["change"] < change_less_than]
+        losers_df = losers_df[losers_df["volume"] > volume_greater_than]
+        losers_df = losers_df[losers_df["trades"] > trade_count_greater_than]
+        return losers_df.sort_values(by="change", ascending=True).reset_index(drop=True).head(total_losers_returned)
+
+    def gainers(
+        self,
+        price_greater_than: float = 5.0,
+        change_greater_than: float = 2.0,
+        volume_greater_than: int = 20000,
+        trade_count_greater_than: int = 2000,
+        total_gainers_returned: int = 100,
+    ) -> pd.DataFrame:
+        """Get top gainers for the day
+
+        Parameters:
+        ___________
+        price_greater_than: float
+                Price greater than optional, default is 5.0
+
+        change_greater_than: float
+                Change greater than optional, default is 2.0
+
+        volume_greater_than: int
+                Volume greater than optional, default is 20000
+
+        trade_count_greater_than: int
+                Trade count greater than optional, default is 2000
+
+        total_gainers_returned: int
+                Total gainers returned optional, default is 100
+
+        Returns:
+        _______
+        pd.DataFrame: Top gainers for the day
+
+        Raises:
+        _______
+        ValueError: If failed to get top gainers
+        """  # noqa
+
+        gainers_df = self._get_percentages()
+
+        gainers_df = gainers_df[gainers_df["price"] > price_greater_than]
+        gainers_df = gainers_df[gainers_df["change"] > change_greater_than]
+        gainers_df = gainers_df[gainers_df["volume"] > volume_greater_than]
+        gainers_df = gainers_df[gainers_df["trades"] > trade_count_greater_than]
+        return gainers_df.sort_values(by="change", ascending=False).reset_index(drop=True).head(total_gainers_returned)
+
+    def _get_percentages(self, timeframe: str = "1Day", start: str = prev_close, end: str = close) -> pd.DataFrame:
         """Get top gainers for the day
 
         Returns:
@@ -66,9 +153,6 @@ class Screener:
         if response.status_code == 200:
             res = json.loads(response.text)
 
-            # res_df = pd.json_normalize(res, max_level=0)["bars"]
-            # bars_df = pd.json_normalize(res_df[0], max_level=0)
-
             bars_df = pd.DataFrame.from_dict(res["bars"], orient="index")
             page_token = res["next_page_token"]
 
@@ -81,7 +165,7 @@ class Screener:
 
             bars_df.reset_index()
 
-            # gainer_df = pd.DataFrame()
+            gainer_df = pd.DataFrame()
 
             for bar in bars_df.iterrows():
                 # bar[0] is symbol
@@ -91,13 +175,19 @@ class Screener:
                 # bar[1][0]["c"] is previous close
                 # ((current close - previous close) / previous close) * 100
                 try:
-                    change = ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100
+                    change = round(((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100, 2)
+                    symbol = bar[0]
+                    sym_data = {
+                        "symbol": symbol,
+                        "change": change,
+                        "price": bar[1][1]["c"],
+                        "volume": bar[1][1]["v"],
+                        "trades": bar[1][1]["n"],
+                    }
+                    gainer_df = pd.concat([gainer_df, pd.DataFrame([sym_data])])
                 except Exception:
                     pass
-                print(change)
-
-            # print(bars_df)
-
-            # return res_df["bars"]
+            gainer_df.reset_index(drop=True, inplace=True)
+            return gainer_df
         else:
             raise ValueError(f"Failed to get top gainers. Response: {response.text}")
