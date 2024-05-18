@@ -4,6 +4,7 @@ from .src.history import History
 from .src.market import Market
 from .src.order import Order
 from .src.position import Position
+from .src.screener import Screener
 from .src.watchlist import Watchlist
 
 
@@ -61,3 +62,4 @@ class PyAlpacaApi:
         self.order = Order(trade_url=self.trade_url, headers=self.headers)
         self.market = Market(trade_url=self.trade_url, headers=self.headers)
         self.watchlist = Watchlist(trade_url=self.trade_url, headers=self.headers)
+        self.screener = Screener(data_url=self.data_url, headers=self.headers, asset=self.asset)
