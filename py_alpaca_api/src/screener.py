@@ -127,7 +127,12 @@ class Screener:
         gainers_df = gainers_df[gainers_df["trades"] > trade_count_greater_than]
         return gainers_df.sort_values(by="change", ascending=False).reset_index(drop=True).head(total_gainers_returned)
 
-    def _get_percentages(self, timeframe: str = "1Day", start: str = prev_close, end: str = close) -> pd.DataFrame:
+    def _get_percentages(
+        self,
+        timeframe: str = "1Day",
+        start: str = prev_close,
+        end: str = close,
+    ) -> pd.DataFrame:
         """Get top gainers for the day
 
         Returns:
@@ -160,7 +165,12 @@ class Screener:
                 params["page_token"] = page_token
                 response = requests.get(url, headers=self.headers, params=params)
                 res = json.loads(response.text)
-                bars_df = pd.concat([bars_df, pd.DataFrame.from_dict(res["bars"], orient="index")])
+                bars_df = pd.concat(
+                    [
+                        bars_df,
+                        pd.DataFrame.from_dict(res["bars"], orient="index"),
+                    ]
+                )
                 page_token = res["next_page_token"]
 
             bars_df.reset_index()
@@ -175,7 +185,10 @@ class Screener:
                 # bar[1][0]["c"] is previous close
                 # ((current close - previous close) / previous close) * 100
                 try:
-                    change = round(((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100, 2)
+                    change = round(
+                        ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100,
+                        2,
+                    )
                     symbol = bar[0]
                     sym_data = {
                         "symbol": symbol,

@@ -44,7 +44,11 @@ def test_watchlist_update(alpaca):
     watchlist = alpaca.watchlist.create(name="test_list", symbols="NVDA, PYPL, NFLX, ADBE, CRM")
     assert watchlist.name == "test_list"
     assert len(watchlist.assets) == 5
-    alpaca.watchlist.update(watchlist_name=watchlist.name, name="test_list", symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO")
+    alpaca.watchlist.update(
+        watchlist_name=watchlist.name,
+        name="test_list",
+        symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO",
+    )
     updated_watchlist = alpaca.watchlist.get_assets(watchlist_name=watchlist.name)
     assert len(updated_watchlist) == 9
     delete_all_watchlists(alpaca)
@@ -70,7 +74,10 @@ def test_watchlist_remove_asset(alpaca):
 
 def test_watchlist_name_get_assets(alpaca):
     delete_all_watchlists(alpaca)
-    watchlist = alpaca.watchlist.create(name="test_list", symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO")
+    watchlist = alpaca.watchlist.create(
+        name="test_list",
+        symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO",
+    )
     assets = alpaca.watchlist.get_assets(watchlist_name=watchlist.name)
     assert len(assets) == 9
     delete_all_watchlists(alpaca)
@@ -78,7 +85,10 @@ def test_watchlist_name_get_assets(alpaca):
 
 def test_watchlist_id_get_assets(alpaca):
     delete_all_watchlists(alpaca)
-    watchlist = alpaca.watchlist.create(name="test_list", symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO")
+    watchlist = alpaca.watchlist.create(
+        name="test_list",
+        symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO",
+    )
     assets = alpaca.watchlist.get_assets(watchlist_name=watchlist.name)
     assert len(assets) == 9
     delete_all_watchlists(alpaca)
@@ -88,7 +98,10 @@ def test_watchlist_get_all(alpaca):
     delete_all_watchlists(alpaca)
     watchlists = 0
     while watchlists < 5:
-        alpaca.watchlist.create(name=f"test_list_{watchlists}", symbols="NVDA, PYPL, NFLX, ADBE, CRM")
+        alpaca.watchlist.create(
+            name=f"test_list_{watchlists}",
+            symbols="NVDA, PYPL, NFLX, ADBE, CRM",
+        )
         watchlists += 1
     watchlists = alpaca.watchlist.get_all()
     assert len(watchlists) == 5

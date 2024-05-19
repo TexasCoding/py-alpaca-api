@@ -307,17 +307,23 @@ def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
         id=str(data_dict["id"] if data_dict["id"] else ""),
         account_id=str(data_dict["account_id"] if data_dict["account_id"] else ""),
         created_at=(
-            datetime.strptime(data_dict["created_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["created_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["created_at"]
             else datetime.date(0, 0, 0)
         ),
         updated_at=(
-            datetime.strptime(data_dict["updated_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["updated_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["updated_at"]
             else datetime.date(0, 0, 0)
         ),
         name=str(data_dict["name"] if data_dict["name"] else ""),
-        assets=[asset_class_from_dict(sym) for sym in data_dict["assets"] if len(data_dict["assets"]) > 0] if data_dict["assets"] else None,
+        assets=([asset_class_from_dict(sym) for sym in data_dict["assets"] if len(data_dict["assets"]) > 0] if data_dict["assets"] else None),
     )
 
 
@@ -339,18 +345,27 @@ def clock_class_from_dict(data_dict: dict) -> ClockClass:
     """  # noqa
     return ClockClass(
         market_time=(
-            datetime.strptime(data_dict["timestamp"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["timestamp"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["timestamp"]
             else datetime.date(0, 0, 0)
         ),
         is_open=bool(data_dict["is_open"]),
         next_open=(
-            datetime.strptime(data_dict["next_open"].replace("T", " ").replace("-04:00", ""), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["next_open"].replace("T", " ").replace("-04:00", ""),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["next_open"]
             else datetime.date(0, 0, 0)
         ),
         next_close=(
-            datetime.strptime(data_dict["next_close"].replace("-04:00", "").replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["next_close"].replace("-04:00", "").replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["next_close"]
             else datetime.date(0, 0, 0)
         ),
@@ -437,7 +452,10 @@ def account_class_from_dict(data_dict: dict) -> AccountClass:
         transfers_blocked=bool(data_dict["transfers_blocked"]),
         account_blocked=bool(data_dict["account_blocked"]),
         created_at=(
-            datetime.strptime(data_dict["created_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["created_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["created_at"]
             else datetime.date(0, 0, 0)
         ),
@@ -513,42 +531,66 @@ def order_class_from_dict(data_dict: dict) -> OrderClass:
         id=str(data_dict["id"] if data_dict["id"] else ""),
         client_order_id=str(data_dict["client_order_id"]),
         created_at=(
-            datetime.strptime(data_dict["created_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["created_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["created_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         updated_at=(
-            datetime.strptime(data_dict["updated_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["updated_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["updated_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         submitted_at=(
-            datetime.strptime(data_dict["submitted_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["submitted_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["submitted_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         filled_at=(
-            datetime.strptime(data_dict["filled_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["filled_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["filled_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         expired_at=(
-            datetime.strptime(data_dict["expired_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["expired_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["expired_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         canceled_at=(
-            datetime.strptime(data_dict["canceled_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["canceled_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["canceled_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         failed_at=(
-            datetime.strptime(data_dict["failed_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["failed_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["failed_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
         replaced_at=(
-            datetime.strptime(data_dict["replaced_at"].split(".")[0].replace("T", " "), "%Y-%m-%d %H:%M:%S")
+            datetime.strptime(
+                data_dict["replaced_at"].split(".")[0].replace("T", " "),
+                "%Y-%m-%d %H:%M:%S",
+            )
             if data_dict["replaced_at"]
             else datetime(1, 1, 1, 0, 0)
         ),

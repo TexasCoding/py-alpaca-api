@@ -28,7 +28,12 @@ class Asset:
         self.trade_url = trade_url
         self.headers = headers
 
-    def get_all(self, status: str = "active", asset_class: str = "us_equity", exchange: str = "") -> pd.DataFrame:
+    def get_all(
+        self,
+        status: str = "active",
+        asset_class: str = "us_equity",
+        exchange: str = "",
+    ) -> pd.DataFrame:
         # Alpaca API URL for asset information
         url = f"{self.trade_url}/assets"
 

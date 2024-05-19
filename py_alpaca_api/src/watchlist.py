@@ -171,7 +171,13 @@ class Watchlist:
     ########################################################
     # ///////////// Update a watchlist ////////////////////#
     ########################################################
-    def update(self, watchlist_id: str = None, watchlist_name: str = None, name: str = "", symbols: str = "") -> WatchlistClass:
+    def update(
+        self,
+        watchlist_id: str = None,
+        watchlist_name: str = None,
+        name: str = "",
+        symbols: str = "",
+    ) -> WatchlistClass:
         """Update a watchlist
 
         Parameters:
@@ -290,7 +296,12 @@ class Watchlist:
         # Create the payload
         payload = {"name": name, "symbols": symbols}
         # Send the request, if 200 return the WatchlistClass object
-        response = requests.put(url, headers=self.headers, json=payload, params={"name": watchlist_name} if watchlist_name else None)
+        response = requests.put(
+            url,
+            headers=self.headers,
+            json=payload,
+            params={"name": watchlist_name} if watchlist_name else None,
+        )
 
         res = json.loads(response.text)
 
@@ -347,7 +358,12 @@ class Watchlist:
     ########################################################
     # ///////////// Add Asset to  watchlist ///////////////#
     ########################################################
-    def add_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+    def add_asset(
+        self,
+        watchlist_id: str = None,
+        watchlist_name: str = None,
+        symbol: str = "",
+    ) -> WatchlistClass:
         """Add a Asset to a watchlist
 
         Parameters:
@@ -434,7 +450,12 @@ class Watchlist:
     ########################################################
     # /////////// Remove a Asset from  watchlist //////////#
     ########################################################
-    def remove_asset(self, watchlist_id: str = None, watchlist_name: str = None, symbol: str = "") -> WatchlistClass:
+    def remove_asset(
+        self,
+        watchlist_id: str = None,
+        watchlist_name: str = None,
+        symbol: str = "",
+    ) -> WatchlistClass:
         """Remove a Asset from a watchlist
 
         Parameters:

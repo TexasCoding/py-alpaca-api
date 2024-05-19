@@ -37,7 +37,7 @@ class PyAlpacaApi:
         >>> PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
         PyAlpacaApi()
         """  # noqa
-        
+
         # Check if API Key and Secret are provided
         if not api_key:
             raise ValueError("API Key is required")
@@ -59,7 +59,11 @@ class PyAlpacaApi:
         self.account = Account(trade_url=self.trade_url, headers=self.headers)
         self.asset = Asset(trade_url=self.trade_url, headers=self.headers)
         self.history = History(data_url=self.data_url, headers=self.headers, asset=self.asset)
-        self.position = Position(trade_url=self.trade_url, headers=self.headers, account=self.account)
+        self.position = Position(
+            trade_url=self.trade_url,
+            headers=self.headers,
+            account=self.account,
+        )
         self.order = Order(trade_url=self.trade_url, headers=self.headers)
         self.market = Market(trade_url=self.trade_url, headers=self.headers)
         self.watchlist = Watchlist(trade_url=self.trade_url, headers=self.headers)
