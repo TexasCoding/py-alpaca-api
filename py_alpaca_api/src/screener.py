@@ -18,7 +18,7 @@ if today.day_of_week == (pendulum.SUNDAY or pendulum.MONDAY):
 
 
 class Screener:
-    def __init__(self, data_url: str, headers: object, asset: Asset) -> None:
+    def __init__(self, data_url: str, headers: dict[str, str], asset: Asset) -> None:
         """Initialize Screener class3
 
         Parameters:

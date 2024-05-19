@@ -35,7 +35,6 @@ class PyAlpacaApi:
         Example:
         --------
         >>> PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-        PyAlpacaApi()
         """  # noqa
 
         # Check if API Key and Secret are provided
