@@ -93,3 +93,15 @@ class Account:
         # If response is not successful, raise an exception
         else:
             raise Exception(f"Failed to get account information. Response: {response.text}")
+
+    def portfolio_history(self, period: str = "1D", intraday_reporting: str = "market_hours") -> dict:
+        url = f"{self.trade_url}/account/portfolio/history"
+        
+        response = requests.get(url, headers=self.headers, params={"period": period, "intraday_reporting": intraday_reporting})
+        
+        if response.status_code == 200:
+            res = json.loads(response.text)
+            return res
+        else:
+            raise Exception(f"Failed to get portfolio information. Response: {response.text}")
+    
