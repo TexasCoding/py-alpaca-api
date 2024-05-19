@@ -94,6 +94,18 @@ def test_watchlist_id_get_assets(alpaca):
     delete_all_watchlists(alpaca)
 
 
+def test_watchlist_compare_asset_counts(alpaca):
+    delete_all_watchlists(alpaca)
+    limit = 5
+    watchlist = alpaca.watchlist.create(
+        name="test_list",
+        symbols="NVDA, PYPL, NFLX, ADBE, CRM, ORCL, IBM, INTC, CSCO",
+    )
+    assets = alpaca.watchlist.get_assets(watchlist_name=watchlist.name)
+    assert len(assets) if len(assets) < limit else limit
+    delete_all_watchlists(alpaca)
+
+
 def test_watchlist_get_all(alpaca):
     delete_all_watchlists(alpaca)
     watchlists = 0

@@ -554,7 +554,7 @@ class Watchlist:
     ########################################################
     # /////////// Get Assets from a watchlist /////////////#
     ########################################################
-    def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list[str]:
+    def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list:
         """Get assets from a watchlist
 
         Parameters:
