@@ -99,8 +99,48 @@ class Account:
     # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
     ########################################################
     def portfolio_history(self, period: str = "1W", timeframe: str = "1D", intraday_reporting: str = "market_hours") -> pd.DataFrame:
-        url = f"{self.trade_url}/account/portfolio/history"
+        """Get portfolio history from Alpaca API
 
+        Parameters:
+        ___________
+        period: str
+                The period of time to retrieve the portfolio history for. Default is 1W
+                Possible values: 1D, 1W, 1M, 3M, 1A
+
+        timeframe: str
+                The timeframe of the portfolio history. Default is 1D
+                Possible values: 1D, 1W, 1M, 3M, 1A
+
+        intraday_reporting: str
+                The intraday reporting for the portfolio history. Default is market_hours
+                Possible values: market_hours, 24_7
+
+        Returns:
+        ________
+        pd.DataFrame: Portfolio history as a pandas DataFrame
+
+        Raises:
+        _______
+        Exception: If the response is not successful
+
+        Example:
+        ________
+        >>> from py_alpaca_api import PyAlpacaApi
+            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
+            portfolio_history = api.account.portfolio_history()
+            print(portfolio_history)
+
+        timestamp    equity  profit_loss  profit_loss_pct  base_value
+        0 2021-07-08  100000.0          0.0              0.0    100000.0
+        1 2021-07-09  100000.0          0.0              0.0    100000.0
+        2 2021-07-10  100000.0          0.0              0.0    100000.0
+        3 2021-07-11  100000.0          0.0              0.0    100000.0
+        4 2021-07-12  100000.0          0.0              0.0    100000.0
+        """  # noqa
+
+        # Alpaca API URL for portfolio history
+        url = f"{self.trade_url}/account/portfolio/history"
+        # Get request to Alpaca API for portfolio history
         response = requests.get(
             url,
             headers=self.headers,
@@ -110,10 +150,11 @@ class Account:
                 "intraday_reporting": intraday_reporting,
             },
         )
-
+        # Check if response is successful
         if response.status_code == 200:
             res = json.loads(response.text)
             res_df = pd.DataFrame(res, columns=["timestamp", "equity", "profit_loss", "profit_loss_pct", "base_value"])
+            # Convert timestamp to date
             res_df["timestamp"] = (
                 pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
             )
