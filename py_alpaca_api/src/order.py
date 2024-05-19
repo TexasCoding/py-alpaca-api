@@ -236,9 +236,7 @@ class Order:
                 limit_price=None, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
         """  # noqa
 
-        # Alpaca API URL for submitting market order
-        url = f"{self.trade_url}/orders"
-        # Market order payload
+        # Payload for market order
         payload = {
             "symbol": symbol,
             "qty": qty if qty else None,
@@ -248,18 +246,8 @@ class Order:
             "time_in_force": time_in_force,
             "extended_hours": extended_hours,
         }
-        # Post request to Alpaca API for submitting market order
-        response = requests.post(url, headers=self.headers, json=payload)
-        # Check if response is successful
-        if response.status_code == 200:
-            # Convert JSON response to dictionary
-            res = json.loads(response.text)
-            # Return market order information as a MarketOrderClass object
-            return order_class_from_dict(res)
-        # If response is not successful, raise an exception
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to submit market order. Code: {response.status_code}, Response: {res["message"]}')
+        # Return market order using submit order method
+        return self.__submit_order(payload)
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Limit Order /////////////////#
@@ -335,9 +323,7 @@ class Order:
 
         """  # noqa
 
-        # Alpaca API URL for submitting market order
-        url = f"{self.trade_url}/orders"
-        # Market order payload
+        # Payload for limit order
         payload = {
             "symbol": symbol,  # Asset symbol to buy/sell
             "limit_price": limit_price,  # Limit price for the order
@@ -348,18 +334,8 @@ class Order:
             "time_in_force": time_in_force,  # Time in force options, default: day
             "extended_hours": extended_hours,  # Extended hours trading, default: False
         }
-        # Post request to Alpaca API for submitting market order
-        response = requests.post(url, headers=self.headers, json=payload)
-        # Check if response is successful
-        if response.status_code == 200:
-            # Convert JSON response to dictionary
-            res = json.loads(response.text)
-            # Return market order information as a MarketOrderClass object
-            return order_class_from_dict(res)
-        # If response is not successful, raise an exception
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}')
+        # Return limit order using submit order method
+        return self.__submit_order(payload)
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Stop Order /////////////////#
@@ -421,9 +397,7 @@ class Order:
 
         """  # noqa
 
-        # Alpaca API URL for submitting market order
-        url = f"{self.trade_url}/orders"
-        # Market order payload
+        # Payload for stop order
         payload = {
             "symbol": symbol,  # Asset symbol to buy/sell
             "stop_price": stop_price,  # Stop price for the order
@@ -433,15 +407,177 @@ class Order:
             "time_in_force": time_in_force,  # Time in force options, default: day
             "extended_hours": extended_hours,  # Extended hours trading, default: False
         }
-        # Post request to Alpaca API for submitting market order
+        # Return stop order using submit order method
+        return self.__submit_order(payload)
+
+    ########################################################
+    # \\\\\\\\\\\\\\\\  Submit Stop Order /////////////////#
+    ########################################################
+    def stop_limit(
+        self,
+        symbol: str,
+        stop_price: float,
+        limit_price: float,
+        qty: float,
+        side: str = "buy",
+        time_in_force: str = "day",
+        extended_hours: bool = False,
+    ) -> OrderClass:
+        """Submit a Stop Limit Order
+
+        Parameters:
+        -----------
+        symbol:         Asset symbol to buy/sell
+                        A valid asset symbol string required
+
+        stop_price:     Stop price for the order
+                        Stop price for the order float required
+
+        limit_price:    Limit price for the order
+                        Limit price for the order float required
+
+        qty:            Quantity of asset to buy/sell
+                        Quantity of asset to buy/sell float required
+
+        side:           Order side (buy/sell) (default: buy)
+                        Order side (buy/sell) (optional) str
+
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+                        Time in force options (optional) str
+
+        extended_hours: Extended hours trading (default: False)
+                        Extended hours trading (optional) bool
+
+        Returns:
+        --------
+        MarketOrderClass: Market order information as a MarketOrderClass object with
+
+        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class,
+                notional, qty, filled_qty, filled_avg_price, order_class, order_type , limit_price,
+                stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to submit stop order
+        """  # noqa
+
+        # Payload for stop order
+        payload = {
+            "symbol": symbol,  # Asset symbol to buy/sell
+            "stop_price": stop_price,  # Stop price for the order
+            "limit_price": limit_price,  # Limit price for the order
+            "qty": qty,  # Quantity of asset to buy/sell
+            "side": (side if side == "buy" else "sell"),  # Check if side is buy or sell
+            "type": "stop_limit",  # Order type is stop
+            "time_in_force": time_in_force,  # Time in force options, default: day
+            "extended_hours": extended_hours,  # Extended hours trading, default: False
+        }
+        # Return stop order using submit order method
+        return self.__submit_order(payload)
+
+    ########################################################
+    # \\\\\\\\\\\\\\\\  Submit Stop Order /////////////////#
+    ########################################################
+    def trailing_stop(
+        self,
+        symbol: str,
+        qty: float,
+        trail_percent: float = None,
+        trail_price: float = None,
+        side: str = "buy",
+        time_in_force: str = "day",
+        extended_hours: bool = False,
+    ) -> OrderClass:
+        """Submit a Trailing Stop Order
+
+        Parameters:
+        -----------
+        symbol:         Asset symbol to buy/sell
+                        A valid asset symbol string required
+
+        qty:            Quantity of asset to buy/sell
+                        Quantity of asset to buy/sell float required
+
+        trail_percent:  Trailing stop percent
+                        Trailing stop percent float optional
+
+        trail_price:    Trailing stop price
+                        Trailing stop price float optional
+
+        side:           Order side (buy/sell) (default: buy)
+                        Order side (buy/sell) (optional) str
+
+        time_in_force:  Time in force options (day, gtc, opg, cls, ioc, fok) (default: day)
+                        Time in force options (optional) str
+
+        extended_hours: Extended hours trading (default: False)
+                        Extended hours trading (optional) bool
+
+        Returns:
+        --------
+        MarketOrderClass: Market order information as a MarketOrderClass object with
+
+        values: id, client_order_id, created_at, submitted_at, asset_id, symbol, asset_class,
+                notional, qty, filled_qty, filled_avg_price, order_class, order_type , limit_price,
+                stop_price, filled_qty, filled_avg_price, status, type, side, time_in_force, extended_hours
+
+        Raises:
+        -------
+        Exception:
+            Exception if failed to submit stop order
+        """  # noqa
+
+        if trail_percent is None and trail_price is None or trail_percent and trail_price:
+            raise ValueError("Either trail_percent or trail_price must be provided, not both.")
+        if trail_percent:
+            if trail_percent < 0:
+                raise ValueError("Trail percent must be greater than 0.")
+        # Payload for stop order
+        payload = {
+            "symbol": symbol,  # Asset symbol to buy/sell
+            "trail_percent": trail_percent,  # Stop price for the order
+            "trail_price": trail_price,  # Limit price for the order
+            "qty": qty,  # Quantity of asset to buy/sell
+            "side": (side if side == "buy" else "sell"),  # Check if side is buy or sell
+            "type": "trailing_stop",  # Order type is stop
+            "time_in_force": time_in_force,  # Time in force options, default: day
+            "extended_hours": extended_hours,  # Extended hours trading, default: False
+        }
+        # Return stop order using submit order method
+        return self.__submit_order(payload)
+
+    ########################################################
+    # \\\\\\\\\\\\\\\\  Submit Order //////////////////////#
+    ########################################################
+    def __submit_order(self, payload: dict) -> OrderClass:
+        """Submit an order
+
+        Parameters:
+        -----------
+        payload:    Order payload dictionary
+                    Order payload dictionary required
+
+        Returns:
+        --------
+        OrderClass: Order information as an OrderClass object
+
+        Raises:
+        -------
+        Exception:  If failed to submit order
+        """  # noqa
+
+        # Alpaca API URL for submitting an order
+        url = f"{self.trade_url}/orders"
+        # Post request to Alpaca API for submitting an order
         response = requests.post(url, headers=self.headers, json=payload)
         # Check if response is successful
         if response.status_code == 200:
             # Convert JSON response to dictionary
             res = json.loads(response.text)
-            # Return market order information as a MarketOrderClass object
+            # Return order information as an OrderClass object
             return order_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to submit limit order. Code: {response.status_code}, Response: {res["message"]}')
+            raise Exception(f'Failed to submit order. Code: {response.status_code}, Response: {res["message"]}')
