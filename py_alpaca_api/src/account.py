@@ -95,7 +95,10 @@ class Account:
         else:
             raise Exception(f"Failed to get account information. Response: {response.text}")
 
-    def portfolio_history(self, period: str = "1D", timeframe: str = "1H", intraday_reporting: str = "market_hours") -> dict:
+    ########################################################
+    # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
+    ########################################################
+    def portfolio_history(self, period: str = "1W", timeframe: str = "1D", intraday_reporting: str = "market_hours") -> pd.DataFrame:
         url = f"{self.trade_url}/account/portfolio/history"
 
         response = requests.get(
@@ -110,6 +113,12 @@ class Account:
 
         if response.status_code == 200:
             res = json.loads(response.text)
-            return pd.json_normalize(res, max_level=0)
+            res_df = pd.DataFrame(res, columns=["timestamp", "equity", "profit_loss", "profit_loss_pct", "base_value"])
+            res_df["timestamp"] = (
+                pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
+            )
+            res_df["timestamp"] = res_df["timestamp"]
+            res_df["profit_loss_pct"] = res_df["profit_loss_pct"] * 100
+            return res_df
         else:
             raise Exception(f"Failed to get portfolio information. Response: {response.text}")
