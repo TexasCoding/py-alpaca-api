@@ -1,0 +1,69 @@
+[tool.poetry]
+name = "py-alpaca-api"
+version = "0.4.7"
+description = "Python package, for communicating with Alpaca Markets REST API."
+authors = ["TexasCoding <jeff10278@me.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/TexasCoding/py-alpaca-api"
+repository = "https://github.com/TexasCoding/py-alpaca-api"
+documentation = "https://py-alpaca-api.readthedocs.io/en/latest/"
+keywords = ["alpaca", "python"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+requests = "^2.31.0"
+numpy = "^1.26.4"
+pendulum = "^3.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+requests-mock = "^1.12.1"
+black = "^24.4.2"
+isort = "^5.13.2"
+pre-commit = "^3.7.1"
+ipykernel = "^6.29.4"
+pytest-mock = "^3.14.0"
+pytest-mock-server = "^0.3.0"
+python-dotenv = "^1.0.1"
+
+
+[tool.poetry.group.test.dependencies]
+flake8 = "^7.0.0"
+
+
+[tool.poetry.group.doc.dependencies]
+sphinx = "^7.3.7"
+sphinx-autobuild = "^2024.4.16"
+myst-parser = "^3.0.1"
+nbsphinx = "^0.9.4"
+sphinx-autoapi = "^3.0.0"
+sphinx-rtd-theme = "^2.0.0"
+
+[tool.black]
+line-length = 79
+exclude = '''
+/(
+\.git
+| \.hg
+| \.mypy_cache
+| \.tox
+| \.venv
+| _build
+| buck-out
+| build
+| dist
+| docs
+)/
+'''
+
+[tool.isort]
+profile = "black"
+known_third_party = []
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
