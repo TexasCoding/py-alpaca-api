@@ -1,5 +1,6 @@
 import json
 
+import pandas as pd
 import requests
 
 from .data_classes import AccountClass, account_class_from_dict
@@ -94,7 +95,7 @@ class Account:
         else:
             raise Exception(f"Failed to get account information. Response: {response.text}")
 
-    def portfolio_history(self, period: str = "1D", intraday_reporting: str = "market_hours") -> dict:
+    def portfolio_history(self, period: str = "1D", timeframe: str = "1H", intraday_reporting: str = "market_hours") -> dict:
         url = f"{self.trade_url}/account/portfolio/history"
 
         response = requests.get(
@@ -102,12 +103,13 @@ class Account:
             headers=self.headers,
             params={
                 "period": period,
+                "timeframe": timeframe,
                 "intraday_reporting": intraday_reporting,
             },
         )
 
         if response.status_code == 200:
             res = json.loads(response.text)
-            return res
+            return pd.json_normalize(res, max_level=0)
         else:
             raise Exception(f"Failed to get portfolio information. Response: {response.text}")
