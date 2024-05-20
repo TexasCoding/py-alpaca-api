@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import pandas as pd
 import pendulum
@@ -18,7 +19,7 @@ if today.day_of_week == (pendulum.SUNDAY or pendulum.MONDAY):
 
 
 class Screener:
-    def __init__(self, data_url: str, headers: dict[str, str], asset: Asset) -> None:
+    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
         """Initialize Screener class3
 
         Parameters:
@@ -194,7 +195,7 @@ class Screener:
 
             bars_df.reset_index()
 
-            gainer_df = pd.DataFrame()
+            all_bars_df = pd.DataFrame()
 
             for bar in bars_df.iterrows():
                 try:
@@ -212,11 +213,11 @@ class Screener:
                         "volume": bar[1][0]["v"],
                         "trades": bar[1][0]["n"],
                     }
-                    gainer_df = pd.concat([gainer_df, pd.DataFrame([sym_data])])
+                    all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
                 except Exception:
                     pass
-            gainer_df.reset_index(drop=True, inplace=True)
-            return gainer_df
+            all_bars_df.reset_index(drop=True, inplace=True)
+            return all_bars_df
         else:
-            raise ValueError(f"Failed to get top gainers. Response: {response.text}")
+            raise ValueError(f"Failed to get assets. Response: {response.text}")
