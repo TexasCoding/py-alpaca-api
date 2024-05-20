@@ -376,38 +376,33 @@ def clock_class_from_dict(data_dict: dict) -> ClockClass:
 # Data Class Position Conversion Functions
 ############################################
 def position_class_from_dict(data_dict: dict) -> PositionClass:
-    """Converts a dictionary to a PositionClass object.
+    """Converts a dictionary to a PositionClass object."""
 
-    Parameters:
-    -----------
-    data_dict: dict
-        A dictionary containing the position data.
+    def get_string_value(data_d: dict, key: str) -> str:
+        return str(data_d.get(key, ""))
 
-    Returns:
-    --------
-    PositionClass
-        A PositionClass object.
-    """  # noqa
+    def get_float_value(data_d: dict, key: str) -> float:
+        return float(data_d.get(key, 0.0))
 
     return PositionClass(
-        asset_id=str(data_dict["asset_id"] if data_dict["asset_id"] else ""),
-        symbol=str(data_dict["symbol"] if data_dict["symbol"] else ""),
-        exchange=str(data_dict["exchange"] if data_dict["exchange"] else ""),
-        asset_class=str(data_dict["asset_class"] if data_dict["asset_class"] else ""),
-        avg_entry_price=float(data_dict["avg_entry_price"] if data_dict["avg_entry_price"] else 0),
-        qty=float(data_dict["qty"] if data_dict["qty"] else 0),
-        qty_available=float(data_dict["qty_available"] if data_dict["qty_available"] else 0),
-        side=str(data_dict["side"] if data_dict["side"] else ""),
-        market_value=float(data_dict["market_value"] if data_dict["market_value"] else 0),
-        cost_basis=float(data_dict["cost_basis"] if data_dict["cost_basis"] else 0),
-        profit_dol=float(data_dict["profit_dol"] if data_dict["profit_dol"] else 0),
-        profit_pct=float(data_dict["profit_pct"] if data_dict["profit_pct"] else 0),
-        intraday_profit_dol=float(data_dict["intraday_profit_dol"] if data_dict["intraday_profit_dol"] else 0),
-        intraday_profit_pct=float(data_dict["intraday_profit_pct"] if data_dict["intraday_profit_pct"] else 0),
-        portfolio_pct=float(data_dict["portfolio_pct"] if data_dict["portfolio_pct"] else 0),
-        current_price=float(data_dict["current_price"] if data_dict["current_price"] else 0),
-        lastday_price=float(data_dict["lastday_price"] if data_dict["lastday_price"] else 0),
-        change_today=float(data_dict["change_today"] if data_dict["change_today"] else 0),
+        asset_id=get_string_value(data_dict, "asset_id"),
+        symbol=get_string_value(data_dict, "symbol"),
+        exchange=get_string_value(data_dict, "exchange"),
+        asset_class=get_string_value(data_dict, "asset_class"),
+        avg_entry_price=get_float_value(data_dict, "avg_entry_price"),
+        qty=get_float_value(data_dict, "qty"),
+        qty_available=get_float_value(data_dict, "qty_available"),
+        side=get_string_value(data_dict, "side"),
+        market_value=get_float_value(data_dict, "market_value"),
+        cost_basis=get_float_value(data_dict, "cost_basis"),
+        profit_dol=get_float_value(data_dict, "profit_dol"),
+        profit_pct=get_float_value(data_dict, "profit_pct"),
+        intraday_profit_dol=get_float_value(data_dict, "intraday_profit_dol"),
+        intraday_profit_pct=get_float_value(data_dict, "intraday_profit_pct"),
+        portfolio_pct=get_float_value(data_dict, "portfolio_pct"),
+        current_price=get_float_value(data_dict, "current_price"),
+        lastday_price=get_float_value(data_dict, "lastday_price"),
+        change_today=get_float_value(data_dict, "change_today"),
         asset_marginable=bool(data_dict["asset_marginable"]),
     )
 
