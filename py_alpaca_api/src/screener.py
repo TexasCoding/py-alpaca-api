@@ -13,9 +13,8 @@ from .asset import Asset
 # If it's Monday, it will return the previous Friday
 today = pendulum.now(tz="America/New_York")
 yesterday = today.subtract(days=1).strftime("%Y-%m-%d")
-if today.day_of_week == (pendulum.SUNDAY or pendulum.MONDAY):
+if today.day_of_week == pendulum.SUNDAY or today.day_of_week == pendulum.MONDAY:
     yesterday = today.previous(pendulum.FRIDAY).strftime("%Y-%m-%d")
-######################################################################
 
 
 class Screener:
@@ -158,7 +157,7 @@ class Screener:
         Raises:
         _______
         ValueError: If failed to get top gainers
-        """  # noqa
+        """
         url = f"{self.data_url}/stocks/bars"
 
         params = {
