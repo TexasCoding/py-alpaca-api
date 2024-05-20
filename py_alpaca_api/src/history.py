@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import pandas as pd
 import requests
@@ -7,7 +8,7 @@ from .asset import Asset
 
 
 class History:
-    def __init__(self, data_url: str, headers: dict[str, str], asset: Asset) -> None:
+    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
         """Initialize History class
 
         Parameters:

@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import requests
 
@@ -6,7 +7,7 @@ from .data_classes import ClockClass, clock_class_from_dict
 
 
 class Market:
-    def __init__(self, trade_url: str, headers: dict[str, str]) -> None:
+    def __init__(self, trade_url: str, headers: Dict[str, str]) -> None:
         """Initialize Market class
 
         Parameters:

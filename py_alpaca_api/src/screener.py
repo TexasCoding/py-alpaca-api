@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import pandas as pd
 import pendulum
@@ -12,13 +13,12 @@ from .asset import Asset
 # If it's Monday, it will return the previous Friday
 today = pendulum.now(tz="America/New_York")
 yesterday = today.subtract(days=1).strftime("%Y-%m-%d")
-if today.day_of_week == (pendulum.SUNDAY or pendulum.MONDAY):
+if today.day_of_week == pendulum.SUNDAY or today.day_of_week == pendulum.MONDAY:
     yesterday = today.previous(pendulum.FRIDAY).strftime("%Y-%m-%d")
-######################################################################
 
 
 class Screener:
-    def __init__(self, data_url: str, headers: dict[str, str], asset: Asset) -> None:
+    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
         """Initialize Screener class3
 
         Parameters:
@@ -157,7 +157,7 @@ class Screener:
         Raises:
         _______
         ValueError: If failed to get top gainers
-        """  # noqa
+        """
         url = f"{self.data_url}/stocks/bars"
 
         params = {
@@ -194,7 +194,7 @@ class Screener:
 
             bars_df.reset_index()
 
-            gainer_df = pd.DataFrame()
+            all_bars_df = pd.DataFrame()
 
             for bar in bars_df.iterrows():
                 try:
@@ -212,11 +212,11 @@ class Screener:
                         "volume": bar[1][0]["v"],
                         "trades": bar[1][0]["n"],
                     }
-                    gainer_df = pd.concat([gainer_df, pd.DataFrame([sym_data])])
+                    all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
                 except Exception:
                     pass
-            gainer_df.reset_index(drop=True, inplace=True)
-            return gainer_df
+            all_bars_df.reset_index(drop=True, inplace=True)
+            return all_bars_df
         else:
-            raise ValueError(f"Failed to get top gainers. Response: {response.text}")
+            raise ValueError(f"Failed to get assets. Response: {response.text}")

@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 import pandas as pd
 import requests
@@ -7,7 +8,7 @@ from .data_classes import AssetClass, asset_class_from_dict
 
 
 class Asset:
-    def __init__(self, trade_url: str, headers: dict[str, str]) -> None:
+    def __init__(self, trade_url: str, headers: Dict[str, str]) -> None:
         """Initialize Asset class
 
         Parameters:
