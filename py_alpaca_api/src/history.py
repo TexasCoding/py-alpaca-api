@@ -7,7 +7,7 @@ from .asset import Asset
 
 
 class History:
-    def __init__(self, data_url: str, headers: object, asset: Asset) -> None:
+    def __init__(self, data_url: str, headers: dict[str, str], asset: Asset) -> None:
         """Initialize History class
 
         Parameters:
@@ -100,7 +100,7 @@ class History:
 
         Example:
         ________
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             stock_data = api.history.get_stock_data(symbol="AAPL", start="2021-01-01", end="2021-12-31", timeframe="1d")
             print(stock_data)

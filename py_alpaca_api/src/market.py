@@ -6,7 +6,7 @@ from .data_classes import ClockClass, clock_class_from_dict
 
 
 class Market:
-    def __init__(self, trade_url: str, headers: object) -> None:
+    def __init__(self, trade_url: str, headers: dict[str, str]) -> None:
         """Initialize Market class
 
         Parameters:
@@ -43,7 +43,7 @@ class Market:
 
         Example:
         ________
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             clock = api.market.clock()
             print(clock)
