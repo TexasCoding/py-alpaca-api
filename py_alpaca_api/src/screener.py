@@ -197,13 +197,6 @@ class Screener:
             gainer_df = pd.DataFrame()
 
             for bar in bars_df.iterrows():
-                # bar[0] is symbol
-                # bar[1][1] is current bar
-                # bar[1][0] is previous bar
-                # bar[1][1]["c"] is current close
-                # bar[1][0]["c"] is previous close
-                # ((current close - previous close) / previous close) * 100
-                # print(bar[1][0])
                 try:
                     change = round(
                         ((bar[1][0]["c"] - bar[1][0]["o"]) / bar[1][0]["o"]) * 100,

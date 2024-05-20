@@ -8,7 +8,7 @@ from .data_classes import PositionClass, position_class_from_dict
 
 
 class Position:
-    def __init__(self, trade_url: str, headers: object, account: Account) -> None:
+    def __init__(self, trade_url: str, headers: dict[str, str], account: Account) -> None:
         """Initialize Position class
 
         Parameters:
@@ -29,7 +29,6 @@ class Position:
         ValueError: If headers are not provided
 
         ValueError: If account is not provided
-
         """  # noqa
 
         self.trade_url = trade_url
@@ -55,7 +54,7 @@ class Position:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             positions = api.position.get_all()
             print(positions)
@@ -185,7 +184,7 @@ class Position:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             position = api.position.get(symbol="AAPL")
             print(position)
@@ -277,7 +276,7 @@ class Position:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             message = api.position.close_all()
             print(message)
@@ -337,7 +336,7 @@ class Position:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             message = api.position.close(symbol_or_id="AAPL", qty=10)
             print(message)

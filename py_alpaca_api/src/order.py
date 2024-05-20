@@ -6,7 +6,7 @@ from .data_classes import OrderClass, order_class_from_dict
 
 
 class Order:
-    def __init__(self, trade_url: str, headers: object) -> None:
+    def __init__(self, trade_url: str, headers: dict[str, str]) -> None:
         """Initialize Order class
 
         Parameters:
@@ -51,7 +51,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.get_by_id(order_id="ORDER_ID")
             print(order)
@@ -117,7 +117,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.cancel_by_id(order_id="ORDER_ID")
             print(order)
@@ -154,7 +154,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.cancel_all()
             print(order)
@@ -225,7 +225,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.market(symbol="AAPL", qty=10)
             print(order)
@@ -301,7 +301,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.limit(symbol="AAPL", limit_price=100, qty=10)
             print(order)
@@ -311,7 +311,7 @@ class Order:
                 notional=1000.0, qty=10.0, filled_qty=10.0, filled_avg_price=100.0, order_class='simple', order_type='limit', \
                 limit_price=100.0, stop_price=None, status='new', side='buy', time_in_force='day', extended_hours=False)
 
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.limit(symbol="AAPL", limit_price=100, notional=1000)
             print(order)
@@ -328,7 +328,7 @@ class Order:
             "symbol": symbol,  # Asset symbol to buy/sell
             "limit_price": limit_price,  # Limit price for the order
             "qty": (qty if qty else None),  # Check if qty is provided, if not, set to None
-            "notional": (round(notional, 2) if notional else None),  # Round notional to 2 decimal places, if notional is provided
+            "notional": (round(notional, 2) if notional else None),  # Round notional to 2 decimal places
             "side": (side if side == "buy" else "sell"),  # Check if side is buy or sell
             "type": "limit",  # Order type is limit
             "time_in_force": time_in_force,  # Time in force options, default: day
@@ -385,7 +385,7 @@ class Order:
 
         Example:
         --------
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             order = api.order.stop(symbol="AAPL", stop_price=100, qty=10)
             print(order)

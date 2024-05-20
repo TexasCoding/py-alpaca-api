@@ -7,7 +7,7 @@ from .data_classes import AssetClass, asset_class_from_dict
 
 
 class Asset:
-    def __init__(self, trade_url: str, headers: object) -> None:
+    def __init__(self, trade_url: str, headers: dict[str, str]) -> None:
         """Initialize Asset class
 
         Parameters:
@@ -83,7 +83,7 @@ class Asset:
 
         Example:
         ________
-        >>> from py_alpaca_api import PyAlpacaApi
+        >>> from py_alpaca_api.alpaca import PyAlpacaApi
             api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
             asset = api.asset.get(symbol="AAPL")
             print(asset)
