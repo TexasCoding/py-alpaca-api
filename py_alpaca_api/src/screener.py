@@ -185,22 +185,19 @@ class Screener:
             all_bars_df = pd.DataFrame()
 
             for bar in bars_df.iterrows():
-
-                print()
                 try:
                     change = round(
-                        ((bar[1][0]["c"] - bar[1][1]["c"]) / bar[1][1]["c"]) * 100,
+                        ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100,
                         2,
                     )
-
                     symbol = bar[0]
 
                     sym_data = {
                         "symbol": symbol,
                         "change": change,
-                        "price": bar[1][0]["c"],
-                        "volume": bar[1][0]["v"],
-                        "trades": bar[1][0]["n"],
+                        "price": bar[1][1]["c"],
+                        "volume": bar[1][1]["v"],
+                        "trades": bar[1][1]["n"],
                     }
                     all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
