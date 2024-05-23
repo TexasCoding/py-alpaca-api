@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from typing import Dict
 
 import pandas as pd
@@ -44,7 +45,7 @@ class History:
         start,
         end,
         timeframe="1d",
-        feed="iex",
+        feed="sip",
         currency="USD",
         limit=1000,
         sort="asc",
@@ -153,7 +154,7 @@ class History:
                 timeframe = "1Day"
             case "1w":
                 timeframe = "1Week"
-            case "1m":
+            case "1mth":
                 timeframe = "1Month"
             case _:
                 # Raise exception if invalid timeframe is provided
@@ -169,19 +170,37 @@ class History:
             "feed": feed,  # Data feed source, default: iex
             "sort": sort,  # Sort order, default: asc
         }
-        # Get historical stock data from Alpaca API
-        response = requests.get(url, headers=self.headers, params=params)
-        # Check if response is successful
-        if response.status_code != 200:
-            # Raise exception if response is not successful
-            raise Exception(json.loads(response.text)["message"])
+
+        page_token = None
+
+        symbols_data = defaultdict(list)
+
+        while True:
+            params["page_token"] = page_token
+            # Get historical stock data from Alpaca API
+            response = requests.get(url, headers=self.headers, params=params)
+
+            # Check if response is successful
+            if response.status_code != 200:
+                # Raise exception if response is not successful
+                raise Exception(json.loads(response.text)["message"])
+
+            res_data = response.json()
+
+            [(symbols_data[symbol].extend(data)) if isinstance(data, list) else symbols_data[symbol].append(data) for data in res_data["bars"]]
+
+            if res_data["next_page_token"] != "":
+                page_token = res_data["next_page_token"]
+            else:
+                page_token = None
+
+            if page_token is None:
+                break
+
+        symbol_data = symbols_data[symbol]
         # Convert JSON response to dictionary
-        res_json = json.loads(response.text)["bars"]
-        # Check if data is available
-        if not res_json:
-            raise ValueError(f"No data available for {symbol}.")
-        # Normalize JSON response and convert to DataFrame
-        bar_data_df = pd.json_normalize(res_json)
+        bar_data_df = pd.DataFrame(symbol_data)
+
         # Add symbol column to DataFrame
         bar_data_df.insert(0, "symbol", symbol)
         # Reformat date column
