@@ -95,7 +95,9 @@ class Order:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise ValueError(f'Failed to get order information. Response: {res["message"]}')
+            raise ValueError(
+                f'Failed to get order information. Response: {res["message"]}'
+            )
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
@@ -137,7 +139,9 @@ class Order:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to cancel order {order_id}, Response: {res["message"]}')
+            raise Exception(
+                f'Failed to cancel order {order_id}, Response: {res["message"]}'
+            )
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
@@ -175,7 +179,9 @@ class Order:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
+            raise Exception(
+                f'Failed to cancel orders. Response: {res["message"]}'
+            )
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Market Order ////////////////#
@@ -198,7 +204,13 @@ class Order:
 
         # Return market order using submit order method
         return self.__submit_order(
-            symbol=symbol, side=side, qty=qty, notional=notional, entry_type="market", time_in_force=time_in_force, extended_hours=extended_hours
+            symbol=symbol,
+            side=side,
+            qty=qty,
+            notional=notional,
+            entry_type="market",
+            time_in_force=time_in_force,
+            extended_hours=extended_hours,
         )
 
     ########################################################
@@ -258,7 +270,13 @@ class Order:
             raise ValueError("Qty is required.")
         # Return stop order
         return self.__submit_order(
-            symbol=symbol, side=side, stop_price=stop_price, qty=qty, entry_type="stop", time_in_force=time_in_force, extended_hours=extended_hours
+            symbol=symbol,
+            side=side,
+            stop_price=stop_price,
+            qty=qty,
+            entry_type="stop",
+            time_in_force=time_in_force,
+            extended_hours=extended_hours,
         )
 
     ########################################################
@@ -315,8 +333,15 @@ class Order:
         if not qty:
             raise ValueError("Qty is required.")
 
-        if trail_percent is None and trail_price is None or trail_percent and trail_price:
-            raise ValueError("Either trail_percent or trail_price must be provided, not both.")
+        if (
+            trail_percent is None
+            and trail_price is None
+            or trail_percent
+            and trail_price
+        ):
+            raise ValueError(
+                "Either trail_percent or trail_price must be provided, not both."
+            )
 
         if trail_percent:
             if trail_percent < 0:
@@ -379,4 +404,6 @@ class Order:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to submit order. Code: {response.status_code}, Response: {res["message"]}')
+            raise Exception(
+                f'Failed to submit order. Code: {response.status_code}, Response: {res["message"]}'
+            )

@@ -305,7 +305,9 @@ class WatchlistClass:
 def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
     return WatchlistClass(
         id=str(data_dict["id"] if data_dict["id"] else ""),
-        account_id=str(data_dict["account_id"] if data_dict["account_id"] else ""),
+        account_id=str(
+            data_dict["account_id"] if data_dict["account_id"] else ""
+        ),
         created_at=(
             datetime.strptime(
                 data_dict["created_at"].split(".")[0].replace("T", " "),
@@ -323,7 +325,15 @@ def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
             else datetime.date(0, 0, 0)
         ),
         name=str(data_dict["name"] if data_dict["name"] else ""),
-        assets=([asset_class_from_dict(sym) for sym in data_dict["assets"] if len(data_dict["assets"]) > 0] if data_dict["assets"] else None),
+        assets=(
+            [
+                asset_class_from_dict(sym)
+                for sym in data_dict["assets"]
+                if len(data_dict["assets"]) > 0
+            ]
+            if data_dict["assets"]
+            else None
+        ),
     )
 
 
@@ -363,7 +373,9 @@ def clock_class_from_dict(data_dict: dict) -> ClockClass:
         ),
         next_close=(
             datetime.strptime(
-                data_dict["next_close"].replace("-04:00", "").replace("T", " "),
+                data_dict["next_close"]
+                .replace("-04:00", "")
+                .replace("T", " "),
                 "%Y-%m-%d %H:%M:%S",
             )
             if data_dict["next_close"]
@@ -427,21 +439,61 @@ def account_class_from_dict(data_dict: dict) -> AccountClass:
         id=str(data_dict["id"] if data_dict["id"] else ""),
         account_number=str(data_dict["account_number"]),
         status=str(data_dict["status"] if data_dict["status"] else ""),
-        crypto_status=str(data_dict["crypto_status"] if data_dict["crypto_status"] else ""),
-        options_approved_level=int(data_dict["options_approved_level"] if data_dict["options_approved_level"] else 0),
-        options_trading_level=int(data_dict["options_trading_level"] if data_dict["options_trading_level"] else 0),
+        crypto_status=str(
+            data_dict["crypto_status"] if data_dict["crypto_status"] else ""
+        ),
+        options_approved_level=int(
+            data_dict["options_approved_level"]
+            if data_dict["options_approved_level"]
+            else 0
+        ),
+        options_trading_level=int(
+            data_dict["options_trading_level"]
+            if data_dict["options_trading_level"]
+            else 0
+        ),
         currency=str(data_dict["currency"] if data_dict["currency"] else ""),
-        buying_power=float(data_dict["buying_power"] if data_dict["buying_power"] else 0),
-        regt_buying_power=float(data_dict["regt_buying_power"] if data_dict["regt_buying_power"] else 0),
-        daytrading_buying_power=float(data_dict["daytrading_buying_power"] if data_dict["daytrading_buying_power"] else 0),
-        effective_buying_power=float(data_dict["effective_buying_power"] if data_dict["effective_buying_power"] else 0),
-        non_marginable_buying_power=float(data_dict["non_marginable_buying_power"] if data_dict["non_marginable_buying_power"] else 0),
-        options_buying_power=float(data_dict["options_buying_power"] if data_dict["options_buying_power"] else 0),
+        buying_power=float(
+            data_dict["buying_power"] if data_dict["buying_power"] else 0
+        ),
+        regt_buying_power=float(
+            data_dict["regt_buying_power"]
+            if data_dict["regt_buying_power"]
+            else 0
+        ),
+        daytrading_buying_power=float(
+            data_dict["daytrading_buying_power"]
+            if data_dict["daytrading_buying_power"]
+            else 0
+        ),
+        effective_buying_power=float(
+            data_dict["effective_buying_power"]
+            if data_dict["effective_buying_power"]
+            else 0
+        ),
+        non_marginable_buying_power=float(
+            data_dict["non_marginable_buying_power"]
+            if data_dict["non_marginable_buying_power"]
+            else 0
+        ),
+        options_buying_power=float(
+            data_dict["options_buying_power"]
+            if data_dict["options_buying_power"]
+            else 0
+        ),
         bod_dtbp=float(data_dict["bod_dtbp"] if data_dict["bod_dtbp"] else 0),
         cash=float(data_dict["cash"] if data_dict["cash"] else 0),
-        accrued_fees=float(data_dict["accrued_fees"] if data_dict["accrued_fees"] else 0),
-        pending_transfer_in=float(data_dict["pending_transfer_in"] if data_dict["pending_transfer_in"] else 0),
-        portfolio_value=float(data_dict["portfolio_value"] if data_dict["portfolio_value"] else 0),
+        accrued_fees=float(
+            data_dict["accrued_fees"] if data_dict["accrued_fees"] else 0
+        ),
+        pending_transfer_in=float(
+            data_dict["pending_transfer_in"]
+            if data_dict["pending_transfer_in"]
+            else 0
+        ),
+        portfolio_value=float(
+            data_dict["portfolio_value"] if data_dict["portfolio_value"] else 0
+        ),
         pattern_day_trader=bool(data_dict["pattern_day_trader"]),
         trading_blocked=bool(data_dict["trading_blocked"]),
         transfers_blocked=bool(data_dict["transfers_blocked"]),
@@ -455,22 +507,62 @@ def account_class_from_dict(data_dict: dict) -> AccountClass:
             else datetime.date(0, 0, 0)
         ),
         trade_suspended_by_user=bool(data_dict["trade_suspended_by_user"]),
-        multiplier=int(data_dict["multiplier"] if data_dict["multiplier"] else 0),
+        multiplier=int(
+            data_dict["multiplier"] if data_dict["multiplier"] else 0
+        ),
         shorting_enabled=bool(data_dict["shorting_enabled"]),
         equity=float(data_dict["equity"] if data_dict["equity"] else 0),
-        last_equity=float(data_dict["last_equity"] if data_dict["last_equity"] else 0),
-        long_market_value=float(data_dict["long_market_value"] if data_dict["long_market_value"] else 0),
-        short_market_value=float(data_dict["short_market_value"] if data_dict["short_market_value"] else 0),
-        position_market_value=float(data_dict["position_market_value"] if data_dict["position_market_value"] else 0),
-        initial_margin=float(data_dict["initial_margin"] if data_dict["initial_margin"] else 0),
-        maintenance_margin=float(data_dict["maintenance_margin"] if data_dict["maintenance_margin"] else 0),
-        last_maintenance_margin=float(data_dict["last_maintenance_margin"] if data_dict["last_maintenance_margin"] else 0),
+        last_equity=float(
+            data_dict["last_equity"] if data_dict["last_equity"] else 0
+        ),
+        long_market_value=float(
+            data_dict["long_market_value"]
+            if data_dict["long_market_value"]
+            else 0
+        ),
+        short_market_value=float(
+            data_dict["short_market_value"]
+            if data_dict["short_market_value"]
+            else 0
+        ),
+        position_market_value=float(
+            data_dict["position_market_value"]
+            if data_dict["position_market_value"]
+            else 0
+        ),
+        initial_margin=float(
+            data_dict["initial_margin"] if data_dict["initial_margin"] else 0
+        ),
+        maintenance_margin=float(
+            data_dict["maintenance_margin"]
+            if data_dict["maintenance_margin"]
+            else 0
+        ),
+        last_maintenance_margin=float(
+            data_dict["last_maintenance_margin"]
+            if data_dict["last_maintenance_margin"]
+            else 0
+        ),
         sma=float(data_dict["sma"] if data_dict["sma"] else 0),
-        daytrade_count=int(data_dict["daytrade_count"] if data_dict["daytrade_count"] else 0),
-        balance_asof=str(data_dict["balance_asof"] if data_dict["balance_asof"] else ""),
-        crypto_tier=int(data_dict["crypto_tier"] if data_dict["crypto_tier"] else 0),
-        intraday_adjustments=int(data_dict["intraday_adjustments"] if data_dict["intraday_adjustments"] else 0),
-        pending_reg_taf_fees=float(data_dict["pending_reg_taf_fees"] if data_dict["pending_reg_taf_fees"] else 0),
+        daytrade_count=int(
+            data_dict["daytrade_count"] if data_dict["daytrade_count"] else 0
+        ),
+        balance_asof=str(
+            data_dict["balance_asof"] if data_dict["balance_asof"] else ""
+        ),
+        crypto_tier=int(
+            data_dict["crypto_tier"] if data_dict["crypto_tier"] else 0
+        ),
+        intraday_adjustments=int(
+            data_dict["intraday_adjustments"]
+            if data_dict["intraday_adjustments"]
+            else 0
+        ),
+        pending_reg_taf_fees=float(
+            data_dict["pending_reg_taf_fees"]
+            if data_dict["pending_reg_taf_fees"]
+            else 0
+        ),
     )
 
 
@@ -496,7 +588,11 @@ def asset_class_from_dict(data_dict: dict) -> AssetClass:
         easy_to_borrow=bool(data_dict["easy_to_borrow"]),
         exchange=str(data_dict["exchange"]) if data_dict["exchange"] else "",
         fractionable=bool(data_dict["fractionable"]),
-        maintenance_margin_requirement=(float(data_dict["maintenance_margin_requirement"]) if data_dict["maintenance_margin_requirement"] else 0),
+        maintenance_margin_requirement=(
+            float(data_dict["maintenance_margin_requirement"])
+            if data_dict["maintenance_margin_requirement"]
+            else 0
+        ),
         marginable=bool(data_dict["marginable"]),
         name=str(data_dict["name"]) if data_dict["name"] else "",
         shortable=bool(data_dict["shortable"]),
@@ -589,27 +685,51 @@ def order_class_from_dict(data_dict: dict) -> OrderClass:
             if data_dict["replaced_at"]
             else datetime(1, 1, 1, 0, 0)
         ),
-        replaced_by=str(data_dict["replaced_by"] if data_dict["replaced_by"] else ""),
+        replaced_by=str(
+            data_dict["replaced_by"] if data_dict["replaced_by"] else ""
+        ),
         replaces=str(data_dict["replaces"] if data_dict["replaces"] else ""),
         asset_id=str(data_dict["asset_id"] if data_dict["asset_id"] else ""),
         symbol=str(data_dict["symbol"] if data_dict["symbol"] else ""),
-        asset_class=str(data_dict["asset_class"] if data_dict["asset_class"] else ""),
+        asset_class=str(
+            data_dict["asset_class"] if data_dict["asset_class"] else ""
+        ),
         notional=float(data_dict["notional"] if data_dict["notional"] else 0),
         qty=float(data_dict["qty"] if data_dict["qty"] else 0),
-        filled_qty=float(data_dict["filled_qty"] if data_dict["filled_qty"] else 0),
-        filled_avg_price=float(data_dict["filled_avg_price"] if data_dict["filled_avg_price"] else 0),
-        order_class=str(data_dict["order_class"] if data_dict["order_class"] else ""),
-        order_type=str(data_dict["order_type"] if data_dict["order_type"] else ""),
+        filled_qty=float(
+            data_dict["filled_qty"] if data_dict["filled_qty"] else 0
+        ),
+        filled_avg_price=float(
+            data_dict["filled_avg_price"]
+            if data_dict["filled_avg_price"]
+            else 0
+        ),
+        order_class=str(
+            data_dict["order_class"] if data_dict["order_class"] else ""
+        ),
+        order_type=str(
+            data_dict["order_type"] if data_dict["order_type"] else ""
+        ),
         type=str(data_dict["type"] if data_dict["type"] else ""),
         side=str(data_dict["side"] if data_dict["side"] else ""),
-        time_in_force=str(data_dict["time_in_force"] if data_dict["time_in_force"] else ""),
-        limit_price=float(data_dict["limit_price"] if data_dict["limit_price"] else 0),
-        stop_price=float(data_dict["stop_price"] if data_dict["stop_price"] else 0),
+        time_in_force=str(
+            data_dict["time_in_force"] if data_dict["time_in_force"] else ""
+        ),
+        limit_price=float(
+            data_dict["limit_price"] if data_dict["limit_price"] else 0
+        ),
+        stop_price=float(
+            data_dict["stop_price"] if data_dict["stop_price"] else 0
+        ),
         status=str(data_dict["status"] if data_dict["status"] else ""),
         extended_hours=bool(data_dict["extended_hours"]),
         legs=data_dict["legs"] if data_dict["legs"] else {},
-        trail_percent=float(data_dict["trail_percent"] if data_dict["trail_percent"] else 0),
-        trail_price=float(data_dict["trail_price"] if data_dict["trail_price"] else 0),
+        trail_percent=float(
+            data_dict["trail_percent"] if data_dict["trail_percent"] else 0
+        ),
+        trail_price=float(
+            data_dict["trail_price"] if data_dict["trail_price"] else 0
+        ),
         hwm=float(data_dict["hwm"] if data_dict["hwm"] else 0),
         subtag=str(data_dict["subtag"] if data_dict["subtag"] else ""),
         source=str(data_dict["source"] if data_dict["source"] else ""),

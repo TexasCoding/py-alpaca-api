@@ -68,4 +68,6 @@ class Market:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to get market clock. Response: {res["message"]}')
+            raise Exception(
+                f'Failed to get market clock. Response: {res["message"]}'
+            )

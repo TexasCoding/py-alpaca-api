@@ -47,12 +47,19 @@ class Account:
             return account_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise Exception(f"Failed to get account information. Response: {response.text}")
+            raise Exception(
+                f"Failed to get account information. Response: {response.text}"
+            )
 
     ########################################################
     # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
     ########################################################
-    def portfolio_history(self, period: str = "1W", timeframe: str = "1D", intraday_reporting: str = "market_hours") -> pd.DataFrame:
+    def portfolio_history(
+        self,
+        period: str = "1W",
+        timeframe: str = "1D",
+        intraday_reporting: str = "market_hours",
+    ) -> pd.DataFrame:
         """Get portfolio history from Alpaca API
 
         Parameters:
@@ -107,13 +114,27 @@ class Account:
         # Check if response is successful
         if response.status_code == 200:
             res = json.loads(response.text)
-            res_df = pd.DataFrame(res, columns=["timestamp", "equity", "profit_loss", "profit_loss_pct", "base_value"])
+            res_df = pd.DataFrame(
+                res,
+                columns=[
+                    "timestamp",
+                    "equity",
+                    "profit_loss",
+                    "profit_loss_pct",
+                    "base_value",
+                ],
+            )
             # Convert timestamp to date
             res_df["timestamp"] = (
-                pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
+                pd.to_datetime(res_df["timestamp"], unit="s")
+                .dt.tz_localize("America/New_York")
+                .dt.tz_convert("UTC")
+                .apply(lambda x: x.date())
             )
             res_df["timestamp"] = res_df["timestamp"]
             res_df["profit_loss_pct"] = res_df["profit_loss_pct"] * 100
             return res_df
         else:
-            raise Exception(f"Failed to get portfolio information. Response: {response.text}")
+            raise Exception(
+                f"Failed to get portfolio information. Response: {response.text}"
+            )

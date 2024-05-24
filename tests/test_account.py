@@ -17,7 +17,9 @@ def alpaca():
 
 @pytest.fixture
 def alpaca_wrong_keys():
-    return PyAlpacaApi(api_key="api_key", api_secret="api_secret", api_paper=True)
+    return PyAlpacaApi(
+        api_key="api_key", api_secret="api_secret", api_paper=True
+    )
 
 
 ##########################################

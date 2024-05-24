@@ -8,7 +8,9 @@ from .data_classes import PositionClass, position_class_from_dict
 
 
 class Position:
-    def __init__(self, trade_url: str, headers: dict[str, str], account: Account) -> None:
+    def __init__(
+        self, trade_url: str, headers: dict[str, str], account: Account
+    ) -> None:
         """Initialize Position class
 
         Parameters:
@@ -105,7 +107,9 @@ class Position:
         # If response is not empty, concatenate DataFrames
         if not res_data_df.empty:
             # Return DataFrame if no positions
-            pos_data_df = pd.concat([pos_data_df, res_data_df], ignore_index=True)
+            pos_data_df = pd.concat(
+                [pos_data_df, res_data_df], ignore_index=True
+            )
         # Rename columns for consistency
         pos_data_df.rename(
             columns={
@@ -148,15 +152,21 @@ class Position:
         round_2 = ["profit_dol", "intraday_profit_dol", "market_value"]
         round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct"]
 
-        pos_data_df[round_2] = pos_data_df[round_2].apply(lambda x: pd.Series.round(x, 2))
-        pos_data_df[round_4] = pos_data_df[round_4].apply(lambda x: pd.Series.round(x, 4))
+        pos_data_df[round_2] = pos_data_df[round_2].apply(
+            lambda x: pd.Series.round(x, 2)
+        )
+        pos_data_df[round_4] = pos_data_df[round_4].apply(
+            lambda x: pd.Series.round(x, 4)
+        )
 
         return pos_data_df
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Get Position //////////////////////#
     ########################################################
-    def get(self, symbol: str = None, symbol_dict: dict = None) -> PositionClass:
+    def get(
+        self, symbol: str = None, symbol_dict: dict = None
+    ) -> PositionClass:
         """Get position information by symbol or asset ID
 
         Parameters:
@@ -238,7 +248,9 @@ class Position:
         res_dict = json.loads(response.text)
 
         equity = self.account.get().equity
-        res_dict["portfolio_pct"] = round(float(res_dict["market_value"]) / equity, 4)
+        res_dict["portfolio_pct"] = round(
+            float(res_dict["market_value"]) / equity, 4
+        )
 
         res_dict["profit_dol"] = round(float(res_dict["unrealized_pl"]), 2)
         del res_dict["unrealized_pl"]
@@ -246,10 +258,14 @@ class Position:
         res_dict["profit_pct"] = round(float(res_dict["unrealized_plpc"]), 4)
         del res_dict["unrealized_plpc"]
 
-        res_dict["intraday_profit_dol"] = round(float(res_dict["unrealized_intraday_pl"]), 2)
+        res_dict["intraday_profit_dol"] = round(
+            float(res_dict["unrealized_intraday_pl"]), 2
+        )
         del res_dict["unrealized_intraday_pl"]
 
-        res_dict["intraday_profit_pct"] = round(float(res_dict["unrealized_intraday_plpc"]), 4)
+        res_dict["intraday_profit_pct"] = round(
+            float(res_dict["unrealized_intraday_plpc"]), 4
+        )
         del res_dict["unrealized_intraday_plpc"]
 
         # Return position information as a PositionClass object
@@ -299,12 +315,16 @@ class Position:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to close positions. Response: {res["message"]}')
+            raise Exception(
+                f'Failed to close positions. Response: {res["message"]}'
+            )
 
     ########################################################
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
     ########################################################
-    def close(self, symbol_or_id: str, qty: float = None, percentage: int = None) -> str:
+    def close(
+        self, symbol_or_id: str, qty: float = None, percentage: int = None
+    ) -> str:
         """Close position by symbol or asset ID from Alpaca API
 
         Parameters:
@@ -367,4 +387,6 @@ class Position:
             return f"Position {symbol_or_id} has been closed"
         else:
             res = json.loads(response.text)
-            raise Exception(f'Failed to close position. Response: {res["message"]}')
+            raise Exception(
+                f'Failed to close position. Response: {res["message"]}'
+            )

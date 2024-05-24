@@ -61,7 +61,9 @@ class Asset:
             return res_df
         # If response is not successful, raise an exception
         else:
-            raise ValueError(f"Failed to get asset information. Response: {response.text}")
+            raise ValueError(
+                f"Failed to get asset information. Response: {response.text}"
+            )
 
     #####################################################
     # \\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
@@ -116,4 +118,6 @@ class Asset:
             return asset_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise ValueError(f"Failed to get asset information. Response: {response.text}")
+            raise ValueError(
+                f"Failed to get asset information. Response: {response.text}"
+            )

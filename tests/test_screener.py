@@ -57,12 +57,16 @@ def test_get_top_50_losers(alpaca):
 
 
 def test_losers_by_volume(alpaca):
-    losers = alpaca.screener.losers(total_losers_returned=10, volume_greater_than=50000)
+    losers = alpaca.screener.losers(
+        total_losers_returned=10, volume_greater_than=50000
+    )
     assert not losers.empty
     assert losers["volume"][0] > 50000
 
 
 def test_gainers_by_volume(alpaca):
-    gainers = alpaca.screener.gainers(total_gainers_returned=10, volume_greater_than=50000)
+    gainers = alpaca.screener.gainers(
+        total_gainers_returned=10, volume_greater_than=50000
+    )
     assert not gainers.empty
     assert gainers["volume"][0] > 50000
