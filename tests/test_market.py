@@ -1,6 +1,7 @@
 import os
-from datetime import datetime
+from datetime import datetime, time
 
+import pandas as pd
 import pytest
 
 from py_alpaca_api.alpaca import PyAlpacaApi
@@ -18,6 +19,15 @@ api_secret = os.environ.get("API_SECRET")
 @pytest.fixture
 def alpaca():
     return PyAlpacaApi(api_key=api_key, api_secret=api_secret, api_paper=True)
+
+
+def test_calender(alpaca):
+    calender = alpaca.market.calender(start_date="2024-05-25", end_date="2024-06-06")
+    assert isinstance(calender, pd.DataFrame)
+    assert isinstance(calender.date[0], datetime)
+    assert isinstance(calender.settlement_date[0], datetime)
+    assert isinstance(calender.open[0], time)
+    assert isinstance(calender.close[0], time)
 
 
 def test_market_clock_success(alpaca):
