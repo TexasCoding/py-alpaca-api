@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import pandas as pd
 import pytest
 
 from py_alpaca_api.alpaca import PyAlpacaApi
@@ -17,9 +18,7 @@ def alpaca():
 
 @pytest.fixture
 def alpaca_wrong_keys():
-    return PyAlpacaApi(
-        api_key="api_key", api_secret="api_secret", api_paper=True
-    )
+    return PyAlpacaApi(api_key="api_key", api_secret="api_secret", api_paper=True)
 
 
 ##########################################
@@ -80,3 +79,14 @@ def test_get_account_attributes(alpaca):
     assert hasattr(account, "id")
     assert hasattr(account, "account_number")
     assert hasattr(account, "status")
+
+
+def test_get_portfolio_history(alpaca):
+    history = alpaca.account.portfolio_history()
+    assert isinstance(history, pd.DataFrame)
+    assert history.timestamp.dtype == datetime
+    assert history.equity.dtype == float
+    assert history.profit_loss.dtype == float
+    assert history.profit_loss_pct.dtype == float
+    assert history.base_value.dtype == float
+    assert history.equity.iloc[-1] == alpaca.account.get().equity
