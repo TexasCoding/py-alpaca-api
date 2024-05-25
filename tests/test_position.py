@@ -46,7 +46,10 @@ class TestPosition(unittest.TestCase):
         pos = position.Position(
             "https://paper-api.alpaca.markets",
             {"APCA-API-KEY-ID": "API", "APCA-API-SECRET-KEY": "SECRET"},
-            position.Account("https://paper-api.alpaca.markets", {"APCA-API-KEY-ID": "API", "APCA-API-SECRET-KEY": "SECRET"}),
+            position.Account(
+                "https://paper-api.alpaca.markets",
+                {"APCA-API-KEY-ID": "API", "APCA-API-SECRET-KEY": "SECRET"},
+            ),
         )
         df = pos.get_all()
 

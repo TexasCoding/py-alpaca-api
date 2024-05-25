@@ -2,6 +2,7 @@ import json
 from typing import Dict
 
 import pandas as pd
+import pendulum
 import requests
 
 from .data_classes import AccountClass, account_class_from_dict
@@ -16,6 +17,66 @@ class Account:
         """
         self.trade_url = trade_url
         self.headers = headers
+
+    def account_activities(self, activity_type: str, date: str = None, until_date: str = None) -> pd.DataFrame:
+        """
+        Retrieves account activities for a specific activity type.
+
+        Args:
+            activity_type (str): The type of activity to retrieve.
+            date (str, optional): The starting date for the activities. Defaults to None.
+            until_date (str, optional): The ending date for the activities. Defaults to None.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the account activities.
+
+        Raises:
+            ValueError: If activity_type is not provided.
+            ValueError: If both date and until_date are provided or if neither is provided.
+            Exception: If the request to retrieve account activities fails.
+        """
+        url = f"{self.trade_url}/account/activities/{activity_type}"
+
+        if not activity_type:
+            raise ValueError("Activity type is required.")
+
+        if date and until_date or (not date and not until_date):
+            raise ValueError("One of the Date and Until Date are required, not both or neither.")
+
+        params = {
+            "date": date if date else None,
+            "until_date": until_date if until_date else None,
+        }
+
+        request = requests.get(url=url, headers=self.headers, params=params)
+
+        if request.status_code != 200:
+            raise Exception(f"Failed to get account activities. Response: {request.text}")
+
+        response = json.loads(request.text)
+
+        activity_df = pd.DataFrame(response).reset_index(drop=True)
+
+        activity_df["transaction_time"] = [pendulum.parse(x, tz="America/New_York").to_datetime_string() for x in activity_df["transaction_time"]]
+
+        activity_df = activity_df.astype(
+            {
+                "symbol": "str",
+                "activity_type": "str",
+                "id": "str",
+                "cum_qty": "float",
+                "leaves_qty": "float",
+                "price": "float",
+                "qty": "float",
+                "side": "str",
+                "transaction_time": "datetime64[ns, America/New_York]",
+                "order_id": "str",
+                "type": "str",
+                "order_status": "str",
+            }
+        )
+
+        return activity_df.sort_values(by="transaction_time", ascending=False)
 
     ########################################################
     # \\\\\\\\\\\\\  Get Account Information ///////////////#
