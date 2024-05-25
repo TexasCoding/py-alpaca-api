@@ -61,51 +61,33 @@ class Asset:
             return res_df
         # If response is not successful, raise an exception
         else:
-            raise ValueError(
-                f"Failed to get asset information. Response: {response.text}"
-            )
+            raise ValueError(f"Failed to get asset information. Response: {response.text}")
 
     #####################################################
     # \\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
     #####################################################
     def get(self, symbol: str) -> AssetClass:
-        """Get asset information from Alpaca API
+        """
+        Gets the asset information for a given symbol using the Alpaca API.
 
-        Parameters:
-        ___________
-        symbol: str
-                Asset symbol required
+        Args:
+            symbol (str): The symbol of the asset.
 
         Returns:
-        ________
-        AssetClass: Asset information as an AssetClass object
+            AssetClass: The asset information as an AssetClass object.
 
         Raises:
-        _______
-        ValueError: If the response is not successful
+            ValueError: If the request to the Alpaca API fails.
 
         Example:
-        ________
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            asset = api.asset.get(symbol="AAPL")
-            print(asset)
-
-        AssetClass(
-            asset_id="375f6b6e-3b5f-4b2b-8f6b-2e6b2a6b2e6b",
-            class="us_equity",
-            easy_to_borrow=True,
-            exchange="NASDAQ",
-            id="375f6b6e-3b5f-4b2b-8f6b-2e6b2a6b2e6b",
-            marginable=True,
-            name="Apple Inc",
-            shortable=True,
-            status="active",
-            symbol="AAPL",
-            tradable=True
-        )
-        """  # noqa
-
+            >>> asset = self.get("AAPL")
+            >>> asset.symbol
+            'AAPL'
+            >>> asset.name
+            'Apple Inc.'
+            >>> asset.exchange
+            'NASDAQ'
+        """
         # Alpaca API URL for asset information
         url = f"{self.trade_url}/assets/{symbol}"
         # Get request to Alpaca API for asset information
@@ -118,6 +100,4 @@ class Asset:
             return asset_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise ValueError(
-                f"Failed to get asset information. Response: {response.text}"
-            )
+            raise ValueError(f"Failed to get asset information. Response: {response.text}")

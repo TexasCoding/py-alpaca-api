@@ -8,9 +8,7 @@ from .data_classes import PositionClass, position_class_from_dict
 
 
 class Position:
-    def __init__(
-        self, trade_url: str, headers: dict[str, str], account: Account
-    ) -> None:
+    def __init__(self, trade_url: str, headers: dict[str, str], account: Account) -> None:
         """Initialize Position class
 
         Parameters:
@@ -107,9 +105,7 @@ class Position:
         # If response is not empty, concatenate DataFrames
         if not res_data_df.empty:
             # Return DataFrame if no positions
-            pos_data_df = pd.concat(
-                [pos_data_df, res_data_df], ignore_index=True
-            )
+            pos_data_df = pd.concat([pos_data_df, res_data_df], ignore_index=True)
         # Rename columns for consistency
         pos_data_df.rename(
             columns={
@@ -152,76 +148,31 @@ class Position:
         round_2 = ["profit_dol", "intraday_profit_dol", "market_value"]
         round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct"]
 
-        pos_data_df[round_2] = pos_data_df[round_2].apply(
-            lambda x: pd.Series.round(x, 2)
-        )
-        pos_data_df[round_4] = pos_data_df[round_4].apply(
-            lambda x: pd.Series.round(x, 4)
-        )
+        pos_data_df[round_2] = pos_data_df[round_2].apply(lambda x: pd.Series.round(x, 2))
+        pos_data_df[round_4] = pos_data_df[round_4].apply(lambda x: pd.Series.round(x, 4))
 
         return pos_data_df
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Get Position //////////////////////#
     ########################################################
-    def get(
-        self, symbol: str = None, symbol_dict: dict = None
-    ) -> PositionClass:
-        """Get position information by symbol or asset ID
+    def get(self, symbol: str = None, symbol_dict: dict = None) -> PositionClass:
+        """
+        Get position information for a specific symbol or from a provided symbol dictionary.
 
-        Parameters:
-        -----------
-        symbol:         Asset symbol to get position information
-                        A valid asset symbol string (optional) str
-
-        symbol_dict:    Asset symbol dictionary to get position information
-                        A valid asset symbol dictionary (optional) dict
+        Args:
+            symbol (str): The symbol for which to retrieve position information. Defaults to None.
+            symbol_dict (dict): A dictionary containing position information. Defaults to None.
 
         Returns:
-        --------
-        PositionClass:  Position information as a PositionClass object with attributes:
-                    asset_id, symbol, exchange, asset_class, avg_entry_price, qty, qty_available, side, market_value, cost_basis,
-                    profit_dol, profit_pct, intraday_profit_dol, intraday_profit_pct, portfolio_pct, current_price, lastday_price,
-                    change_today, asset_marginable
+            PositionClass: An object representing the position information.
 
         Raises:
-        -------
-        ValueError:     ValueError if symbol or symbol_dict is not provided
+            ValueError: If neither symbol nor symbol_dict is provided.
+            ValueError: If both symbol and symbol_dict are provided.
+            ValueError: If the response from the Alpaca API is not successful.
 
-        ValueError:     ValueError if both symbol and symbol_dict are provided
-
-        Exception:      Exception if failed to get position information
-
-        Example:
-        --------
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            position = api.position.get(symbol="AAPL")
-            print(position)
-
-        PositionClass(
-            asset_id="375f6b6e-3b5f-4b2b-8f6b-2e6b2a6b2e6b",
-            symbol="AAPL",
-            exchange="NASDAQ",
-            asset_class="us_equity",
-            avg_entry_price=100.0,
-            qty=10.0,
-            qty_available=10.0,
-            side="long",
-            market_value=1000.0,
-            cost_basis=1000.0,
-            profit_dol=0.0,
-            profit_pct=0.0,
-            intraday_profit_dol=0.0,
-            intraday_profit_pct=0.0,
-            portfolio_pct=0.1,
-            current_price=100.0,
-            lastday_price=100.0,
-            change_today=0.0,
-            asset_marginable=True
-        )
-        """  # noqa
-
+        """
         # Check if symbol or symbol_dict is provided
         if not symbol and not symbol_dict:
             # Raise ValueError if symbol or symbol_dict is not provided
@@ -248,9 +199,7 @@ class Position:
         res_dict = json.loads(response.text)
 
         equity = self.account.get().equity
-        res_dict["portfolio_pct"] = round(
-            float(res_dict["market_value"]) / equity, 4
-        )
+        res_dict["portfolio_pct"] = round(float(res_dict["market_value"]) / equity, 4)
 
         res_dict["profit_dol"] = round(float(res_dict["unrealized_pl"]), 2)
         del res_dict["unrealized_pl"]
@@ -258,14 +207,10 @@ class Position:
         res_dict["profit_pct"] = round(float(res_dict["unrealized_plpc"]), 4)
         del res_dict["unrealized_plpc"]
 
-        res_dict["intraday_profit_dol"] = round(
-            float(res_dict["unrealized_intraday_pl"]), 2
-        )
+        res_dict["intraday_profit_dol"] = round(float(res_dict["unrealized_intraday_pl"]), 2)
         del res_dict["unrealized_intraday_pl"]
 
-        res_dict["intraday_profit_pct"] = round(
-            float(res_dict["unrealized_intraday_plpc"]), 4
-        )
+        res_dict["intraday_profit_pct"] = round(float(res_dict["unrealized_intraday_plpc"]), 4)
         del res_dict["unrealized_intraday_plpc"]
 
         # Return position information as a PositionClass object
@@ -315,16 +260,12 @@ class Position:
         # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to close positions. Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to close positions. Response: {res["message"]}')
 
     ########################################################
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
     ########################################################
-    def close(
-        self, symbol_or_id: str, qty: float = None, percentage: int = None
-    ) -> str:
+    def close(self, symbol_or_id: str, qty: float = None, percentage: int = None) -> str:
         """Close position by symbol or asset ID from Alpaca API
 
         Parameters:
@@ -387,6 +328,4 @@ class Position:
             return f"Position {symbol_or_id} has been closed"
         else:
             res = json.loads(response.text)
-            raise Exception(
-                f'Failed to close position. Response: {res["message"]}'
-            )
+            raise Exception(f'Failed to close position. Response: {res["message"]}')
