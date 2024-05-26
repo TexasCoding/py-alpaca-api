@@ -25,9 +25,7 @@ class Watchlist:
     # ///////////// Helper functions //////////////////////#
     ########################################################
     @staticmethod
-    def _handle_response(
-        response: dict, no_content_msg: str
-    ) -> Union[WatchlistClass, str]:
+    def _handle_response(response: dict, no_content_msg: str) -> Union[WatchlistClass, str]:
         """
         Handles the response from the API and returns a WatchlistClass object
         if the response is not empty, otherwise returns the specified no_content_msg.
@@ -47,9 +45,7 @@ class Watchlist:
     ########################################################
     # ///////////// Send a request to the API //////////////#
     ########################################################
-    def _request(
-        self, method: str, url: str, payload: dict = None, params: dict = None
-    ) -> Dict:
+    def _request(self, method: str, url: str, payload: dict = None, params: dict = None) -> Dict:
         """
         Sends a request to the specified URL using the specified HTTP method.
 
@@ -82,9 +78,7 @@ class Watchlist:
     ########################################################
     # //////////////// Get a  watchlist ///////////////////#
     ########################################################
-    def get(
-        self, watchlist_id: str = None, watchlist_name: str = None
-    ) -> WatchlistClass:
+    def get(self, watchlist_id: str = None, watchlist_name: str = None) -> WatchlistClass:
         """
         Retrieves a watchlist based on the provided watchlist ID or name.
 
@@ -99,11 +93,7 @@ class Watchlist:
             ValueError: If both watchlist_id and watchlist_name are provided, or if neither is provided.
 
         """
-        if (
-            watchlist_id
-            and watchlist_name
-            or (not watchlist_id and not watchlist_name)
-        ):
+        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if watchlist_id:
@@ -114,9 +104,7 @@ class Watchlist:
         params = {"name": watchlist_name} if watchlist_name else None
 
         response = self._request(method="GET", url=url, params=params)
-        return self._handle_response(
-            response=response, no_content_msg="No watchlist was found."
-        )
+        return self._handle_response(response=response, no_content_msg="No watchlist was found.")
 
     ########################################################
     # ///////////// Get all watchlists ////////////////////#
@@ -169,9 +157,7 @@ class Watchlist:
 
         payload = {"symbols": symbols, "name": name}
         response = self._request(method="POST", url=url, payload=payload)
-        return self._handle_response(
-            response=response, no_content_msg="The watchlist was not created."
-        )
+        return self._handle_response(response=response, no_content_msg="The watchlist was not created.")
 
     ########################################################
     # ///////////// Update a watchlist ////////////////////#
@@ -201,11 +187,7 @@ class Watchlist:
 
         """
         # Check if both watchlist_id and watchlist_name are provided and raise an error if they are
-        if (
-            watchlist_id
-            and watchlist_name
-            or (not watchlist_id and not watchlist_name)
-        ):
+        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
         # Check if watchlist_id is provided
         if watchlist_id:
@@ -225,19 +207,13 @@ class Watchlist:
         payload = {"name": name, "symbols": symbols}
         params = {"name": watchlist_name} if watchlist_name else None
 
-        response = self._request(
-            method="PUT", url=url, payload=payload, params=params
-        )
-        return self._handle_response(
-            response=response, no_content_msg="The watchlist was not updated."
-        )
+        response = self._request(method="PUT", url=url, payload=payload, params=params)
+        return self._handle_response(response=response, no_content_msg="The watchlist was not updated.")
 
     ########################################################
     # ///////////// Delete a watchlist ////////////////////#
     ########################################################
-    def delete(
-        self, watchlist_id: str = None, watchlist_name: str = None
-    ) -> str:
+    def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> str:
         """
         Deletes a watchlist.
 
@@ -252,11 +228,7 @@ class Watchlist:
             ValueError: If both watchlist_id and watchlist_name are provided or if neither is provided.
 
         """
-        if (
-            watchlist_id
-            and watchlist_name
-            or (not watchlist_id and not watchlist_name)
-        ):
+        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if watchlist_id:
@@ -295,11 +267,7 @@ class Watchlist:
         Raises:
             ValueError: If both watchlist_id and watchlist_name are provided, or if symbol is not provided.
         """
-        if (
-            watchlist_id
-            and watchlist_name
-            or (not watchlist_id and not watchlist_name)
-        ):
+        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if not symbol:
@@ -313,9 +281,7 @@ class Watchlist:
         params = {"name": watchlist_name} if watchlist_name else None
         payload = {"symbol": symbol}
 
-        response = self._request(
-            method="POST", url=url, payload=payload, params=params
-        )
+        response = self._request(method="POST", url=url, payload=payload, params=params)
         return self._handle_response(
             response=response,
             no_content_msg="Failed to add asset to watchlist.",
@@ -346,11 +312,7 @@ class Watchlist:
         Raises:
             ValueError: If both watchlist_id and watchlist_name are provided, or if symbol is not provided.
         """
-        if (
-            watchlist_id
-            and watchlist_name
-            or (not watchlist_id and not watchlist_name)
-        ):
+        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if not symbol:
@@ -370,9 +332,7 @@ class Watchlist:
     ########################################################
     # /////////// Get Assets from a watchlist /////////////#
     ########################################################
-    def get_assets(
-        self, watchlist_id: str = None, watchlist_name: str = None
-    ) -> list:
+    def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list:
         """
         Retrieves the symbols of assets in a watchlist.
 

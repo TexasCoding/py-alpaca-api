@@ -10,9 +10,7 @@ from .data_classes import AssetClass
 
 
 class History:
-    def __init__(
-        self, data_url: str, headers: Dict[str, str], asset: Asset
-    ) -> None:
+    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
         """
         Args:
             data_url: A string representing the URL of the data.
@@ -78,15 +76,11 @@ class History:
         }
 
         if timeframe not in timeframe_mapping:
-            raise ValueError(
-                'Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1M"'
-            )
+            raise ValueError('Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1M"')
 
         # Parameters for historical stock data request
         params = {
-            "timeframe": timeframe_mapping[
-                timeframe
-            ],  # Timeframe for historical data, default: 1d
+            "timeframe": timeframe_mapping[timeframe],  # Timeframe for historical data, default: 1d
             "start": start,  # Start date for historical data
             "end": end,  # End date for historical data
             "currency": currency,  # Currency for historical data, default: USD
@@ -130,9 +124,7 @@ class History:
     # /////////// PreProcess Data \\\\\\\\\\\ #
     ###########################################
     @staticmethod
-    def preprocess_data(
-        symbol_data: list[defaultdict], symbol: str
-    ) -> pd.DataFrame:
+    def preprocess_data(symbol_data: list[defaultdict], symbol: str) -> pd.DataFrame:
         """Prepross data
         Preprocesses the given symbol data by converting it to a pandas DataFrame and performing various
         data transformations.
@@ -151,9 +143,7 @@ class History:
         # Add symbol column to DataFrame
         bar_data_df.insert(0, "symbol", symbol)
         # Reformat date column
-        bar_data_df["t"] = pd.to_datetime(
-            bar_data_df["t"].replace("[A-Za-z]", " ", regex=True)
-        )
+        bar_data_df["t"] = pd.to_datetime(bar_data_df["t"].replace("[A-Za-z]", " ", regex=True))
         # Rename columns for consistency
         bar_data_df.rename(
             columns={
@@ -188,9 +178,7 @@ class History:
     ###########################################
     # ///////// Get Historical Data \\\\\\\\\ #
     ###########################################
-    def get_historical_data(
-        self, symbol: str, url: str, params: dict
-    ) -> list[defaultdict]:
+    def get_historical_data(self, symbol: str, url: str, params: dict) -> list[defaultdict]:
         """Get historical stock data
         Args:
             symbol (str): The symbol of the stock or asset for which historical data is being fetched.
