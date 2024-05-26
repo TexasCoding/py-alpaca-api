@@ -9,7 +9,10 @@
 :caption: 'Contents:'
 :maxdepth: 2
 
-notebooks/usage
+notebooks/account
+notebooks/asset
+notebooks/history
+notebooks/market
 ````
 
 # Indices and tables

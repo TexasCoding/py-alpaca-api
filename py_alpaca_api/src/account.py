@@ -18,7 +18,9 @@ class Account:
         self.trade_url = trade_url
         self.headers = headers
 
-    def account_activities(self, activity_type: str, date: str = None, until_date: str = None) -> pd.DataFrame:
+    def activity(
+        self, activity_type: str, date: str = None, until_date: str = None
+    ) -> pd.DataFrame:
         """
         Retrieves account activities for a specific activity type.
 
@@ -41,7 +43,9 @@ class Account:
             raise ValueError("Activity type is required.")
 
         if date and until_date or (not date and not until_date):
-            raise ValueError("One of the Date and Until Date are required, not both or neither.")
+            raise ValueError(
+                "One of the Date and Until Date are required, not both or neither."
+            )
 
         params = {
             "date": date if date else None,
@@ -51,13 +55,41 @@ class Account:
         request = requests.get(url=url, headers=self.headers, params=params)
 
         if request.status_code != 200:
-            raise Exception(f"Failed to get account activities. Response: {request.text}")
+            raise Exception(
+                f"Failed to get account activities. Response: {request.text}"
+            )
 
         response = json.loads(request.text)
 
+        activity_df = pd.DataFrame()
+        activity_df = activity_df.assign(
+                symbol= "NAN",
+                activity_type= "NAN",
+                id= "NAN",
+                cum_qty= "NAN",
+                leaves_qty= "NAN",
+                price= "NAN",
+                qty= "NAN",
+                side= "NAN",
+                transaction_time= "NAN",
+                order_id= "NAN",
+                type= "NAN",
+                order_status= "NAN",
+        )
+
         activity_df = pd.DataFrame(response).reset_index(drop=True)
 
-        activity_df["transaction_time"] = [pendulum.parse(x, tz="America/New_York").to_datetime_string() for x in activity_df["transaction_time"]]
+        if activity_df.empty:
+            return activity_df
+
+        activity_df["transaction_time"] = (
+            [
+                pendulum.parse(x, tz="America/New_York").to_datetime_string()
+                for x in activity_df["transaction_time"]
+            ]
+            if "transaction_time" in activity_df.columns
+            else None
+        )
 
         activity_df = activity_df.astype(
             {
@@ -110,7 +142,9 @@ class Account:
             return account_class_from_dict(res)
         # If response is not successful, raise an exception
         else:
-            raise Exception(f"Failed to get account information. Response: {response.text}")
+            raise Exception(
+                f"Failed to get account information. Response: {response.text}"
+            )
 
     ########################################################
     # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
@@ -161,10 +195,15 @@ class Account:
             )
 
             timestamp_transformed = (
-                pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
+                pd.to_datetime(res_df["timestamp"], unit="s")
+                .dt.tz_localize("America/New_York")
+                .dt.tz_convert("UTC")
+                .apply(lambda x: x.date())
             )
             res_df["timestamp"] = timestamp_transformed
             res_df["profit_loss_pct"] = res_df["profit_loss_pct"] * 100
             return res_df
         else:
-            raise Exception(f"Failed to get portfolio information. Response: {response.text}")
+            raise Exception(
+                f"Failed to get portfolio information. Response: {response.text}"
+            )

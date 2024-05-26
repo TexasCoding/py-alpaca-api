@@ -90,3 +90,13 @@ def test_get_portfolio_history(alpaca):
     assert history.profit_loss_pct.dtype == float
     assert history.base_value.dtype == float
     assert history.equity.iloc[-1] == alpaca.account.get().equity
+
+def test_get_account_activities(alpaca):
+    activities = alpaca.account.activity(activity_type="FILL", date="2024-05-24")
+    assert isinstance(activities, pd.DataFrame)
+    if not activities.empty:
+        assert activities.timestamp.dtype == datetime
+        assert activities.activity_type.dtype == str
+        assert activities.symbol.dtype == str
+        assert activities.qty.dtype == float
+

@@ -24,74 +24,74 @@ mocked_activities = [
 ]
 
 
-def test_account_activities_both_dates():
+def test_account_activity_both_dates():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.text = json.dumps(mocked_activities)
 
         try:
-            mocked_account.account_activities("FILL", "2021-10-16", "2021-10-18")
+            mocked_account.activity("FILL", "2021-10-16", "2021-10-18")
             assert False, "Expected an Exception"
         except ValueError as err:
             assert str(err) == "One of the Date and Until Date are required, not both or neither."
 
 
-def test_account_activities_no_dates():
+def test_account_activity_no_dates():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.text = json.dumps(mocked_activities)
 
         try:
-            mocked_account.account_activities("FILL")
+            mocked_account.activity("FILL")
             assert False, "Expected an Exception"
         except ValueError as err:
             assert str(err) == "One of the Date and Until Date are required, not both or neither."
 
 
-def test_account_activities_no_activity_type():
+def test_account_activity_no_activity_type():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.text = json.dumps(mocked_activities)
 
         try:
-            mocked_account.account_activities("", "2021-10-16")
+            mocked_account.activity("", "2021-10-16")
             assert False, "Expected an Exception"
         except ValueError as err:
             assert str(err) == "Activity type is required."
 
 
-def test_account_activities_valid_activities_with_dates():
+def test_account_activity_valid_activities_with_dates():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.text = json.dumps(mocked_activities)
 
-        transactions = mocked_account.account_activities("FILL", "2021-10-17")
+        transactions = mocked_account.activity("FILL", "2021-10-17")
         assert isinstance(transactions, pd.DataFrame)
         assert not transactions.empty
 
 
-def test_account_activities_valid_activities_without_dates():
+def test_account_activity_valid_activities_without_dates():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.text = json.dumps(mocked_activities)
-        transactions = mocked_account.account_activities("FILL", until_date="2021-10-18")
+        transactions = mocked_account.activity("FILL", until_date="2021-10-18")
         assert isinstance(transactions, pd.DataFrame)
         assert not transactions.empty
 
 
-def test_account_activities_error_response():
+def test_account_activity_error_response():
     with patch("requests.get") as mocked_get:
         mocked_account = Account("trade_url", {"header": "header"})
         mocked_get.return_value.status_code = 404
         mocked_get.return_value.text = json.dumps(mocked_activities)
 
         try:
-            mocked_account.account_activities("FILL", "2021-10-16")
+            mocked_account.activity("FILL", "2021-10-16")
             assert False, "Expected an Exception"
         except Exception as err:
             assert str(err) == "Failed to get account activities. Response: " + mocked_get.return_value.text
