@@ -234,5 +234,8 @@ class Screener:
             .reset_index(drop=True)
         )
 
-        self.yesterday = calender.iloc[1]["date"]
-        self.day_before_yesterday = calender.iloc[0]["date"]
+        self.yesterday = calender.iloc[1]["date"].strftime("%Y-%m-%d")
+        self.day_before_yesterday = calender.iloc[0]["date"].strftime("%Y-%m-%d")
+
+        print(f"Yesterday: {self.yesterday}")
+        print(f"Day Before Yesterday: {self.day_before_yesterday}")
