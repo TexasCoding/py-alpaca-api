@@ -138,9 +138,7 @@ def test_order_instance(alpaca):
 ###########################################
 def test_limit_order_with_qty(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.limit(
-        symbol="AAPL", qty=0.1, side="buy", limit_price=200.00
-    )
+    order = alpaca.order.limit(symbol="AAPL", qty=0.1, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
     assert order.type == "limit"
@@ -150,9 +148,7 @@ def test_limit_order_with_qty(alpaca):
 
 def test_limit_order_with_notional(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.limit(
-        symbol="AAPL", notional=2.00, side="buy", limit_price=200.00
-    )
+    order = alpaca.order.limit(symbol="AAPL", notional=2.00, side="buy", limit_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "accepted"
     assert order.type == "limit"
@@ -162,17 +158,13 @@ def test_limit_order_with_notional(alpaca):
 
 def test_limit_order_with_fake_symbol(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.limit(
-            symbol="FAKESYM", notional=2.00, side="buy", limit_price=200.00
-        )
+        alpaca.order.limit(symbol="FAKESYM", notional=2.00, side="buy", limit_price=200.00)
     alpaca.order.cancel_all()
 
 
 def test_limit_order_with_no_money(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.limit(
-            symbol="AAPL", qty=2000, side="buy", limit_price=200.00
-        )
+        alpaca.order.limit(symbol="AAPL", qty=2000, side="buy", limit_price=200.00)
     alpaca.order.cancel_all()
 
 
@@ -181,9 +173,7 @@ def test_limit_order_with_no_money(alpaca):
 ###########################################
 def test_stop_order_with_qty(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.stop(
-        symbol="AAPL", qty=1, side="buy", stop_price=200.00
-    )
+    order = alpaca.order.stop(symbol="AAPL", qty=1, side="buy", stop_price=200.00)
     assert isinstance(order, OrderClass)
     assert order.status == "pending_new" or order.status == "accepted"
     assert order.type == "stop"
@@ -193,17 +183,13 @@ def test_stop_order_with_qty(alpaca):
 
 def test_stop_order_with_fake_symbol(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.stop(
-            symbol="FAKESYM", qty=1.0, side="buy", stop_price=200.00
-        )
+        alpaca.order.stop(symbol="FAKESYM", qty=1.0, side="buy", stop_price=200.00)
     alpaca.order.cancel_all()
 
 
 def test_stop_order_with_no_money(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.stop(
-            symbol="AAPL", qty=2000, side="buy", stop_price=200.00
-        )
+        alpaca.order.stop(symbol="AAPL", qty=2000, side="buy", stop_price=200.00)
     alpaca.order.cancel_all()
 
 
@@ -212,9 +198,7 @@ def test_stop_order_with_no_money(alpaca):
 ###########################################
 def test_stop_limit_order_with_qty(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.stop_limit(
-        symbol="AAPL", qty=1, side="buy", stop_price=200.00, limit_price=200.20
-    )
+    order = alpaca.order.stop_limit(symbol="AAPL", qty=1, side="buy", stop_price=200.00, limit_price=200.20)
     assert isinstance(order, OrderClass)
     assert order.status == "pending_new" or order.status == "accepted"
     assert order.type == "stop_limit"
@@ -251,15 +235,9 @@ def test_stop_limit_order_with_no_money(alpaca):
 ###########################################
 def test_trailing_stop_order_with_price(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.trailing_stop(
-        symbol="AAPL", qty=1, side="buy", trail_price=10.00
-    )
+    order = alpaca.order.trailing_stop(symbol="AAPL", qty=1, side="buy", trail_price=10.00)
     assert isinstance(order, OrderClass)
-    assert (
-        order.status == "pending_new"
-        or order.status == "accepted"
-        or order.status == "new"
-    )
+    assert order.status == "pending_new" or order.status == "accepted" or order.status == "new"
     assert order.type == "trailing_stop"
     assert order.qty == 1
     alpaca.order.cancel_all()
@@ -267,15 +245,9 @@ def test_trailing_stop_order_with_price(alpaca):
 
 def test_trailing_stop_order_with_percent(alpaca):
     delete_all_orders(alpaca)
-    order = alpaca.order.trailing_stop(
-        symbol="AAPL", qty=1, side="buy", trail_percent=2
-    )
+    order = alpaca.order.trailing_stop(symbol="AAPL", qty=1, side="buy", trail_percent=2)
     assert isinstance(order, OrderClass)
-    assert (
-        order.status == "pending_new"
-        or order.status == "accepted"
-        or order.status == "new"
-    )
+    assert order.status == "pending_new" or order.status == "accepted" or order.status == "new"
     assert order.type == "trailing_stop"
     assert order.qty == 1
     alpaca.order.cancel_all()
@@ -295,23 +267,17 @@ def test_trailing_stop_order_with_both_percent_and_price(alpaca):
 
 def test_trailing_stop_order_with_percent_less_than(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.trailing_stop(
-            symbol="AAPL", qty=2.00, side="buy", trail_percent=-2
-        )
+        alpaca.order.trailing_stop(symbol="AAPL", qty=2.00, side="buy", trail_percent=-2)
     alpaca.order.cancel_all()
 
 
 def test_trailing_stop_order_with_fake_symbol(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.trailing_stop(
-            symbol="FAKESYM", notional=2.00, side="buy", trail_price=10.00
-        )
+        alpaca.order.trailing_stop(symbol="FAKESYM", notional=2.00, side="buy", trail_price=10.00)
     alpaca.order.cancel_all()
 
 
 def test_trailing_stop_order_with_no_money(alpaca):
     with pytest.raises(Exception):
-        alpaca.order.trailing_stop(
-            symbol="AAPL", qty=2000, side="buy", trail_price=10.00
-        )
+        alpaca.order.trailing_stop(symbol="AAPL", qty=2000, side="buy", trail_price=10.00)
     alpaca.order.cancel_all()

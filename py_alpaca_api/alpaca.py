@@ -7,6 +7,7 @@ from .src.position import Position
 from .src.screener import Screener
 from .src.watchlist import Watchlist
 
+
 # PyAlpacaApi class
 class PyAlpacaApi:
     def __init__(self, api_key: str, api_secret: str, api_paper: bool = True):

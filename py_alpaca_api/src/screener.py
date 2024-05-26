@@ -16,9 +16,7 @@ THURSDAY = pendulum.THURSDAY
 
 
 class Screener:
-    def __init__(
-        self, data_url: str, headers: Dict[str, str], asset: Asset
-    ) -> None:
+    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
         """Initialize Screener class3
 
         Parameters:
@@ -77,19 +75,13 @@ class Screener:
         print(f"Yesterday was {self.yesterday}")
         print(f"Day before yesterday was {self.day_before_yesterday}")
 
-        losers_df = self._get_percentages(
-            start=self.day_before_yesterday, end=self.yesterday
-        )
+        losers_df = self._get_percentages(start=self.day_before_yesterday, end=self.yesterday)
 
         losers_df = losers_df[losers_df["price"] > price_greater_than]
         losers_df = losers_df[losers_df["change"] < change_less_than]
         losers_df = losers_df[losers_df["volume"] > volume_greater_than]
         losers_df = losers_df[losers_df["trades"] > trade_count_greater_than]
-        return (
-            losers_df.sort_values(by="change", ascending=True)
-            .reset_index(drop=True)
-            .head(total_losers_returned)
-        )
+        return losers_df.sort_values(by="change", ascending=True).reset_index(drop=True).head(total_losers_returned)
 
     def gainers(
         self,
@@ -119,21 +111,13 @@ class Screener:
         """
         self.set_dates()
 
-        gainers_df = self._get_percentages(
-            start=self.day_before_yesterday, end=self.yesterday
-        )
+        gainers_df = self._get_percentages(start=self.day_before_yesterday, end=self.yesterday)
 
         gainers_df = gainers_df[gainers_df["price"] > price_greater_than]
         gainers_df = gainers_df[gainers_df["change"] > change_greater_than]
         gainers_df = gainers_df[gainers_df["volume"] > volume_greater_than]
-        gainers_df = gainers_df[
-            gainers_df["trades"] > trade_count_greater_than
-        ]
-        return (
-            gainers_df.sort_values(by="change", ascending=False)
-            .reset_index(drop=True)
-            .head(total_gainers_returned)
-        )
+        gainers_df = gainers_df[gainers_df["trades"] > trade_count_greater_than]
+        return gainers_df.sort_values(by="change", ascending=False).reset_index(drop=True).head(total_gainers_returned)
 
     def _get_percentages(
         self,
@@ -186,9 +170,7 @@ class Screener:
 
             while page_token:
                 params["page_token"] = page_token
-                response = requests.get(
-                    url, headers=self.headers, params=params
-                )
+                response = requests.get(url, headers=self.headers, params=params)
                 res = json.loads(response.text)
                 bars_df = pd.concat(
                     [
@@ -205,8 +187,7 @@ class Screener:
             for bar in bars_df.iterrows():
                 try:
                     change = round(
-                        ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"])
-                        * 100,
+                        ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100,
                         2,
                     )
                     symbol = bar[0]
@@ -218,18 +199,14 @@ class Screener:
                         "volume": bar[1][1]["v"],
                         "trades": bar[1][1]["n"],
                     }
-                    all_bars_df = pd.concat(
-                        [all_bars_df, pd.DataFrame([sym_data])]
-                    )
+                    all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
                 except Exception:
                     pass
             all_bars_df.reset_index(drop=True, inplace=True)
             return all_bars_df
         else:
-            raise ValueError(
-                f"Failed to get assets. Response: {response.text}"
-            )
+            raise ValueError(f"Failed to get assets. Response: {response.text}")
 
     @staticmethod
     def get_previous_date(current_date, day_to_look):
@@ -260,9 +237,5 @@ class Screener:
             self.yesterday = self.get_previous_date(today, MONDAY)
             self.day_before_yesterday = self.get_previous_date(today, FRIDAY)
         else:
-            self.yesterday = self.get_previous_date(
-                today, today.day_of_week - 1
-            )
-            self.day_before_yesterday = self.get_previous_date(
-                today, today.day_of_week - 2
-            )
+            self.yesterday = self.get_previous_date(today, today.day_of_week - 1)
+            self.day_before_yesterday = self.get_previous_date(today, today.day_of_week - 2)
