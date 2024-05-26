@@ -8,23 +8,16 @@ from .data_classes import OrderClass, order_class_from_dict
 
 class Order:
     def __init__(self, trade_url: str, headers: Dict[str, str]) -> None:
-        """Initialize Order class
+        """
+        Initializes a new instance of the Order class.
 
-        Parameters:
-        ___________
-        trade_url: str
-                Alpaca Trade API URL required
+        Args:
+            trade_url (str): The URL for trading.
+            headers (Dict[str, str]): The headers for the API request.
 
-        headers: object
-                API request headers required
-
-        Raises:
-        _______
-        ValueError: If trade URL is not provided
-
-        ValueError: If headers are not provided
-        """  # noqa
-
+        Returns:
+            None
+        """
         self.trade_url = trade_url
         self.headers = headers
 
@@ -32,53 +25,19 @@ class Order:
     # \\\\\\\\\/////////  Get Order BY id \\\\\\\///////////#
     #########################################################
     def get_by_id(self, order_id: str, nested: bool = False) -> OrderClass:
-        """Get order information by order ID
+        """
+        Retrieves order information by its ID.
 
-        Parameters:
-        -----------
-        order_id:   Order ID to get information
-                    A valid order ID string required
-
-        nested:     Include nested objects (default: False)
-                    Include nested objects (optional) bool
+        Args:
+            order_id (str): The ID of the order to retrieve.
+            nested (bool, optional): Whether to include nested objects in the response. Defaults to False.
 
         Returns:
-        --------
-        OrderClass: Order information as an OrderClass object
+            OrderClass: An object representing the order information.
 
         Raises:
-        -------
-        ValueError: If failed to get order information
-
-        Example:
-        --------
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            order = api.order.get_by_id(order_id="ORDER_ID")
-            print(order)
-
-        OrderClass(
-            id="ORDER_ID",
-            client_order_id="CLIENT_ORDER_ID",
-            created_at="2021-10-01T00:00:00Z",
-            submitted_at="2021-10-01 00:00:00",
-            asset_id="ASSET_ID",
-            symbol="AAPL",
-            asset_class="us_equity",
-            notional=1000.0,
-            qty=10.0,
-            filled_qty=10.0,
-            filled_avg_price=100.0,
-            order_class="simple",
-            order_type="market",
-            limit_price=None,
-            stop_price=None,
-            status="new",
-            side="buy",
-            time_in_force="day",
-            extended_hours=False
-        )
-        """  # noqa
+            ValueError: If the request to retrieve order information fails.
+        """
 
         # Parameters for the request
         params = {"nested": nested}
@@ -101,30 +60,18 @@ class Order:
     # \\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
     ########################################################
     def cancel_by_id(self, order_id: str) -> str:
-        """Cancel order by order ID
+        """
+        Cancel an order by its ID.
 
-        Parameters:
-        -----------
-        order_id:   Order ID to cancel
-                    A valid order ID string required
+        Args:
+            order_id (str): The ID of the order to be cancelled.
 
         Returns:
-        --------
-        str:        Order cancellation confirmation message
+            str: A message indicating the status of the cancellation.
 
         Raises:
-        -------
-        Exception:  If failed to cancel order
-
-        Example:
-        --------
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            order = api.order.cancel_by_id(order_id="ORDER_ID")
-            print(order)
-
-        Order ORDER_ID has been cancelled
-        """  # noqa
+            Exception: If the cancellation request fails, an exception is raised with the error message.
+        """
 
         # Alpaca API URL for canceling an order
         url = f"{self.trade_url}/orders/{order_id}"
@@ -143,26 +90,15 @@ class Order:
     # \\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
     ########################################################
     def cancel_all(self) -> str:
-        """Cancel all orders
+        """
+        Cancels all open orders.
 
         Returns:
-        --------
-        str:        Order cancellation confirmation message
+            str: A message indicating the number of orders that have been cancelled.
 
         Raises:
-        -------
-        Exception:  If failed to cancel all orders
-
-        Example:
-        --------
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            order = api.order.cancel_all()
-            print(order)
-
-        10 orders have been cancelled
-        """  # noqa
-
+            Exception: If the request to cancel orders is not successful, an exception is raised with the error message.
+        """
         # Alpaca API URL for canceling all orders
         url = f"{self.trade_url}/orders"
         # Delete request to Alpaca API for canceling all orders
@@ -189,6 +125,26 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits a market order for the specified symbol.
+
+        Args:
+            symbol (str): The symbol to trade.
+            qty (float, optional): The quantity to trade. Either `qty` or `notional` must be provided, not both.
+            Defaults to None.
+            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both.
+            Defaults to None.
+            side (str, optional): The side of the trade. Defaults to "buy".
+            time_in_force (str, optional): The time in force for the order. Defaults to "day".
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: The submitted market order.
+
+        Raises:
+            ValueError: If `symbol` is not provided.
+            ValueError: If both `qty` and `notional` are not provided, or if both are provided.
+        """
 
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
@@ -196,7 +152,6 @@ class Order:
         if not (qty or notional) or (qty and notional):
             raise ValueError("Qty or Notional are required, not both.")
 
-        # Return market order using submit order method
         return self.__submit_order(
             symbol=symbol,
             side=side,
@@ -220,6 +175,27 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits a limit order for trading.
+
+        Args:
+            symbol (str): The symbol of the security to trade.
+            limit_price (float): The limit price for the order.
+            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both.
+            Defaults to None.
+            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both.
+            Defaults to None.
+            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
+            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: The submitted limit order.
+
+        Raises:
+            ValueError: If `symbol` or `limit_price` is not provided, or if both `qty` and `notional` are provided or not provided.
+
+        """
 
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
@@ -229,7 +205,7 @@ class Order:
 
         if not (qty or notional) or (qty and notional):
             raise ValueError("Qty or Notional are required, not both.")
-        # Return limit order
+
         return self.__submit_order(
             symbol=symbol,
             side=side,
@@ -253,6 +229,23 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits a stop order for trading.
+
+        Args:
+            symbol (str): The symbol of the security to trade.
+            stop_price (float): The stop price for the order.
+            qty (float): The quantity of shares to trade.
+            side (str, optional): The side of the order. Defaults to "buy".
+            time_in_force (str, optional): The time in force for the order. Defaults to "day".
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: The submitted stop order.
+
+        Raises:
+            ValueError: If symbol, stop_price, or qty is not provided.
+        """
 
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
@@ -262,7 +255,7 @@ class Order:
 
         if not qty:
             raise ValueError("Qty is required.")
-        # Return stop order
+
         return self.__submit_order(
             symbol=symbol,
             side=side,
@@ -286,6 +279,26 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits a stop-limit order for trading.
+
+        Args:
+            symbol (str): The symbol of the security to trade.
+            stop_price (float): The stop price for the order.
+            limit_price (float): The limit price for the order.
+            qty (float): The quantity of shares to trade.
+            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
+            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: The submitted stop-limit order.
+
+        Raises:
+            ValueError: If symbol is not provided.
+            ValueError: If neither limit_price nor stop_price is provided.
+            ValueError: If qty is not provided.
+        """
 
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
@@ -295,7 +308,7 @@ class Order:
 
         if not qty:
             raise ValueError("Qty is required.")
-        # Return stop_limit order
+
         return self.__submit_order(
             symbol=symbol,
             side=side,
@@ -320,6 +333,29 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits a trailing stop order for the specified symbol.
+
+        Args:
+            symbol (str): The symbol of the security to trade.
+            qty (float): The quantity of shares to trade.
+            trail_percent (float, optional): The trailing stop percentage. Either `trail_percent` or `trail_price`
+            must be provided, not both. Defaults to None.
+            trail_price (float, optional): The trailing stop price. Either `trail_percent` or `trail_price`
+            must be provided, not both. Defaults to None.
+            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
+            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: The submitted trailing stop order.
+
+        Raises:
+            ValueError: If `symbol` is not provided.
+            ValueError: If `qty` is not provided.
+            ValueError: If both `trail_percent` and `trail_price` are provided, or if neither is provided.
+            ValueError: If `trail_percent` is less than 0.
+        """
 
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
@@ -334,7 +370,6 @@ class Order:
             if trail_percent < 0:
                 raise ValueError("Trail percent must be greater than 0.")
 
-        # Return trailing_stop
         return self.__submit_order(
             symbol=symbol,
             side=side,
@@ -363,6 +398,28 @@ class Order:
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
+        """
+        Submits an order to the Alpaca API.
+
+        Args:
+            symbol (str): The symbol of the security to trade.
+            entry_type (str): The type of order to submit (e.g., 'market', 'limit', 'stop').
+            qty (float, optional): The quantity of shares to trade. Defaults to None.
+            notional (float, optional): The desired notional value of the trade. Defaults to None.
+            stop_price (float, optional): The stop price for a stop order. Defaults to None.
+            limit_price (float, optional): The limit price for a limit order. Defaults to None.
+            trail_percent (float, optional): The trailing stop percentage for a trailing stop order. Defaults to None.
+            trail_price (float, optional): The trailing stop price for a trailing stop order. Defaults to None.
+            side (str, optional): The side of the trade ('buy' or 'sell'). Defaults to 'buy'.
+            time_in_force (str, optional): The time in force for the order ('day', 'gtc', 'opg', 'ioc', 'fok'). Defaults to 'day'.
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+
+        Returns:
+            OrderClass: An object representing the submitted order.
+
+        Raises:
+            Exception: If the order submission fails, an exception is raised with the error message.
+        """
 
         payload = {
             "symbol": symbol,
@@ -378,17 +435,13 @@ class Order:
             "extended_hours": extended_hours,
         }
 
-        # Alpaca API URL for submitting an order
         url = f"{self.trade_url}/orders"
-        # Post request to Alpaca API for submitting an order
+
         response = requests.post(url, headers=self.headers, json=payload)
-        # Check if response is successful
+
         if response.status_code == 200:
-            # Convert JSON response to dictionary
             res = json.loads(response.text)
-            # Return order information as an OrderClass object
             return order_class_from_dict(res)
-        # If response is not successful, raise an exception
         else:
             res = json.loads(response.text)
             raise Exception(f'Failed to submit order. Code: {response.status_code}, Response: {res["message"]}')
