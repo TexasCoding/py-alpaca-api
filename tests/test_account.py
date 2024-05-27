@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+import pandas as pd
 import pytest
 
 from py_alpaca_api.alpaca import PyAlpacaApi
@@ -78,3 +79,24 @@ def test_get_account_attributes(alpaca):
     assert hasattr(account, "id")
     assert hasattr(account, "account_number")
     assert hasattr(account, "status")
+
+
+def test_get_portfolio_history(alpaca):
+    history = alpaca.account.portfolio_history()
+    assert isinstance(history, pd.DataFrame)
+    assert history.timestamp.dtype == datetime
+    assert history.equity.dtype == float
+    assert history.profit_loss.dtype == float
+    assert history.profit_loss_pct.dtype == float
+    assert history.base_value.dtype == float
+    assert history.equity.iloc[-1] == alpaca.account.get().equity
+
+
+def test_get_account_activities(alpaca):
+    activities = alpaca.account.activity(activity_type="FILL", date="2024-05-24")
+    assert isinstance(activities, pd.DataFrame)
+    if not activities.empty:
+        assert activities.timestamp.dtype == datetime
+        assert activities.activity_type.dtype == str
+        assert activities.symbol.dtype == str
+        assert activities.qty.dtype == float

@@ -2,6 +2,7 @@ import json
 from typing import Dict
 
 import pandas as pd
+import pendulum
 import requests
 
 from .data_classes import AccountClass, account_class_from_dict
@@ -17,23 +18,108 @@ class Account:
         self.trade_url = trade_url
         self.headers = headers
 
+    def activity(self, activity_type: str, date: str = None, until_date: str = None) -> pd.DataFrame:
+        """
+        Retrieves account activities for a specific activity type.
+
+        Args:
+            activity_type (str): The type of activity to retrieve.
+            date (str, optional): The starting date for the activities. Defaults to None.
+            until_date (str, optional): The ending date for the activities. Defaults to None.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the account activities.
+
+        Raises:
+            ValueError: If activity_type is not provided.
+            ValueError: If both date and until_date are provided or if neither is provided.
+            Exception: If the request to retrieve account activities fails.
+        """
+        url = f"{self.trade_url}/account/activities/{activity_type}"
+
+        if not activity_type:
+            raise ValueError("Activity type is required.")
+
+        if date and until_date or (not date and not until_date):
+            raise ValueError("One of the Date and Until Date are required, not both or neither.")
+
+        params = {
+            "date": date if date else None,
+            "until_date": until_date if until_date else None,
+        }
+
+        request = requests.get(url=url, headers=self.headers, params=params)
+
+        if request.status_code != 200:
+            raise Exception(f"Failed to get account activities. Response: {request.text}")
+
+        response = json.loads(request.text)
+
+        activity_df = pd.DataFrame()
+        activity_df = activity_df.assign(
+            symbol="NAN",
+            activity_type="NAN",
+            id="NAN",
+            cum_qty="NAN",
+            leaves_qty="NAN",
+            price="NAN",
+            qty="NAN",
+            side="NAN",
+            transaction_time="NAN",
+            order_id="NAN",
+            type="NAN",
+            order_status="NAN",
+        )
+
+        activity_df = pd.DataFrame(response).reset_index(drop=True)
+
+        if activity_df.empty:
+            return activity_df
+
+        activity_df["transaction_time"] = (
+            [pendulum.parse(x, tz="America/New_York").to_datetime_string() for x in activity_df["transaction_time"]]
+            if "transaction_time" in activity_df.columns
+            else None
+        )
+
+        activity_df = activity_df.astype(
+            {
+                "symbol": "str",
+                "activity_type": "str",
+                "id": "str",
+                "cum_qty": "float",
+                "leaves_qty": "float",
+                "price": "float",
+                "qty": "float",
+                "side": "str",
+                "transaction_time": "datetime64[ns, America/New_York]",
+                "order_id": "str",
+                "type": "str",
+                "order_status": "str",
+            }
+        )
+
+        return activity_df.sort_values(by="transaction_time", ascending=False)
+
     ########################################################
     # \\\\\\\\\\\\\  Get Account Information ///////////////#
     ########################################################
     def get(self) -> AccountClass:
         """
-        This method `get` is used to retrieve account information from the Alpaca API.
+        get(self) -> AccountClass
+            Get account information from Alpaca API.
 
-        Returns:
-            AccountClass: An object representing the account information.
+            Returns:
+                AccountClass: An instance of the AccountClass representing the account information.
 
-        Raises:
-            Exception: If the request to the Alpaca API fails.
+            Raises:
+                Exception: If the request fails or the response status code is not 200.
 
-        Example Usage:
-            >>> account = account.get()
-            >>> print(account)
+            Usage:
+                account = get()
 
+            Example:
+                >>> account = account.get()
         """
         # Alpaca API URL for account information
         url = f"{self.trade_url}/account"
@@ -52,49 +138,28 @@ class Account:
     ########################################################
     # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
     ########################################################
-    def portfolio_history(self, period: str = "1W", timeframe: str = "1D", intraday_reporting: str = "market_hours") -> pd.DataFrame:
-        """Get portfolio history from Alpaca API
-
-        Parameters:
-        ___________
-        period: str
-                The period of time to retrieve the portfolio history for. Default is 1W
-                Possible values: 1D, 1W, 1M, 3M, 1A
-
-        timeframe: str
-                The timeframe of the portfolio history. Default is 1D
-                Possible values: 1D, 1W, 1M, 3M, 1A
-
-        intraday_reporting: str
-                The intraday reporting for the portfolio history. Default is market_hours
-                Possible values: market_hours, 24_7
+    def portfolio_history(
+        self,
+        period: str = "1W",
+        timeframe: str = "1D",
+        intraday_reporting: str = "market_hours",
+    ) -> pd.DataFrame:
+        """
+        Args:
+            period (str): The period of time for which the portfolio history is requested. Defaults to "1W" (1 week).
+            timeframe (str): The timeframe for the intervals of the portfolio history. Defaults to "1D" (1 day).
+            intraday_reporting (str): The type of intraday reporting to be used. Defaults to "market_hours".
 
         Returns:
-        ________
-        pd.DataFrame: Portfolio history as a pandas DataFrame
+            pd.DataFrame: A pandas DataFrame containing the portfolio history data.
 
         Raises:
-        _______
-        Exception: If the response is not successful
+            Exception: If the request to the Alpaca API fails.
 
-        Example:
-        ________
-        >>> from py_alpaca_api.alpaca import PyAlpacaApi
-            api = PyAlpacaApi(api_key="API", api_secret="SECRET", api_paper=True)
-            portfolio_history = api.account.portfolio_history()
-            print(portfolio_history)
+        """
 
-        timestamp    equity  profit_loss  profit_loss_pct  base_value
-        0 2021-07-08  100000.0          0.0              0.0    100000.0
-        1 2021-07-09  100000.0          0.0              0.0    100000.0
-        2 2021-07-10  100000.0          0.0              0.0    100000.0
-        3 2021-07-11  100000.0          0.0              0.0    100000.0
-        4 2021-07-12  100000.0          0.0              0.0    100000.0
-        """  # noqa
-
-        # Alpaca API URL for portfolio history
         url = f"{self.trade_url}/account/portfolio/history"
-        # Get request to Alpaca API for portfolio history
+
         response = requests.get(
             url,
             headers=self.headers,
@@ -104,15 +169,24 @@ class Account:
                 "intraday_reporting": intraday_reporting,
             },
         )
-        # Check if response is successful
+
         if response.status_code == 200:
             res = json.loads(response.text)
-            res_df = pd.DataFrame(res, columns=["timestamp", "equity", "profit_loss", "profit_loss_pct", "base_value"])
-            # Convert timestamp to date
-            res_df["timestamp"] = (
+            res_df = pd.DataFrame(
+                res,
+                columns=[
+                    "timestamp",
+                    "equity",
+                    "profit_loss",
+                    "profit_loss_pct",
+                    "base_value",
+                ],
+            )
+
+            timestamp_transformed = (
                 pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
             )
-            res_df["timestamp"] = res_df["timestamp"]
+            res_df["timestamp"] = timestamp_transformed
             res_df["profit_loss_pct"] = res_df["profit_loss_pct"] * 100
             return res_df
         else:
