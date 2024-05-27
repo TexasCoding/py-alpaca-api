@@ -23,6 +23,33 @@ class History:
         self.asset = asset
 
     ###########################################
+    # /////// Check if Asset is Stock \\\\\\\ #
+    ###########################################
+    def check_if_stock(self, symbol: str) -> AssetClass:
+        """Check if asset is stock
+        Args:
+            symbol: The symbol of the asset to be checked.
+
+        Returns:
+            AssetClass: The asset information for the given symbol.
+
+        Raises:
+            ValueError: If there is an error getting the asset information or if the asset is not a stock.
+        """
+        # Get asset information for the symbol
+        try:
+            asset = self.asset.get(symbol)
+        # Raise exception if failed to get asset information
+        except Exception as e:
+            raise ValueError(e)
+        else:
+            # Check if asset is a stock
+            if asset.asset_class != "us_equity":
+                # Raise exception if asset is not a stock
+                raise ValueError(f"{symbol} is not a stock.")
+        return asset
+
+    ###########################################
     # ////// Get Stock Historical Data \\\\\\ #
     ###########################################
     def get_stock_data(
@@ -92,33 +119,6 @@ class History:
         symbol_data = self.get_historical_data(symbol, url, params)
         bar_data_df = self.preprocess_data(symbol_data, symbol)
         return bar_data_df
-
-    ###########################################
-    # /////// Check if Asset is Stock \\\\\\\ #
-    ###########################################
-    def check_if_stock(self, symbol: str) -> AssetClass:
-        """Check if asset is stock
-        Args:
-            symbol: The symbol of the asset to be checked.
-
-        Returns:
-            AssetClass: The asset information for the given symbol.
-
-        Raises:
-            ValueError: If there is an error getting the asset information or if the asset is not a stock.
-        """
-        # Get asset information for the symbol
-        try:
-            asset = self.asset.get(symbol)
-        # Raise exception if failed to get asset information
-        except Exception as e:
-            raise ValueError(e)
-        else:
-            # Check if asset is a stock
-            if asset.asset_class != "us_equity":
-                # Raise exception if asset is not a stock
-                raise ValueError(f"{symbol} is not a stock.")
-        return asset
 
     ###########################################
     # /////////// PreProcess Data \\\\\\\\\\\ #

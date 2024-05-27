@@ -121,6 +121,8 @@ class Order:
         symbol: str,
         qty: float = None,
         notional: float = None,
+        take_profit: float = None,
+        stop_loss: float = None,
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
@@ -130,16 +132,18 @@ class Order:
 
         Args:
             symbol (str): The symbol to trade.
-            qty (float, optional): The quantity to trade. Either `qty` or `notional` must be provided, not both.
+            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both.
             Defaults to None.
-            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both.
+            notional (float, optional): The desired notional value of the trade. Either `qty` or `notional` must be provided, not both.
             Defaults to None.
-            side (str, optional): The side of the trade. Defaults to "buy".
-            time_in_force (str, optional): The time in force for the order. Defaults to "day".
+            take_profit (float, optional): The take profit price for the order. Defaults to None.
+            stop_loss (float, optional): The stop loss price for the order. Defaults to None.
+            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
+            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
             extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
 
         Returns:
-            OrderClass: The submitted market order.
+            OrderClass: The submitted order.
 
         Raises:
             ValueError: If `symbol` is not provided.
@@ -152,11 +156,13 @@ class Order:
         if not (qty or notional) or (qty and notional):
             raise ValueError("Qty or Notional are required, not both.")
 
-        return self.__submit_order(
+        return self._submit_order(
             symbol=symbol,
             side=side,
             qty=qty,
             notional=notional,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
             entry_type="market",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
@@ -171,6 +177,8 @@ class Order:
         limit_price: float,
         qty: float = None,
         notional: float = None,
+        take_profit: float = None,
+        stop_loss: float = None,
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
@@ -181,22 +189,21 @@ class Order:
         Args:
             symbol (str): The symbol of the security to trade.
             limit_price (float): The limit price for the order.
-            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both.
-            Defaults to None.
-            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both.
-            Defaults to None.
+            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both. Defaults to None.
+            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both. Defaults to None.
+            take_profit (float, optional): The take profit price for the order. Defaults to None.
+            stop_loss (float, optional): The stop loss price for the order. Defaults to None.
             side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
             time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
             extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
 
         Returns:
-            OrderClass: The submitted limit order.
+            OrderClass: The submitted order.
 
         Raises:
-            ValueError: If `symbol` or `limit_price` is not provided, or if both `qty` and `notional` are provided or not provided.
-
+            ValueError: If `symbol` or `limit_price` is not provided.
+            ValueError: If both `qty` and `notional` are not provided, or if both are provided.
         """
-
         if not symbol:
             raise ValueError("Must provide symbol for trading.")
 
@@ -206,12 +213,14 @@ class Order:
         if not (qty or notional) or (qty and notional):
             raise ValueError("Qty or Notional are required, not both.")
 
-        return self.__submit_order(
+        return self._submit_order(
             symbol=symbol,
             side=side,
             limit_price=limit_price,
             qty=qty,
             notional=notional,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
             entry_type="limit",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
@@ -226,6 +235,8 @@ class Order:
         stop_price: float,
         qty: float,
         side: str = "buy",
+        take_profit: float = None,
+        stop_loss: float = None,
         time_in_force: str = "day",
         extended_hours: bool = False,
     ) -> OrderClass:
@@ -237,11 +248,13 @@ class Order:
             stop_price (float): The stop price for the order.
             qty (float): The quantity of shares to trade.
             side (str, optional): The side of the order. Defaults to "buy".
+            take_profit (float, optional): The take profit price for the order. Defaults to None.
+            stop_loss (float, optional): The stop loss price for the order. Defaults to None.
             time_in_force (str, optional): The time in force for the order. Defaults to "day".
             extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
 
         Returns:
-            OrderClass: The submitted stop order.
+            OrderClass: The submitted order.
 
         Raises:
             ValueError: If symbol, stop_price, or qty is not provided.
@@ -256,11 +269,13 @@ class Order:
         if not qty:
             raise ValueError("Qty is required.")
 
-        return self.__submit_order(
+        return self._submit_order(
             symbol=symbol,
             side=side,
             stop_price=stop_price,
             qty=qty,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
             entry_type="stop",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
@@ -309,7 +324,7 @@ class Order:
         if not qty:
             raise ValueError("Qty is required.")
 
-        return self.__submit_order(
+        return self._submit_order(
             symbol=symbol,
             side=side,
             stop_price=stop_price,
@@ -370,7 +385,7 @@ class Order:
             if trail_percent < 0:
                 raise ValueError("Trail percent must be greater than 0.")
 
-        return self.__submit_order(
+        return self._submit_order(
             symbol=symbol,
             side=side,
             trail_price=trail_price,
@@ -384,7 +399,7 @@ class Order:
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Order //////////////////////#
     ########################################################
-    def __submit_order(
+    def _submit_order(
         self,
         symbol: str,
         entry_type: str,
@@ -394,6 +409,8 @@ class Order:
         limit_price: float = None,
         trail_percent: float = None,
         trail_price: float = None,
+        take_profit: Dict[str, float] = None,
+        stop_loss: Dict[str, float] = None,
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
@@ -429,6 +446,8 @@ class Order:
             "limit_price": limit_price if limit_price else None,
             "trail_percent": trail_percent if trail_percent else None,
             "trail_price": trail_price if trail_price else None,
+            "take_profit": {"limit_price": take_profit} if take_profit else None,
+            "stop_loss": {"stop_price": stop_loss} if stop_loss else None,
             "side": side if side == "buy" else "sell",
             "type": entry_type,
             "time_in_force": time_in_force,
