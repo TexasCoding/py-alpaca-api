@@ -447,6 +447,7 @@ class Order:
             "limit_price": limit_price if limit_price else None,
             "trail_percent": trail_percent if trail_percent else None,
             "trail_price": trail_price if trail_price else None,
+            "order_class": "bracket" if take_profit or stop_loss else "simple",
             "take_profit": {"limit_price": take_profit} if take_profit else None,
             "stop_loss": {"stop_price": stop_loss} if stop_loss else None,
             "side": side if side == "buy" else "sell",

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 
 import pendulum
 
@@ -74,7 +75,7 @@ class OrderClass:
     stop_price: float
     status: str
     extended_hours: bool
-    legs: object
+    legs: List[object]
     trail_percent: float
     trail_price: float
     hwm: float
@@ -397,6 +398,60 @@ def order_class_from_dict(data_dict: dict) -> OrderClass:
         KeyError: If any of the required keys are missing in the data_dict.
 
     """
+
+    def process_legs(legs: dict) -> List[object]:
+        """
+        Args:
+            legs: A dictionary containing the legs data.
+
+        Returns:
+            A list of objects representing the legs data.
+
+        """
+        leg_list = []
+        if not legs:
+            return []
+        for leg in legs:
+            leg_list.append(
+                OrderClass(
+                    id=get_dict_str_value(leg, "id"),
+                    client_order_id=get_dict_str_value(leg, "client_order_id"),
+                    created_at=parse_date(leg, "created_at"),
+                    updated_at=parse_date(leg, "updated_at"),
+                    submitted_at=parse_date(leg, "submitted_at"),
+                    filled_at=parse_date(leg, "filled_at"),
+                    expired_at=parse_date(leg, "expired_at"),
+                    canceled_at=parse_date(leg, "canceled_at"),
+                    failed_at=parse_date(leg, "failed_at"),
+                    replaced_at=parse_date(leg, "replaced_at"),
+                    replaced_by=get_dict_str_value(leg, "replaced_by"),
+                    replaces=get_dict_str_value(leg, "replaces"),
+                    asset_id=get_dict_str_value(leg, "asset_id"),
+                    symbol=get_dict_str_value(leg, "symbol"),
+                    asset_class=get_dict_str_value(leg, "asset_class"),
+                    notional=get_dict_float_value(leg, "notional"),
+                    qty=get_dict_float_value(leg, "qty"),
+                    filled_qty=get_dict_float_value(leg, "filled_qty"),
+                    filled_avg_price=get_dict_float_value(leg, "filled_avg_price"),
+                    order_class=get_dict_str_value(leg, "order_class"),
+                    order_type=get_dict_str_value(leg, "order_type"),
+                    type=get_dict_str_value(leg, "type"),
+                    side=get_dict_str_value(leg, "side"),
+                    time_in_force=get_dict_str_value(leg, "time_in_force"),
+                    limit_price=get_dict_float_value(leg, "limit_price"),
+                    stop_price=get_dict_float_value(leg, "stop_price"),
+                    status=get_dict_str_value(leg, "status"),
+                    extended_hours=bool(leg["extended_hours"]),
+                    legs=[],
+                    trail_percent=get_dict_float_value(leg, "trail_percent"),
+                    trail_price=get_dict_float_value(leg, "trail_price"),
+                    hwm=get_dict_float_value(leg, "hwm"),
+                    subtag=get_dict_str_value(leg, "subtag"),
+                    source=get_dict_str_value(leg, "source"),
+                )
+            )
+        return leg_list
+
     return OrderClass(
         id=get_dict_str_value(data_dict, "id"),
         client_order_id=get_dict_str_value(data_dict, "client_order_id"),
@@ -426,7 +481,7 @@ def order_class_from_dict(data_dict: dict) -> OrderClass:
         stop_price=get_dict_float_value(data_dict, "stop_price"),
         status=get_dict_str_value(data_dict, "status"),
         extended_hours=bool(data_dict["extended_hours"]),
-        legs=data_dict["legs"] if data_dict["legs"] else {},
+        legs=process_legs(data_dict.get("legs")),
         trail_percent=get_dict_float_value(data_dict, "trail_percent"),
         trail_price=get_dict_float_value(data_dict, "trail_price"),
         hwm=get_dict_float_value(data_dict, "hwm"),
