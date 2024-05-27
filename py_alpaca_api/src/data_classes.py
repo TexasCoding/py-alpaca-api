@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import Dict, List
 
 import pendulum
 
@@ -159,7 +159,7 @@ class WatchlistClass:
     created_at: datetime
     updated_at: datetime
     name: str
-    assets: object
+    assets: List[object]
 
 
 def get_dict_str_value(data_dict: dict, key: str) -> str:
@@ -218,25 +218,75 @@ def get_dict_int_value(data_dict: dict, key: str) -> int:
     return int(data_dict.get(key, 0)) if data_dict.get(key) else 0
 
 
-def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
+KEY_PROCESSORS = {
+    int: get_dict_int_value,
+    str: get_dict_str_value,
+    float: get_dict_float_value,
+    datetime: parse_date,
+    bool: lambda data_dict, key: bool(data_dict[key]),
+    List[object]: lambda data_dict, key: data_dict[key] if data_dict.get(key) else [],
+}
+
+
+############################################
+# Data Class Extraction Functions
+############################################
+def extract_class_data(data_dict: dict, field_processors: Dict, data_class: dataclass):
     """
-    Constructs a WatchlistClass object from a given dictionary.
+    Extracts and processes data from a dictionary based on a given data class and field processors.
 
     Args:
-        data_dict (dict): A dictionary containing the data to construct the WatchlistClass.
+        data_dict (dict): The dictionary containing the data to be processed.
+        field_processors (Dict): A dictionary of field processors.
+        data_class (dataclass): The data class used to define the fields and types.
 
     Returns:
-        WatchlistClass: The constructed WatchlistClass object.
+        dict: A dictionary containing processed data, with keys corresponding to the fields of the data class.
 
+    Raises:
+        KeyError: When a field processor is not found for a specific data type.
     """
-    return WatchlistClass(
-        id=get_dict_str_value(data_dict, "id"),
-        account_id=get_dict_str_value(data_dict, "account_id"),
-        created_at=parse_date(data_dict, "created_at"),
-        updated_at=parse_date(data_dict, "updated_at"),
-        name=get_dict_str_value(data_dict, "name"),
-        assets=list(map(asset_class_from_dict, data_dict["assets"])) if data_dict.get("assets") else None,
-    )
+    if "class" in data_dict:
+        data_dict["asset_class"] = data_dict["class"]
+        del data_dict["class"]
+    return {
+        field: field_processors[data_type](data_dict, field)
+        for field, data_type in data_class.__annotations__.items()
+        if field_processors.get(data_type, None)
+    }
+
+
+############################################
+# Data Class Watchlist Conversion Functions
+############################################
+def process_assets(assets: List[Dict]) -> List[AssetClass]:
+    """Process a list of assets.
+
+    This function takes a list of asset dictionaries and returns a list of AssetClass objects.
+    Each asset dictionary should contain the necessary information to create an AssetClass object.
+
+    Args:
+        assets (List[Dict]): A list of asset dictionaries.
+
+    Returns:
+        List[AssetClass]: A list of AssetClass objects.
+    """
+    if not assets:
+        return []
+    return [AssetClass(**extract_class_data(asset, KEY_PROCESSORS, AssetClass)) for asset in assets] if assets else []
+
+
+def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
+    """
+    Args:
+        data_dict: A dictionary containing the data needed to create a WatchlistClass object.
+
+    Returns:
+        A new instance of the WatchlistClass created from the data in the input dictionary.
+    """
+    watchlist_data = extract_class_data(data_dict, KEY_PROCESSORS, WatchlistClass)
+    watchlist_data["assets"] = process_assets(data_dict.get("assets", []))
+    return WatchlistClass(**watchlist_data)
 
 
 ############################################
@@ -245,18 +295,16 @@ def watchlist_class_from_dict(data_dict: dict) -> WatchlistClass:
 def clock_class_from_dict(data_dict: dict) -> ClockClass:
     """
     Args:
-        data_dict (dict): A dictionary containing the relevant data for creating a ClockClass object.
+        data_dict: A dictionary containing data for creating an instance of `ClockClass`.
 
     Returns:
-        ClockClass: An instance of the ClockClass class.
+        An instance of `ClockClass` created using the data from `data_dict`.
 
+    Raises:
+        None.
     """
-    return ClockClass(
-        market_time=parse_date(data_dict, "timestamp"),
-        is_open=bool(data_dict["is_open"]),
-        next_open=parse_date(data_dict, "next_open"),
-        next_close=parse_date(data_dict, "next_close"),
-    )
+    clock_data = extract_class_data(data_dict, KEY_PROCESSORS, ClockClass)
+    return ClockClass(**clock_data)
 
 
 ############################################
@@ -264,34 +312,16 @@ def clock_class_from_dict(data_dict: dict) -> ClockClass:
 ############################################
 def position_class_from_dict(data_dict: dict) -> PositionClass:
     """
+    Returns a PositionClass object created from a given data dictionary.
+
     Args:
         data_dict: A dictionary containing the data for creating a PositionClass object.
 
     Returns:
-        A PositionClass object created using the data from the provided dictionary.
-
+        PositionClass: A PositionClass object created using the data from the dictionary.
     """
-    return PositionClass(
-        asset_id=get_dict_str_value(data_dict, "asset_id"),
-        symbol=get_dict_str_value(data_dict, "symbol"),
-        exchange=get_dict_str_value(data_dict, "exchange"),
-        asset_class=get_dict_str_value(data_dict, "asset_class"),
-        avg_entry_price=get_dict_float_value(data_dict, "avg_entry_price"),
-        qty=get_dict_float_value(data_dict, "qty"),
-        qty_available=get_dict_float_value(data_dict, "qty_available"),
-        side=get_dict_str_value(data_dict, "side"),
-        market_value=get_dict_float_value(data_dict, "market_value"),
-        cost_basis=get_dict_float_value(data_dict, "cost_basis"),
-        profit_dol=get_dict_float_value(data_dict, "profit_dol"),
-        profit_pct=get_dict_float_value(data_dict, "profit_pct"),
-        intraday_profit_dol=get_dict_float_value(data_dict, "intraday_profit_dol"),
-        intraday_profit_pct=get_dict_float_value(data_dict, "intraday_profit_pct"),
-        portfolio_pct=get_dict_float_value(data_dict, "portfolio_pct"),
-        current_price=get_dict_float_value(data_dict, "current_price"),
-        lastday_price=get_dict_float_value(data_dict, "lastday_price"),
-        change_today=get_dict_float_value(data_dict, "change_today"),
-        asset_marginable=bool(data_dict["asset_marginable"]),
-    )
+    position_data = extract_class_data(data_dict, KEY_PROCESSORS, PositionClass)
+    return PositionClass(**position_data)
 
 
 ############################################
@@ -299,60 +329,16 @@ def position_class_from_dict(data_dict: dict) -> PositionClass:
 ############################################
 def account_class_from_dict(data_dict: dict) -> AccountClass:
     """
-    This function converts a dictionary into an instance of the AccountClass.
+    Converts a dictionary into an instance of the `AccountClass`.
 
     Args:
-        data_dict (dict): A dictionary containing the account data.
+        data_dict (dict): A dictionary containing the data for the `AccountClass` instance.
 
     Returns:
-        AccountClass: An instance of the AccountClass with the attributes populated with the values from the dictionary.
-
-    Note:
-        The function uses various helper functions (`get_dict_str_value`, `get_dict_int_value`, `get_dict_float_value`,
-        and `parse_date`) to extract the values from the dictionary and convert them to the appropriate types.
+        AccountClass: An instance of the `AccountClass` created from the provided dictionary.
     """
-    return AccountClass(
-        id=get_dict_str_value(data_dict, "id"),
-        account_number=get_dict_str_value(data_dict, "account_number"),
-        status=get_dict_str_value(data_dict, "status"),
-        crypto_status=get_dict_str_value(data_dict, "crypto_status"),
-        options_approved_level=get_dict_int_value(data_dict, "options_approved_level"),
-        options_trading_level=get_dict_int_value(data_dict, "options_trading_level"),
-        currency=get_dict_str_value(data_dict, "currency"),
-        buying_power=get_dict_float_value(data_dict, "buying_power"),
-        regt_buying_power=get_dict_float_value(data_dict, "regt_buying_power"),
-        daytrading_buying_power=get_dict_float_value(data_dict, "daytrading_buying_power"),
-        effective_buying_power=get_dict_float_value(data_dict, "effective_buying_power"),
-        non_marginable_buying_power=get_dict_float_value(data_dict, "non_marginable_buying_power"),
-        options_buying_power=get_dict_float_value(data_dict, "options_buying_power"),
-        bod_dtbp=get_dict_float_value(data_dict, "bod_dtbp"),
-        cash=get_dict_float_value(data_dict, "cash"),
-        accrued_fees=get_dict_float_value(data_dict, "accrued_fees"),
-        pending_transfer_in=get_dict_float_value(data_dict, "pending_transfer_in"),
-        portfolio_value=get_dict_float_value(data_dict, "portfolio_value"),
-        pattern_day_trader=bool(data_dict["pattern_day_trader"]),
-        trading_blocked=bool(data_dict["trading_blocked"]),
-        transfers_blocked=bool(data_dict["transfers_blocked"]),
-        account_blocked=bool(data_dict["account_blocked"]),
-        created_at=parse_date(data_dict, "created_at"),
-        trade_suspended_by_user=bool(data_dict["trade_suspended_by_user"]),
-        multiplier=get_dict_int_value(data_dict, "multiplier"),
-        shorting_enabled=bool(data_dict["shorting_enabled"]),
-        equity=get_dict_float_value(data_dict, "equity"),
-        last_equity=get_dict_float_value(data_dict, "last_equity"),
-        long_market_value=get_dict_float_value(data_dict, "long_market_value"),
-        short_market_value=get_dict_float_value(data_dict, "short_market_value"),
-        position_market_value=get_dict_float_value(data_dict, "position_market_value"),
-        initial_margin=get_dict_float_value(data_dict, "initial_margin"),
-        maintenance_margin=get_dict_float_value(data_dict, "maintenance_margin"),
-        last_maintenance_margin=get_dict_float_value(data_dict, "last_maintenance_margin"),
-        sma=get_dict_float_value(data_dict, "sma"),
-        daytrade_count=get_dict_int_value(data_dict, "daytrade_count"),
-        balance_asof=get_dict_str_value(data_dict, "balance_asof"),
-        crypto_tier=get_dict_int_value(data_dict, "crypto_tier"),
-        intraday_adjustments=get_dict_int_value(data_dict, "intraday_adjustments"),
-        pending_reg_taf_fees=get_dict_float_value(data_dict, "pending_reg_taf_fees"),
-    )
+    account_data = extract_class_data(data_dict, KEY_PROCESSORS, AccountClass)
+    return AccountClass(**account_data)
 
 
 ############################################
@@ -361,130 +347,52 @@ def account_class_from_dict(data_dict: dict) -> AccountClass:
 def asset_class_from_dict(data_dict: dict) -> AssetClass:
     """
     Args:
-        data_dict: A dictionary containing the data for an asset class.
+        data_dict: A dictionary containing the data for creating an instance of AssetClass.
 
     Returns:
-        An AssetClass object initialized with the values from the data_dict.
+        An instance of the AssetClass class.
 
+    Raises:
+        None
     """
-    return AssetClass(
-        id=get_dict_str_value(data_dict, "id"),
-        asset_class=get_dict_str_value(data_dict, "class"),
-        easy_to_borrow=bool(data_dict["easy_to_borrow"]),
-        exchange=get_dict_str_value(data_dict, "exchange"),
-        fractionable=bool(data_dict["fractionable"]),
-        maintenance_margin_requirement=get_dict_float_value(data_dict, "maintenance_margin_requirement"),
-        marginable=bool(data_dict["marginable"]),
-        name=get_dict_str_value(data_dict, "name"),
-        shortable=bool(data_dict["shortable"]),
-        status=get_dict_str_value(data_dict, "status"),
-        symbol=get_dict_str_value(data_dict, "symbol"),
-        tradable=bool(data_dict["tradable"]),
-    )
+    asset_data = extract_class_data(data_dict, KEY_PROCESSORS, AssetClass)
+    return AssetClass(**asset_data)
 
 
 ############################################
 # Data Class Order Conversion Functions
 ############################################
-def order_class_from_dict(data_dict: dict) -> OrderClass:
+def process_legs(legs: List[Dict]) -> List[OrderClass]:
     """
+    Process the legs and create a list of OrderClass objects based on the provided data.
+
     Args:
-        data_dict: A dictionary containing data for creating an OrderClass object.
+        legs (List[Dict]): A list of dictionaries representing the legs.
 
     Returns:
-        An instance of the OrderClass class.
+        List[OrderClass]: A list of OrderClass objects generated from the leg data.
+
+    Note:
+        If the legs parameter is empty, an empty list will be returned.
+    """
+    if not legs:
+        return []
+    return [OrderClass(**extract_class_data(leg, KEY_PROCESSORS, OrderClass)) for leg in legs] if legs else []
+
+
+def order_class_from_dict(data_dict: Dict) -> OrderClass:
+    """
+    Creates an instance of `OrderClass` using the provided dictionary data.
+
+    Args:
+        data_dict (Dict): A dictionary containing the data used to create the `OrderClass` instance.
+
+    Returns:
+        OrderClass: An instance of `OrderClass` created using the provided data.
 
     Raises:
-        KeyError: If any of the required keys are missing in the data_dict.
-
+        None
     """
-
-    def process_legs(legs: dict) -> List[object]:
-        """
-        Args:
-            legs: A dictionary containing the legs data.
-
-        Returns:
-            A list of objects representing the legs data.
-
-        """
-        leg_list = []
-        if not legs:
-            return []
-        for leg in legs:
-            leg_list.append(
-                OrderClass(
-                    id=get_dict_str_value(leg, "id"),
-                    client_order_id=get_dict_str_value(leg, "client_order_id"),
-                    created_at=parse_date(leg, "created_at"),
-                    updated_at=parse_date(leg, "updated_at"),
-                    submitted_at=parse_date(leg, "submitted_at"),
-                    filled_at=parse_date(leg, "filled_at"),
-                    expired_at=parse_date(leg, "expired_at"),
-                    canceled_at=parse_date(leg, "canceled_at"),
-                    failed_at=parse_date(leg, "failed_at"),
-                    replaced_at=parse_date(leg, "replaced_at"),
-                    replaced_by=get_dict_str_value(leg, "replaced_by"),
-                    replaces=get_dict_str_value(leg, "replaces"),
-                    asset_id=get_dict_str_value(leg, "asset_id"),
-                    symbol=get_dict_str_value(leg, "symbol"),
-                    asset_class=get_dict_str_value(leg, "asset_class"),
-                    notional=get_dict_float_value(leg, "notional"),
-                    qty=get_dict_float_value(leg, "qty"),
-                    filled_qty=get_dict_float_value(leg, "filled_qty"),
-                    filled_avg_price=get_dict_float_value(leg, "filled_avg_price"),
-                    order_class=get_dict_str_value(leg, "order_class"),
-                    order_type=get_dict_str_value(leg, "order_type"),
-                    type=get_dict_str_value(leg, "type"),
-                    side=get_dict_str_value(leg, "side"),
-                    time_in_force=get_dict_str_value(leg, "time_in_force"),
-                    limit_price=get_dict_float_value(leg, "limit_price"),
-                    stop_price=get_dict_float_value(leg, "stop_price"),
-                    status=get_dict_str_value(leg, "status"),
-                    extended_hours=bool(leg["extended_hours"]),
-                    legs=[],
-                    trail_percent=get_dict_float_value(leg, "trail_percent"),
-                    trail_price=get_dict_float_value(leg, "trail_price"),
-                    hwm=get_dict_float_value(leg, "hwm"),
-                    subtag=get_dict_str_value(leg, "subtag"),
-                    source=get_dict_str_value(leg, "source"),
-                )
-            )
-        return leg_list
-
-    return OrderClass(
-        id=get_dict_str_value(data_dict, "id"),
-        client_order_id=get_dict_str_value(data_dict, "client_order_id"),
-        created_at=parse_date(data_dict, "created_at"),
-        updated_at=parse_date(data_dict, "updated_at"),
-        submitted_at=parse_date(data_dict, "submitted_at"),
-        filled_at=parse_date(data_dict, "filled_at"),
-        expired_at=parse_date(data_dict, "expired_at"),
-        canceled_at=parse_date(data_dict, "canceled_at"),
-        failed_at=parse_date(data_dict, "failed_at"),
-        replaced_at=parse_date(data_dict, "replaced_at"),
-        replaced_by=get_dict_str_value(data_dict, "replaced_by"),
-        replaces=get_dict_str_value(data_dict, "replaces"),
-        asset_id=get_dict_str_value(data_dict, "asset_id"),
-        symbol=get_dict_str_value(data_dict, "symbol"),
-        asset_class=get_dict_str_value(data_dict, "asset_class"),
-        notional=get_dict_float_value(data_dict, "notional"),
-        qty=get_dict_float_value(data_dict, "qty"),
-        filled_qty=get_dict_float_value(data_dict, "filled_qty"),
-        filled_avg_price=get_dict_float_value(data_dict, "filled_avg_price"),
-        order_class=get_dict_str_value(data_dict, "order_class"),
-        order_type=get_dict_str_value(data_dict, "order_type"),
-        type=get_dict_str_value(data_dict, "type"),
-        side=get_dict_str_value(data_dict, "side"),
-        time_in_force=get_dict_str_value(data_dict, "time_in_force"),
-        limit_price=get_dict_float_value(data_dict, "limit_price"),
-        stop_price=get_dict_float_value(data_dict, "stop_price"),
-        status=get_dict_str_value(data_dict, "status"),
-        extended_hours=bool(data_dict["extended_hours"]),
-        legs=process_legs(data_dict.get("legs")),
-        trail_percent=get_dict_float_value(data_dict, "trail_percent"),
-        trail_price=get_dict_float_value(data_dict, "trail_price"),
-        hwm=get_dict_float_value(data_dict, "hwm"),
-        subtag=get_dict_str_value(data_dict, "subtag"),
-        source=get_dict_str_value(data_dict, "source"),
-    )
+    order_data = extract_class_data(data_dict, KEY_PROCESSORS, OrderClass)
+    order_data["legs"] = process_legs(data_dict.get("legs", []))
+    return OrderClass(**order_data)
