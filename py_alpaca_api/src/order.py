@@ -420,24 +420,25 @@ class Order:
 
         Args:
             symbol (str): The symbol of the security to trade.
-            entry_type (str): The type of order to submit (e.g., 'market', 'limit', 'stop').
+            entry_type (str): The type of order to submit.
             qty (float, optional): The quantity of shares to trade. Defaults to None.
-            notional (float, optional): The desired notional value of the trade. Defaults to None.
+            notional (float, optional): The notional value of the trade. Defaults to None.
             stop_price (float, optional): The stop price for a stop order. Defaults to None.
             limit_price (float, optional): The limit price for a limit order. Defaults to None.
             trail_percent (float, optional): The trailing stop percentage for a trailing stop order. Defaults to None.
             trail_price (float, optional): The trailing stop price for a trailing stop order. Defaults to None.
-            side (str, optional): The side of the trade ('buy' or 'sell'). Defaults to 'buy'.
-            time_in_force (str, optional): The time in force for the order ('day', 'gtc', 'opg', 'ioc', 'fok'). Defaults to 'day'.
+            take_profit (Dict[str, float], optional): The take profit parameters for the order. Defaults to None.
+            stop_loss (Dict[str, float], optional): The stop loss parameters for the order. Defaults to None.
+            side (str, optional): The side of the trade (buy or sell). Defaults to "buy".
+            time_in_force (str, optional): The time in force for the order. Defaults to "day".
             extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
 
         Returns:
-            OrderClass: An object representing the submitted order.
+            OrderClass: The submitted order.
 
         Raises:
-            Exception: If the order submission fails, an exception is raised with the error message.
+            Exception: If the order submission fails.
         """
-
         payload = {
             "symbol": symbol,
             "qty": qty if qty else None,
