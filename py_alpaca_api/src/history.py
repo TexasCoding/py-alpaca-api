@@ -36,17 +36,13 @@ class History:
         Raises:
             ValueError: If there is an error getting the asset information or if the asset is not a stock.
         """
-        # Get asset information for the symbol
+
         try:
             asset = self.asset.get(symbol)
-        # Raise exception if failed to get asset information
         except Exception as e:
             raise ValueError(e)
-        else:
-            # Check if asset is a stock
-            if asset.asset_class != "us_equity":
-                # Raise exception if asset is not a stock
-                raise ValueError(f"{symbol} is not a stock.")
+        if asset.asset_class != "us_equity":
+            raise ValueError(f"{symbol} is not a stock.")
         return asset
 
     ###########################################
@@ -82,14 +78,11 @@ class History:
 
         Raises:
             ValueError: If the given timeframe is not one of the allowed values.
-
         """
-
         self.check_if_stock(symbol)
 
-        # URL for historical stock data request
         url = f"{self.data_url}/stocks/{symbol}/bars"
-        # Set timeframe
+
         timeframe_mapping: dict = {
             "1m": "1Min",
             "5m": "5Min",
@@ -105,7 +98,6 @@ class History:
         if timeframe not in timeframe_mapping:
             raise ValueError('Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1M"')
 
-        # Parameters for historical stock data request
         params = {
             "timeframe": timeframe_mapping[timeframe],  # Timeframe for historical data, default: 1d
             "start": start,  # Start date for historical data
@@ -135,16 +127,13 @@ class History:
 
         Returns:
             A pandas DataFrame containing the preprocessed historical stock data.
-
         """
-        # Convert JSON response to dictionary
+
         bar_data_df = pd.DataFrame(symbol_data)
 
-        # Add symbol column to DataFrame
         bar_data_df.insert(0, "symbol", symbol)
-        # Reformat date column
         bar_data_df["t"] = pd.to_datetime(bar_data_df["t"].replace("[A-Za-z]", " ", regex=True))
-        # Rename columns for consistency
+
         bar_data_df.rename(
             columns={
                 "t": "date",
@@ -158,7 +147,7 @@ class History:
             },
             inplace=True,
         )
-        # Convert columns to appropriate data types
+
         bar_data_df = bar_data_df.astype(
             {
                 "open": "float",
@@ -172,7 +161,7 @@ class History:
                 "volume": "int",
             }
         )
-        # Return historical stock data as a DataFrame
+
         return bar_data_df
 
     ###########################################
@@ -194,13 +183,6 @@ class History:
 
         This function fetches historical data for a given symbol by making requests to the specified API endpoint.
         It uses a page token to paginate through the response data and retrieves all available historical bars.
-
-        Example usage:
-            symbol = "AAPL"
-            url = "https://api.example.com/historical"
-            params = {"start_date": "2021-01-01", "end_date": "2021-01-31"}
-
-            historical_data = get_historical_data(symbol, url, params)
         """
         page_token = None
         symbols_data = defaultdict(list)

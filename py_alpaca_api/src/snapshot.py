@@ -1,6 +1,8 @@
 import json
 from typing import Dict
 
+import pandas as pd
+
 # import pandas as pd
 import requests
 
@@ -28,4 +30,4 @@ class SnapShot:
 
         snapshot_data = response.json()
 
-        return snapshot_data["latestTrade"]
+        return pd.DataFrame(snapshot_data["latestTrade"], index=[0])

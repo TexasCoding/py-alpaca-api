@@ -186,7 +186,7 @@ class Watchlist:
             ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor `watchlist_name` are provided.
 
         """
-        # Check if both watchlist_id and watchlist_name are provided and raise an error if they are
+
         if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
         # Check if watchlist_id is provided

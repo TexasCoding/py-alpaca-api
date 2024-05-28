@@ -114,7 +114,13 @@ class Order:
             raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
 
     @staticmethod
-    def check_for_order_errors(symbol: str, qty: float = None, notional: float = None, take_profit: float = None, stop_loss: float = None) -> None:
+    def check_for_order_errors(
+        symbol: str,
+        qty: float = None,
+        notional: float = None,
+        take_profit: float = None,
+        stop_loss: float = None,
+    ) -> None:
         """
         Checks for order errors based on the given parameters.
 
@@ -181,7 +187,13 @@ class Order:
         Returns:
             OrderClass: An instance of the OrderClass representing the submitted order.
         """
-        self.check_for_order_errors(symbol=symbol, qty=qty, notional=notional, take_profit=take_profit, stop_loss=stop_loss)
+        self.check_for_order_errors(
+            symbol=symbol,
+            qty=qty,
+            notional=notional,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
+        )
 
         return self._submit_order(
             symbol=symbol,
@@ -228,7 +240,13 @@ class Order:
         Returns:
             OrderClass: The submitted order.
         """
-        self.check_for_order_errors(symbol=symbol, qty=qty, notional=notional, take_profit=take_profit, stop_loss=stop_loss)
+        self.check_for_order_errors(
+            symbol=symbol,
+            qty=qty,
+            notional=notional,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
+        )
 
         return self._submit_order(
             symbol=symbol,
@@ -274,9 +292,13 @@ class Order:
 
         Raises:
             OrderError: If there are any errors with the order parameters.
-
         """
-        self.check_for_order_errors(symbol=symbol, qty=qty, take_profit=take_profit, stop_loss=stop_loss)
+        self.check_for_order_errors(
+            symbol=symbol,
+            qty=qty,
+            take_profit=take_profit,
+            stop_loss=stop_loss,
+        )
 
         return self._submit_order(
             symbol=symbol,
@@ -457,7 +479,7 @@ class Order:
             "trail_percent": trail_percent if trail_percent else None,
             "trail_price": trail_price if trail_price else None,
             "order_class": "bracket" if take_profit or stop_loss else "simple",
-            "take_profit": {"limit_price": take_profit} if take_profit else None,
+            "take_profit": ({"limit_price": take_profit} if take_profit else None),
             "stop_loss": {"stop_price": stop_loss} if stop_loss else None,
             "side": side if side == "buy" else "sell",
             "type": entry_type,

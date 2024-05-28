@@ -224,7 +224,7 @@ KEY_PROCESSORS = {
     float: get_dict_float_value,
     datetime: parse_date,
     bool: lambda data_dict, key: bool(data_dict[key]),
-    List[object]: lambda data_dict, key: data_dict[key] if data_dict.get(key) else [],
+    List[object]: lambda data_dict, key: (data_dict[key] if data_dict.get(key) else []),
 }
 
 

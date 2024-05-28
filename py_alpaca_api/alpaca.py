@@ -23,7 +23,6 @@ class PyAlpacaApi:
 
         Raises:
             ValueError: If the API key or API secret is not provided.
-
         """
         if not api_key:
             raise ValueError("API Key is required")
@@ -55,5 +54,10 @@ class PyAlpacaApi:
         self.order = Order(trade_url=self.trade_url, headers=self.headers)
         self.market = Market(trade_url=self.trade_url, headers=self.headers)
         self.watchlist = Watchlist(trade_url=self.trade_url, headers=self.headers)
-        self.screener = Screener(data_url=self.data_url, headers=self.headers, asset=self.asset, market=self.market)
+        self.screener = Screener(
+            data_url=self.data_url,
+            headers=self.headers,
+            asset=self.asset,
+            market=self.market,
+        )
         self.snapshot = SnapShot(data_url=self.data_url, headers=self.headers)
