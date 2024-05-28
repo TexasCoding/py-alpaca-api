@@ -135,7 +135,7 @@ class Watchlist:
     ########################################################
     # ///////////// Create a new watchlist ////////////////#
     ########################################################
-    def create(self, name: str, symbols: str = "") -> WatchlistClass:
+    def create(self, name: str, symbols: Union[list, str] = None) -> WatchlistClass:
         """
         Creates a new watchlist with the given name and symbols.
 
@@ -153,7 +153,8 @@ class Watchlist:
         # Create the URL
         url = f"{self.trade_url}/watchlists"
         # Split the symbols and remove any spaces
-        symbols = symbols.replace(" ", "").split(",") if symbols else []
+        if isinstance(symbols, str):
+            symbols = symbols.replace(" ", "").split(",")
 
         payload = {"symbols": symbols, "name": name}
         response = self._request(method="POST", url=url, payload=payload)
@@ -167,7 +168,7 @@ class Watchlist:
         watchlist_id: str = None,
         watchlist_name: str = None,
         name: str = "",
-        symbols: str = "",
+        symbols: Union[list, str] = None,
     ) -> WatchlistClass:
         """
         Update a watchlist with the specified parameters.
@@ -199,8 +200,10 @@ class Watchlist:
 
         name = name if name else watchlist.name
 
-        if symbols != "":
+        if isinstance(symbols, str):
             symbols = symbols.replace(" ", "").split(",")
+        elif isinstance(symbols, list):
+            symbols = symbols
         else:
             symbols = ",".join([o.symbol for o in watchlist.assets])
 
