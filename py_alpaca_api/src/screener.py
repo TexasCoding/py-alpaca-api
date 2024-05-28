@@ -6,17 +6,17 @@ import pendulum
 import requests
 
 from .asset import Asset
-
-# Constants for better readability
-SUNDAY = pendulum.SUNDAY
-MONDAY = pendulum.MONDAY
-TUESDAY = pendulum.TUESDAY
-FRIDAY = pendulum.FRIDAY
-THURSDAY = pendulum.THURSDAY
+from .market import Market
 
 
 class Screener:
-    def __init__(self, data_url: str, headers: Dict[str, str], asset: Asset) -> None:
+    def __init__(
+        self,
+        data_url: str,
+        headers: Dict[str, str],
+        asset: Asset,
+        market: Market,
+    ) -> None:
         """Initialize Screener class3
 
         Parameters:
@@ -37,10 +37,11 @@ class Screener:
         ValueError: If headers are not provided
 
         ValueError: If asset is not provided
-        """  # noqa
+        """
         self.data_url = data_url
         self.headers = headers
         self.asset = asset
+        self.market = market
 
         self.yesterday = ""
         self.day_before_yesterday = ""
@@ -71,9 +72,6 @@ class Screener:
             trade_count_greater_than=3000, total_losers_returned=50)
         """
         self.set_dates()
-
-        print(f"Yesterday was {self.yesterday}")
-        print(f"Day before yesterday was {self.day_before_yesterday}")
 
         losers_df = self._get_percentages(start=self.day_before_yesterday, end=self.yesterday)
 
@@ -217,25 +215,27 @@ class Screener:
 
     def set_dates(self):
         """
-        Set the dates for yesterday and the day before yesterday based on the current date.
+        Sets the dates for the screener.
 
-        Args:
-            self: The current instance of the class.
+        This method retrieves the last two trading dates from the market calendar
+        and assigns them to the `yesterday` and `day_before_yesterday` attributes.
 
         Returns:
-            None
-
-        Raises:
             None
         """
         today = pendulum.now(tz="America/New_York")
 
-        if today.day_of_week in [SUNDAY, MONDAY]:
-            self.yesterday = self.get_previous_date(today, FRIDAY)
-            self.day_before_yesterday = self.get_previous_date(today, THURSDAY)
-        elif today.day_of_week == TUESDAY:
-            self.yesterday = self.get_previous_date(today, MONDAY)
-            self.day_before_yesterday = self.get_previous_date(today, FRIDAY)
-        else:
-            self.yesterday = self.get_previous_date(today, today.day_of_week - 1)
-            self.day_before_yesterday = self.get_previous_date(today, today.day_of_week - 2)
+        calender = (
+            self.market.calender(
+                start_date=today.subtract(days=7).format("YYYY-MM-DD"),
+                end_date=today.subtract(days=1).format("YYYY-MM-DD"),
+            )
+            .tail(2)
+            .reset_index(drop=True)
+        )
+
+        self.yesterday = calender.iloc[1]["date"].strftime("%Y-%m-%d")
+        self.day_before_yesterday = calender.iloc[0]["date"].strftime("%Y-%m-%d")
+
+        print(f"Yesterday: {self.yesterday}")
+        print(f"Day Before Yesterday: {self.day_before_yesterday}")
