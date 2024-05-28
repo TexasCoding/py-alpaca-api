@@ -113,6 +113,42 @@ class Order:
             res = json.loads(response.text)
             raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
 
+    @staticmethod
+    def check_for_order_errors(symbol: str, qty: float = None, notional: float = None, take_profit: float = None, stop_loss: float = None) -> None:
+        """
+        Checks for order errors based on the given parameters.
+
+        Args:
+            symbol (str): The symbol for trading.
+            qty (float, optional): The quantity of the order. Defaults to None.
+            notional (float, optional): The notional value of the order. Defaults to None.
+            take_profit (float, optional): The take profit value for the order. Defaults to None.
+            stop_loss (float, optional): The stop loss value for the order. Defaults to None.
+
+        Raises:
+            ValueError: If symbol is not provided.
+            ValueError: If both qty and notional are provided or if neither is provided.
+            ValueError: If either take_profit or stop_loss is not provided.
+            ValueError: If both take_profit and stop_loss are not provided.
+            ValueError: If notional is provided or if qty is not an integer when both take_profit and
+            stop_loss are provided.
+
+        Returns:
+            None
+        """
+        if not symbol:
+            raise ValueError("Must provide symbol for trading.")
+
+        if not (qty or notional) or (qty and notional):
+            raise ValueError("Qty or Notional are required, not both.")
+
+        if take_profit and not stop_loss or stop_loss and not take_profit:
+            raise ValueError("Both take profit and stop loss are required for bracket orders.")
+
+        if take_profit and stop_loss:
+            if notional or not qty.is_integer():
+                raise ValueError("Bracket orders can not be fractionable.")
+
     ########################################################
     # \\\\\\\\\\\\\\\\  Submit Market Order ////////////////#
     ########################################################
@@ -128,33 +164,24 @@ class Order:
         extended_hours: bool = False,
     ) -> OrderClass:
         """
-        Submits a market order for the specified symbol.
+        Submits a market order for a specified symbol.
 
         Args:
-            symbol (str): The symbol to trade.
-            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both.
-            Defaults to None.
-            notional (float, optional): The desired notional value of the trade. Either `qty` or `notional` must be provided, not both.
-            Defaults to None.
+            symbol (str): The symbol of the asset to trade.
+            qty (float, optional): The quantity of the asset to trade. Either qty or notional must be provided,
+            but not both. Defaults to None.
+            notional (float, optional): The notional value of the asset to trade. Either qty or notional must be
+            provided, but not both. Defaults to None.
             take_profit (float, optional): The take profit price for the order. Defaults to None.
             stop_loss (float, optional): The stop loss price for the order. Defaults to None.
-            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
-            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
-            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+            side (str, optional): The side of the order (buy/sell). Defaults to "buy".
+            time_in_force (str, optional): The time in force for the order (day/gtc/opg/ioc/fok). Defaults to "day".
+            extended_hours (bool, optional): Whether to trade during extended hours. Defaults to False.
 
         Returns:
-            OrderClass: The submitted order.
-
-        Raises:
-            ValueError: If `symbol` is not provided.
-            ValueError: If both `qty` and `notional` are not provided, or if both are provided.
+            OrderClass: An instance of the OrderClass representing the submitted order.
         """
-
-        if not symbol:
-            raise ValueError("Must provide symbol for trading.")
-
-        if not (qty or notional) or (qty and notional):
-            raise ValueError("Qty or Notional are required, not both.")
+        self.check_for_order_errors(symbol=symbol, qty=qty, notional=notional, take_profit=take_profit, stop_loss=stop_loss)
 
         return self._submit_order(
             symbol=symbol,
@@ -184,34 +211,24 @@ class Order:
         extended_hours: bool = False,
     ) -> OrderClass:
         """
-        Submits a limit order for trading.
+        Limit order function that submits an order to buy or sell a specified symbol at a specified limit price.
 
         Args:
-            symbol (str): The symbol of the security to trade.
-            limit_price (float): The limit price for the order.
-            qty (float, optional): The quantity of shares to trade. Either `qty` or `notional` must be provided, not both. Defaults to None.
-            notional (float, optional): The notional value of the trade. Either `qty` or `notional` must be provided, not both. Defaults to None.
-            take_profit (float, optional): The take profit price for the order. Defaults to None.
-            stop_loss (float, optional): The stop loss price for the order. Defaults to None.
-            side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
-            time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
-            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+            symbol (str): The symbol of the asset to trade.
+            limit_price (float): The limit price at which to execute the order.
+            qty (float, optional): The quantity of the asset to trade. Default is None.
+            notional (float, optional): The amount of money to spend on the asset. Default is None.
+            take_profit (float, optional): The price at which to set a take profit order. Default is None.
+            stop_loss (float, optional): The price at which to set a stop loss order. Default is None.
+            side (str, optional): The side of the order. Must be either "buy" or "sell". Default is "buy".
+            time_in_force (str, optional): The duration of the order. Must be either "day" or "gtc"
+            (good till canceled). Default is "day".
+            extended_hours (bool, optional): Whether to allow trading during extended hours. Default is False.
 
         Returns:
             OrderClass: The submitted order.
-
-        Raises:
-            ValueError: If `symbol` or `limit_price` is not provided.
-            ValueError: If both `qty` and `notional` are not provided, or if both are provided.
         """
-        if not symbol:
-            raise ValueError("Must provide symbol for trading.")
-
-        if not limit_price:
-            raise ValueError("Must provide limit price for trading.")
-
-        if not (qty or notional) or (qty and notional):
-            raise ValueError("Qty or Notional are required, not both.")
+        self.check_for_order_errors(symbol=symbol, qty=qty, notional=notional, take_profit=take_profit, stop_loss=stop_loss)
 
         return self._submit_order(
             symbol=symbol,
@@ -241,33 +258,25 @@ class Order:
         extended_hours: bool = False,
     ) -> OrderClass:
         """
-        Submits a stop order for trading.
-
         Args:
-            symbol (str): The symbol of the security to trade.
-            stop_price (float): The stop price for the order.
-            qty (float): The quantity of shares to trade.
-            side (str, optional): The side of the order. Defaults to "buy".
-            take_profit (float, optional): The take profit price for the order. Defaults to None.
-            stop_loss (float, optional): The stop loss price for the order. Defaults to None.
-            time_in_force (str, optional): The time in force for the order. Defaults to "day".
-            extended_hours (bool, optional): Whether to allow trading during extended hours. Defaults to False.
+            symbol: The symbol of the security to trade.
+            stop_price: The stop price at which the trade should be triggered.
+            qty: The quantity of shares to trade.
+            side: The side of the trade. Defaults to 'buy'.
+            take_profit: The price at which to take profit on the trade. Defaults to None.
+            stop_loss: The price at which to set the stop loss on the trade. Defaults to None.
+            time_in_force: The duration for which the order will be in effect. Defaults to 'day'.
+            extended_hours: A boolean value indicating whether to place the order during extended hours.
+            Defaults to False.
 
         Returns:
-            OrderClass: The submitted order.
+            An instance of the OrderClass representing the submitted order.
 
         Raises:
-            ValueError: If symbol, stop_price, or qty is not provided.
+            OrderError: If there are any errors with the order parameters.
+
         """
-
-        if not symbol:
-            raise ValueError("Must provide symbol for trading.")
-
-        if not stop_price:
-            raise ValueError("Must provide stop price for trading.")
-
-        if not qty:
-            raise ValueError("Qty is required.")
+        self.check_for_order_errors(symbol=symbol, qty=qty, take_profit=take_profit, stop_loss=stop_loss)
 
         return self._submit_order(
             symbol=symbol,
