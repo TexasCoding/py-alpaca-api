@@ -231,7 +231,7 @@ class Screener:
                     }
                     all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
-                except KeyError:
+                except TypeError or KeyError:
                     pass
             all_bars_df.reset_index(drop=True, inplace=True)
             return all_bars_df
