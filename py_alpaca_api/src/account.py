@@ -174,5 +174,13 @@ class Account:
             pd.to_datetime(portfolio_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
         )
         portfolio_df["timestamp"] = timestamp_transformed
+        portfolio_df = portfolio_df.astype(
+            {
+                "equity": "float",
+                "profit_loss": "float",
+                "profit_loss_pct": "float",
+                "base_value": "float",
+            }
+        )
         portfolio_df["profit_loss_pct"] = portfolio_df["profit_loss_pct"] * 100
         return portfolio_df
