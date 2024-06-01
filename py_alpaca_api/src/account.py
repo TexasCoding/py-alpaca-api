@@ -56,7 +56,7 @@ class Account:
         response = json.loads(request.text)
 
         activity_df = pd.DataFrame()
-        activity_df = activity_df.assign(
+        activity_df.assign(
             symbol="NAN",
             activity_type="NAN",
             id="NAN",

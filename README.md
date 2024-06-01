@@ -5,10 +5,10 @@
     <h1 align="center">PY-ALPACA-API</h1>
 </p>
 <p align="center">
-    <em>Empowering Alpaca Trading API with Python</em>
+    <em>Empower Trading with Seamless Alpaca API Integration</em>
 </p>
 <p align="center">
-<img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/TexasCoding/py-alpaca-api/.github%2Fworkflows%2Ftest-package.yml?logo=github">
+   <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/TexasCoding/py-alpaca-api/.github%2Fworkflows%2Ftest-package.yml?logo=github">
 	<img src="https://img.shields.io/github/license/TexasCoding/py-alpaca-api?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
 	<img src="https://img.shields.io/github/last-commit/TexasCoding/py-alpaca-api?style=default&logo=git&logoColor=white&color=0080ff" alt="last-commit">
 	<img src="https://img.shields.io/github/languages/top/TexasCoding/py-alpaca-api?style=default&color=0080ff" alt="repo-top-language">
@@ -18,7 +18,6 @@
 	<!-- default option, no dependency badges. -->
    <img alt="Python" src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54">
    <img alt="Poetry" src="https://img.shields.io/badge/Poetry-%233B82F6.svg?style=for-the-badge&logo=poetry&logoColor=0B3D8D">
-
 </p>
 
 <br><!-- TABLE OF CONTENTS -->
@@ -42,7 +41,7 @@
 
 ##  Overview
 
-The py-alpaca-api project facilitates seamless interaction with the Alpaca Markets REST API, offering a comprehensive suite of functionalities for trading and investment purposes. Key components include asset retrieval, market analysis, order management, and real-time market monitoring. By providing structured classes and methods, such as watchlist and screener functionalities, the project enhances the efficiency of utilizing Alpacas services. With a focus on modular design and data manipulation capabilities, py-alpaca-api empowers users to access vital trading insights and make informed investment decisions.
+The py-alpaca-api project provides a comprehensive Python interface for seamless interaction with the Alpaca API, offering functionalities such as accessing account information, retrieving asset data, managing market details, executing orders, and analyzing stock performance. By encapsulating key components like account, asset, order, and market classes, this project facilitates efficient data retrieval, trading operations, and market analysis within the Alpaca ecosystem. Integrated with GitHub Actions for testing integrity, py-alpaca-api enhances developers capabilities in integrating Alpacas features into diverse projects, emphasizing simplicity and reliability in financial data processing and trading activities.
 
 ---
 
@@ -50,63 +49,83 @@ The py-alpaca-api project facilitates seamless interaction with the Alpaca Marke
 
 |    |   Feature         | Description |
 |----|-------------------|---------------------------------------------------------------|
-| ⚙️  | **Architecture**  | The project follows a structured architecture using classes like PyAlpacaApi, Watchlist, Screener, Position, Order, Market, and others for specific API interactions. This modular design enhances functionality and maintainability. |
-| 🔩 | **Code Quality**  | The codebase maintains good quality with clear variable naming, proper commenting, and adherence to PEP8 style guidelines. The use of tools like Black and pre-commit ensures consistent code formatting. |
-| 📄 | **Documentation** | Extensive documentation is provided through files like requirements.txt, pyproject.toml, and inline comments. Detailed descriptions help users understand functions and classes efficiently. Proper metadata and dependencies are also outlined. |
-| 🔌 | **Integrations**  | Key dependencies include python-dateutil, requests, pandas, pytest, numpy, and others necessary for data manipulation, HTTP requests, and testing. GitHub Actions are used for CI/CD processes. |
-| 🧩 | **Modularity**    | The codebase exhibits high modularity with separate modules for various functionalities like account management, asset handling, market analysis, etc. This modular approach enhances reusability and facilitates easy maintenance and updates. |
-| 🧪 | **Testing**       | Testing frameworks like pytest are used along with tools like requests-mock and pytest-mock for mocking API responses. Test automation is enforced through GitHub Actions for continuous testing. |
-| ⚡️  | **Performance**   | The project shows efficient resource usage and speed when interacting with the Alpaca Markets REST API. Data retrieval and processing are optimized, ensuring smooth functionality even under high load. |
-| 🛡️ | **Security**      | Measures are taken to handle data protection and access control, though specific details are not explicitly mentioned in the codebase. Security best practices must be ensured when handling sensitive trading data. |
-| 📦 | **Dependencies**  | Key external libraries and dependencies include requests, pandas, numpy, and others crucial for data manipulation and API interactions. Poetry is used for dependency management. |
+| ⚙️  | **Architecture**  | The project follows a modular architecture, with key components like `account.py`, `asset.py`, `market.py`, etc., encapsulating specific functionalities. This design enhances code organization and maintainability. |
+| 🔩 | **Code Quality**  | The codebase maintains high quality and follows PEP8 style conventions. It leverages tools like `black`, `flake8`, and `isort` for consistent formatting and clean code practices. |
+| 📄 | **Documentation** | The project includes detailed documentation in `pyproject.toml`, outlining metadata, dependencies, and structure. Inline code comments and docstrings enhance readability and understanding for developers. |
+| 🔌 | **Integrations**  | Key integrations include `requests`, `pandas`, `numpy`, etc., for data processing, HTTP requests, and financial analysis. External services like Alpaca API are seamlessly integrated for trading operations. |
+| 🧩 | **Modularity**    | The codebase exhibits high modularity, allowing for code reuse and easy maintenance. Each module focuses on specific tasks, promoting separation of concerns and enhancing scalability. |
+| 🧪 | **Testing**       | Testing frameworks such as `pytest` and `pytest-mock` are employed for unit testing. `pre-commit` ensures code quality checks before commits, maintaining robust test coverage. |
+| ⚡️  | **Performance**   | The project emphasizes efficiency and resource optimization, ensuring swift data retrieval and processing. Performance tuning techniques are implemented to enhance speed and responsiveness. |
+| 🛡️ | **Security**      | Security measures are in place for data protection and access control. Proper handling of API credentials and secure HTTP communication safeguard sensitive information. |
+| 📦 | **Dependencies**  | Key dependencies include `certifi`, `requests`, `pytz`, etc., facilitating API interaction, data manipulation, and time zone handling. These libraries enhance the project's functionality. |
 
 ---
 
 ##  Repository Structure
 
 ```sh
-   py_alpaca_api
-   ├── alpaca.py
-   └── src
-       ├── __init__.py
-       ├── account.py
-       ├── asset.py
-       ├── data_classes.py
-       ├── history.py
-       ├── market.py
-       ├── order.py
-       ├── position.py
-       ├── screener.py
-       └── watchlist.py
+py_alpaca_api 
+├── __init__.py
+├── alpaca.py
+└── src
+   ├── __init__.py
+   ├── account.py
+   ├── asset.py
+   ├── data_classes.py
+   ├── history.py
+   ├── market.py
+   ├── order.py
+   ├── position.py
+   ├── screener.py
+   └── watchlist.py
 ```
 
 ---
 
 ##  Modules
 
+<details closed><summary>.</summary>
+
+| File                                                                                          | Summary                                                                                                                                                                                                                                      |
+| ---                                                                                           | ---                                                                                                                                                                                                                                          |
+| [pyproject.toml](https://github.com/TexasCoding/py-alpaca-api/blob/master/pyproject.toml)     | Defines dependencies and metadata for Python Alpaca API package.-Specifies version, description, authors, license, homepage, and repository.-Lists development, testing, and documentation dependencies.                                     |
+| [requirements.txt](https://github.com/TexasCoding/py-alpaca-api/blob/master/requirements.txt) | Specifies Python package dependencies for the repository based on version compatibility. Essential libraries for API integration and data processing are outlined, ensuring proper functioning and alignment with specified Python versions. |
+
+</details>
+
 <details closed><summary>py_alpaca_api</summary>
 
-| File                                                                                          | Summary                                                                                                                                                                                                                              |
-| ---                                                                                           | ---                                                                                                                                                                                                                                  |
-| [alpaca.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/alpaca.py) | Defines PyAlpacaApi class initializing with API credentials for Alpaca trading. Sets URL based on trading type. Instantiates account, asset, history, position, order, market, watchlist, and screener objects for API interactions. |
+| File                                                                                          | Summary                                                                                                                                                                                                                                               |
+| ---                                                                                           | ---                                                                                                                                                                                                                                                   |
+| [alpaca.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/alpaca.py) | Defines PyAlpacaApi class central to Alpaca API interaction. Initializes key components like account, asset, history, position, order, market, watchlist, and screener with API credentials and URLs for seamless data access and trading operations. |
+
+</details>
+
+<details closed><summary>.github.workflows</summary>
+
+| File                                                                                                            | Summary                                                                                                                           |
+| ---                                                                                                             | ---                                                                                                                               |
+| [test-package.yml](https://github.com/TexasCoding/py-alpaca-api/blob/master/.github/workflows/test-package.yml) | Verifies Python package build and tests integrity using GitHub Actions workflow test-package.yml in the py-alpaca-api repository. |
 
 </details>
 
 <details closed><summary>py_alpaca_api.src</summary>
 
-| File                                                                                                          | Summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ---                                                                                                           | ---                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| [watchlist.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/watchlist.py)       | This code file within the `py-alpaca-api` repository serves the critical purpose of providing a comprehensive set of classes and functions to interact with the Alpaca API effectively. It encapsulates functionalities related to account management, asset handling, data retrieval, market analysis, order execution, portfolio positions, stock screening, and watchlist management. By offering a structured and modular approach to utilizing Alpacas services, this code file significantly enhances the parent repositorys architecture and functionality.                          |
-| [screener.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/screener.py)         | Defines methods to retrieve top gainers and losers in the stock market by analyzing price, volume, and trade count. Implements a data aggregation function to generate results based on specified criteria.                                                                                                                                                                                                                                                                                                                                                                                 |
-| [position.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/position.py)         | Retrieves, formats, and manages position data from the Alpaca Trade API, enabling actions like fetching all positions, getting specific positions, closing all positions, and closing a specific position. Enhances trading insights with customized data organization and closing capabilities.                                                                                                                                                                                                                                                                                            |
-| [order.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/order.py)               | This code file, `screener.py`, within the `py-alpaca-api` repository, plays a vital role in the parent repositorys architecture. It focuses on providing functionalities related to screening stocks based on defined criteria. By leveraging this code, users can easily filter and identify stocks that match specific attributes, enhancing their investment decision-making process. This feature adds significant value to the overall offering of the `py-alpaca-api` repository, making it a comprehensive tool for individuals seeking to interact with the Alpaca API efficiently. |
-| [market.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/market.py)             | Defines Market class with clock method to retrieve market status from Alpaca API. Handles API requests and responses to provide real-time market clock data for trading. Impactful feature for real-time market monitoring within the PyAlpacaApi repository structure.                                                                                                                                                                                                                                                                                                                     |
-| [history.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/history.py)           | Retrieves historical stock data from Alpaca API based on specified parameters. Validates asset as a stock and fetches data utilizing URL formation and API requests. Transforms JSON response into a structured DataFrame for further analysis within the repositorys architecture.                                                                                                                                                                                                                                                                                                         |
-| [data_classes.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/data_classes.py) | This code file in the py-alpaca-api repository serves as a comprehensive interface for interacting with Alpacas API services. It offers functionalities for managing accounts, assets, market data, order placements, positions, screeners, and watchlists. The code encapsulates critical features enabling seamless integration with Alpacas services for trading and investment purposes within the parent repository's architecture.                                                                                                                                                    |
-| [asset.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/asset.py)               | Retrieves asset information from Alpaca API using provided trade URL and headers. Supports fetching all assets based on status, asset class, and exchange. Implements error handling for unsuccessful requests.                                                                                                                                                                                                                                                                                                                                                                             |
-| [account.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/account.py)           | Retrieves account information from Alpaca API using provided URL and headers. Implements a method to return account details as an object. Handles successful and unsuccessful responses appropriately.                                                                                                                                                                                                                                                                                                                                                                                      |
+| File                                                                                                          | Summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ---                                                                                                           | ---                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [account.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/account.py)           | Retrieves account activities for a specific type, ensuring valid date usage. Fetches account information from Alpaca API and portfolio history data, transforming timestamps. Maintains DataFrame consistency and raises exceptions for failed requests.                                                                                                                                                                                                                        |
+| [asset.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/asset.py)               | Retrieves asset information from Alpaca API using given parameters. Utilizes requests to fetch data, then processes and returns it in a structured format. Maps API responses to custom AssetClass objects for ease of use.                                                                                                                                                                                                                                                     |
+| [data_classes.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/data_classes.py) | This code file, `alpaca.py`, serves as a crucial component within the `py-alpaca-api` repository. It encapsulates functionalities related to interacting with the Alpaca API, including handling account information, managing assets, and executing orders. By providing a streamlined interface for accessing Alpacas services, this module enhances the overall capability of the repository, enabling seamless integration of Alpacas features into broader projects.       |
+| [history.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/history.py)           | Retrieves historical stock data, validates if an asset is a stock, and preprocesses data. Supports fetching data based on symbol, timeframe, and date range. Ensures data integrity and format consistency for analysis within the parent repositorys Alpaca API integration.                                                                                                                                                                                                   |
+| [market.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/market.py)             | Implements Market class with methods for retrieving calendar data and market clock status from Alpaca API. Provides functionalities to fetch, process, and return market-related information in a structured format.                                                                                                                                                                                                                                                            |
+| [order.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/order.py)               | Watchlist.py`The `watchlist.py` file in the `py-alpaca-api` repository is crucial for managing and tracking user-defined watchlists of assets within the Alpaca trading platform. It enables users to create, update, and retrieve custom watchlists, providing a streamlined approach to monitor specific assets of interest. By utilizing this module, users can easily curate and monitor their preferred assets, enhancing their trading experience on the Alpaca platform. |
+| [position.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/position.py)         | Retrieves, processes, and manages Alpaca account positions, providing data in DataFrame format, individual position details, and options to close positions individually or all at once. Maintains accuracy and consistency in position-related actions within the Alpaca API ecosystem.                                                                                                                                                                                        |
+| [screener.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/screener.py)         | Analyzes stock winners and losers by filtering data based on preset criteria. Retrieves and ranks stock performances for the previous day, with options to customize filter thresholds. Requires asset and market context for accurate analysis.                                                                                                                                                                                                                                |
+| [watchlist.py](https://github.com/TexasCoding/py-alpaca-api/blob/master/py_alpaca_api/src/watchlist.py)       | Retrieval, creation, updating, deletion, and asset management. Encapsulates request handling, response processing, and error management. conforms to the parent repositorys architecture by structuring functionality into distinct modules.                                                                                                                                                                                                                                    |
 
 </details>
+
+---
 
 ##  Getting Started
 
@@ -131,7 +150,7 @@ The py-alpaca-api project facilitates seamless interaction with the Alpaca Marke
 >
 > 3. Install the dependencies:
 > ```console
-> $ poetry install
+> $ pip install -r requirements.txt
 > ```
 
 ###  Usage
@@ -197,7 +216,7 @@ Contributions are welcome! Here are several ways you can contribute:
 
 ##  License
 
-This project is protected under the [SELECT-A-LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+This project is protected under the [MIT]() License. For more details, refer to the [LICENSE](https://github.com/TexasCoding/py-alpaca-api/blob/master/LICENSE) file.
 
 ---
 

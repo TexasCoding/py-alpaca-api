@@ -97,6 +97,27 @@ def test_no_money_value_market_order(alpaca):
     alpaca.order.cancel_all()
 
 
+def test_market_order_with_take_profit_but_qty_fractional(alpaca):
+    with pytest.raises(ValueError):
+        alpaca.order.market(symbol="AAPL", qty=0.12, side="buy", take_profit=250.00, stop_loss=150.00)
+    alpaca.order.cancel_all()
+
+
+def test_market_order_with_take_profit_but_notional(alpaca):
+    with pytest.raises(ValueError):
+        alpaca.order.market(symbol="AAPL", notional=230.23, side="buy", take_profit=250.00, stop_loss=150.00)
+    alpaca.order.cancel_all()
+
+
+def test_market_order_with_take_profit(alpaca):
+    delete_all_orders(alpaca)
+    order = alpaca.order.market(symbol="AAPL", qty=1, side="buy", take_profit=250.00, stop_loss=150.00)
+    assert isinstance(order, OrderClass)
+    assert order.legs is not None
+    assert order.legs[0].limit_price == 250.00
+    assert order.legs[1].stop_price == 150.00
+
+
 def test_order_instance(alpaca):
     delete_all_orders(alpaca)
     order = alpaca.order.market(symbol="AAPL", qty=0.01, side="buy")
@@ -178,6 +199,12 @@ def test_stop_order_with_qty(alpaca):
     assert order.status == "pending_new" or order.status == "accepted"
     assert order.type == "stop"
     assert order.qty == 1
+    alpaca.order.cancel_all()
+
+
+def test_stop_order_with_fractional_shares(alpaca):
+    with pytest.raises(Exception):
+        alpaca.order.stop(symbol="AAPL", qty=1.34, side="buy", stop_price=200.00)
     alpaca.order.cancel_all()
 
 

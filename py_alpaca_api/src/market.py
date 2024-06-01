@@ -43,7 +43,6 @@ class Market:
 
         Returns:
             pd.DataFrame: A pandas DataFrame object containing the calendar data for the specified date range.
-
         """
         url = f"{self.trade_url}/calendar"
         params = {
