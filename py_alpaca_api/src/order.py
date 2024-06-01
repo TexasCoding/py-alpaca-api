@@ -1,9 +1,8 @@
 import json
 from typing import Dict
 
-import requests
-
 from .data_classes import OrderClass, order_class_from_dict
+from .requests import Requests
 
 
 class Order:
@@ -38,23 +37,13 @@ class Order:
         Raises:
             ValueError: If the request to retrieve order information fails.
         """
-
-        # Parameters for the request
         params = {"nested": nested}
-        # Alpaca API URL for order information
         url = f"{self.trade_url}/orders/{order_id}"
-        # Get request to Alpaca API for order information
-        response = requests.get(url, headers=self.headers, params=params)
-        # Check if response is successful
-        if response.status_code == 200:
-            # Convert JSON response to dictionary
-            res = json.loads(response.text)
-            # Return order information as an OrderClass object
-            return order_class_from_dict(res)
-        # If response is not successful, raise an exception
-        else:
-            res = json.loads(response.text)
-            raise ValueError(f'Failed to get order information. Response: {res["message"]}')
+
+        request = Requests().get(url=url, headers=self.headers, params=params)
+
+        response = json.loads(request.text)
+        return order_class_from_dict(response)
 
     ########################################################
     # \\\\\\\\\\\\\\\\\ Cancel Order By ID /////////////////#
@@ -72,19 +61,11 @@ class Order:
         Raises:
             Exception: If the cancellation request fails, an exception is raised with the error message.
         """
-
-        # Alpaca API URL for canceling an order
         url = f"{self.trade_url}/orders/{order_id}"
-        # Delete request to Alpaca API for canceling an order
-        response = requests.delete(url, headers=self.headers)
-        # Check if response is successful
-        if response.status_code == 204:
-            # Convert JSON response to dictionary
-            return f"Order {order_id} has been cancelled"
-        # If response is not successful, raise an exception
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to cancel order {order_id}, Response: {res["message"]}')
+
+        Requests().delete(url=url, headers=self.headers)
+
+        return f"Order {order_id} has been cancelled"
 
     ########################################################
     # \\\\\\\\\\\\\\\\  Cancel All Orders //////////////////#
@@ -99,19 +80,11 @@ class Order:
         Raises:
             Exception: If the request to cancel orders is not successful, an exception is raised with the error message.
         """
-        # Alpaca API URL for canceling all orders
         url = f"{self.trade_url}/orders"
-        # Delete request to Alpaca API for canceling all orders
-        response = requests.delete(url, headers=self.headers)
-        # Check if response is successful
-        if response.status_code == 207:
-            # Convert JSON response to dictionary
-            res = json.loads(response.text)
-            return f"{len(res)} orders have been cancelled"
-        # If response is not successful, raise an exception
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to cancel orders. Response: {res["message"]}')
+        request = Requests().delete(url=url, headers=self.headers)
+
+        response = json.loads(request.text)
+        return f"{len(response)} orders have been cancelled"
 
     @staticmethod
     def check_for_order_errors(
@@ -489,11 +462,7 @@ class Order:
 
         url = f"{self.trade_url}/orders"
 
-        response = requests.post(url, headers=self.headers, json=payload)
+        request = Requests().post(url=url, headers=self.headers, payload=payload)
 
-        if response.status_code == 200:
-            res = json.loads(response.text)
-            return order_class_from_dict(res)
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to submit order. Code: {response.status_code}, Response: {res["message"]}')
+        response = json.loads(request.text)
+        return order_class_from_dict(response)

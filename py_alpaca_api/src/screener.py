@@ -3,10 +3,10 @@ from typing import Dict
 
 import pandas as pd
 import pendulum
-import requests
 
 from .asset import Asset
 from .market import Market
+from .requests import Requests
 
 
 class Screener:
@@ -190,53 +190,50 @@ class Screener:
             "sort": "asc",
         }
 
-        response = requests.get(url, headers=self.headers, params=params)
+        request = Requests().get(url=url, headers=self.headers, params=params)
 
-        if response.status_code == 200:
-            res = json.loads(response.text)
+        res = json.loads(request.text)
 
-            bars_df = pd.DataFrame.from_dict(res["bars"], orient="index")
+        bars_df = pd.DataFrame.from_dict(res["bars"], orient="index")
+        page_token = res["next_page_token"]
+
+        while page_token:
+            params["page_token"] = page_token
+            request = Requests().get(url=url, headers=self.headers, params=params)
+            res = json.loads(request.text)
+            bars_df = pd.concat(
+                [
+                    bars_df,
+                    pd.DataFrame.from_dict(res["bars"], orient="index"),
+                ]
+            )
             page_token = res["next_page_token"]
 
-            while page_token:
-                params["page_token"] = page_token
-                response = requests.get(url, headers=self.headers, params=params)
-                res = json.loads(response.text)
-                bars_df = pd.concat(
-                    [
-                        bars_df,
-                        pd.DataFrame.from_dict(res["bars"], orient="index"),
-                    ]
+        bars_df.reset_index()
+
+        all_bars_df = pd.DataFrame()
+
+        for bar in bars_df.iterrows():
+            try:
+                change = round(
+                    ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100,
+                    2,
                 )
-                page_token = res["next_page_token"]
+                symbol = bar[0]
 
-            bars_df.reset_index()
+                sym_data = {
+                    "symbol": symbol,
+                    "change": change,
+                    "price": bar[1][1]["c"],
+                    "volume": bar[1][1]["v"],
+                    "trades": bar[1][1]["n"],
+                }
+                all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
 
-            all_bars_df = pd.DataFrame()
-
-            for bar in bars_df.iterrows():
-                try:
-                    change = round(
-                        ((bar[1][1]["c"] - bar[1][0]["c"]) / bar[1][0]["c"]) * 100,
-                        2,
-                    )
-                    symbol = bar[0]
-
-                    sym_data = {
-                        "symbol": symbol,
-                        "change": change,
-                        "price": bar[1][1]["c"],
-                        "volume": bar[1][1]["v"],
-                        "trades": bar[1][1]["n"],
-                    }
-                    all_bars_df = pd.concat([all_bars_df, pd.DataFrame([sym_data])])
-
-                except TypeError or KeyError:
-                    pass
-            all_bars_df.reset_index(drop=True, inplace=True)
-            return all_bars_df
-        else:
-            raise ValueError(f"Failed to get assets. Response: {response.text}")
+            except TypeError or KeyError:
+                pass
+        all_bars_df.reset_index(drop=True, inplace=True)
+        return all_bars_df
 
     ##################################################
     # ///////////////// Set Dates \\\\\\\\\\\\\\\\\\ #
@@ -260,6 +257,7 @@ class Screener:
             )
             .tail(2)
             .reset_index(drop=True)
+            .sort_values(by="date", ascending=True)
         )
 
         self.yesterday = calender.iloc[1]["date"].strftime("%Y-%m-%d")

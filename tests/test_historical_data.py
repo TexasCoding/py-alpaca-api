@@ -1,9 +1,9 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
+import pendulum
 import pytest
-from pytz import timezone
 
 from py_alpaca_api.alpaca import PyAlpacaApi
 
@@ -15,10 +15,10 @@ from py_alpaca_api.alpaca import PyAlpacaApi
 api_key = os.environ.get("API_KEY")
 api_secret = os.environ.get("API_SECRET")
 
-tz = timezone("US/Eastern")
-ctime = datetime.now(tz)
-previous_day = (ctime - timedelta(days=1)).strftime("%Y-%m-%d")
-month_ago = (ctime - timedelta(days=200)).strftime("%Y-%m-%d")
+today = pendulum.now(tz="America/New_York")
+
+previous_day = today.subtract(days=2).format("YYYY-MM-DD")
+month_ago = today.subtract(months=1).format("YYYY-MM-DD")
 
 
 @pytest.fixture
