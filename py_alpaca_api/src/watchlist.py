@@ -169,17 +169,21 @@ class Watchlist:
         Update a watchlist with the specified parameters.
 
         Args:
-            watchlist_id (str, optional): The ID of the watchlist to update. Either `watchlist_id` or `watchlist_name` must be provided.
-            watchlist_name (str, optional): The name of the watchlist to update. Either `watchlist_id` or `watchlist_name` must be provided.
+            watchlist_id (str, optional): The ID of the watchlist to update. Either `watchlist_id` or `watchlist_name`
+            must be provided.
+            watchlist_name (str, optional): The name of the watchlist to update. Either `watchlist_id` or
+            `watchlist_name` must be provided.
             name (str, optional): The new name for the watchlist. If not provided, the existing name will be used.
-            symbols (str, optional): A comma-separated string of symbols to update the watchlist with. If not provided, the existing symbols
+            symbols (str, optional): A comma-separated string of symbols to update the watchlist with. If not provided,
+             the existing symbols
             will be used.
 
         Returns:
             WatchlistClass: The updated watchlist.
 
         Raises:
-            ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor `watchlist_name` are provided.
+            ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor
+            `watchlist_name` are provided.
 
         """
 
@@ -255,15 +259,19 @@ class Watchlist:
         Adds an asset to a watchlist.
 
         Args:
-            watchlist_id (str, optional): The ID of the watchlist to add the asset to. If not provided, the watchlist_name
-            parameter must be provided. watchlist_name (str, optional): The name of the watchlist to add the asset to. If not provided,
-            the watchlist_id parameter must be provided. symbol (str): The symbol of the asset to add to the watchlist.
+            watchlist_id (str): The ID of the watchlist to add the asset to. If `watchlist_id` is provided,
+            `watchlist_name` should be None.
+            watchlist_name (str): The name of the watchlist to add the asset to. If `watchlist_name` is provided,
+            `watchlist_id` should be None.
+            symbol (str): The symbol of the asset to add to the watchlist.
 
         Returns:
-            WatchlistClass: The updated watchlist object.
+            WatchlistClass: The updated watchlist after adding the asset.
 
         Raises:
-            ValueError: If both watchlist_id and watchlist_name are provided, or if symbol is not provided.
+            ValueError: If both `watchlist_id` and `watchlist_name` are provided or neither is provided.
+            ValueError: If `symbol` is not provided.
+
         """
         if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
             raise ValueError("Watchlist ID or Name is required, not both.")
@@ -298,9 +306,11 @@ class Watchlist:
         Removes an asset from a watchlist.
 
         Args:
-            watchlist_id (str, optional): The ID of the watchlist. If not provided, the watchlist_name parameter will be used to
+            watchlist_id (str, optional): The ID of the watchlist. If not provided, the watchlist_name parameter
+            will be used to
             retrieve the ID. Defaults to None.
-            watchlist_name (str, optional): The name of the watchlist. If not provided, thewatchlist_id parameter will be used to
+            watchlist_name (str, optional): The name of the watchlist. If not provided, thewatchlist_id parameter
+             will be used to
             retrieve the ID. Defaults to None.
             symbol (str): The symbol of the asset to be removed from the watchlist.
 
@@ -335,16 +345,19 @@ class Watchlist:
         Retrieves the symbols of assets in a watchlist.
 
         Args:
-            watchlist_id (str, optional): The ID of the watchlist. Either `watchlist_id` or `watchlist_name` should be provided,
+            watchlist_id (str, optional): The ID of the watchlist. Either `watchlist_id` or `watchlist_name`
+             should be provided,
             not both. Defaults to None.
-            watchlist_name (str, optional): The name of the watchlist. Either `watchlist_id` or `watchlist_name` should be
+            watchlist_name (str, optional): The name of the watchlist. Either `watchlist_id` or `watchlist_name`
+             should be
             provided, not both. Defaults to None.
 
         Returns:
             list: A list of symbols of assets in the watchlist.
 
         Raises:
-            ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor `watchlist_name` are provided.
+            ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor
+            `watchlist_name` are provided.
         """
 
         if watchlist_id and watchlist_name:

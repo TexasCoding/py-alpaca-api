@@ -48,11 +48,6 @@ class Account:
             "until_date": until_date if until_date else None,
         }
 
-        # request = requests.get(url=url, headers=self.headers, params=params)
-
-        # if request.status_code != 200:
-        #     raise Exception(f"Failed to get account activities. Response: {request.text}")
-
         request = Requests().get(url=url, headers=self.headers, params=params)
         response = json.loads(request.text)
 

@@ -32,7 +32,7 @@ class Position:
         Retrieves all positions from the Alpaca API and returns them as a DataFrame.
 
         Returns:
-            pd.DataFrame: A DataFrame containing the positions data.
+            pd.DataFrame: A DataFrame containing the position's data.
 
         Raises:
             Exception: If the API response is not successful.

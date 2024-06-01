@@ -97,8 +97,10 @@ class Screener:
         Args:
             price_greater_than (float): The minimum price threshold for stocks to be considered losers. Default is 5.0.
             change_less_than (float): The maximum change threshold for stocks to be considered losers. Default is -2.0.
-            volume_greater_than (int): The minimum volume threshold for stocks to be considered losers. Default is 20000.
-            trade_count_greater_than (int): The minimum trade count threshold for stocks to be considered losers. Default is 2000.
+            volume_greater_than (int): The minimum volume threshold for stocks to be considered losers. Default is
+            20000.
+            trade_count_greater_than (int): The minimum trade count threshold for stocks to be considered losers.
+             Default is 2000.
             total_losers_returned (int): The maximum number of losers to be returned. Default is 100.
 
         Returns:
@@ -126,11 +128,15 @@ class Screener:
     ) -> pd.DataFrame:
         """
         Args:
-            price_greater_than (float): The minimum price threshold for the stocks to be included in the gainers list. Default is 5.0.
-            change_greater_than (float): The minimum change (in percentage) threshold for the stocks to be included in the gainers list.
+            price_greater_than (float): The minimum price threshold for the stocks to be included in the gainers list.
+            Default is 5.0.
+            change_greater_than (float): The minimum change (in percentage) threshold for the stocks to be included in
+            the gainers list.
             Default is 2.0.
-            volume_greater_than (int): The minimum volume threshold for the stocks to be included in the gainers list. Default is 20000.
-            trade_count_greater_than (int): The minimum trade count threshold for the stocks to be included in the gainers list. Default is 2000.
+            volume_greater_than (int): The minimum volume threshold for the stocks to be included in the gainers list.
+             Default is 20000.
+            trade_count_greater_than (int): The minimum trade count threshold for the stocks to be included in the
+            gainers list. Default is 2000.
             total_gainers_returned (int): The maximum number of gainers to be returned. Default is 100.
 
         Returns:
