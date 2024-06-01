@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-alpaca-api"
-version = "0.6.5"
+version = "1.0.0"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
 license = "MIT"
@@ -27,8 +27,6 @@ pre-commit = "^3.7.1"
 ipykernel = "^6.29.4"
 pytest-mock = "^3.14.0"
 pytest-mock-server = "^0.3.0"
-python-dotenv = "^1.0.1"
-coverage = "^7.5.1"
 
 
 [tool.poetry.group.test.dependencies]
