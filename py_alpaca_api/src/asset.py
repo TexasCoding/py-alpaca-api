@@ -2,9 +2,9 @@ import json
 from typing import Dict
 
 import pandas as pd
-import requests
 
 from .data_classes import AssetClass, asset_class_from_dict
+from .requests import Requests
 
 
 class Asset:
@@ -50,20 +50,17 @@ class Asset:
             "exchange": exchange,
         }
 
-        response = requests.get(url, headers=self.headers, params=params)
+        request = Requests().get(url, headers=self.headers, params=params)
 
-        if response.status_code == 200:
-            res_df = pd.json_normalize(json.loads(response.text))
+        assets_df = pd.json_normalize(json.loads(request.text))
 
-            res_df = res_df[res_df["status"] == "active"]
-            res_df = res_df[res_df["fractionable"]]
-            res_df = res_df[res_df["tradable"]]
-            res_df = res_df[res_df["exchange"] != "OTC"]
-            res_df.reset_index(drop=True, inplace=True)
+        assets_df = assets_df[assets_df["status"] == "active"]
+        assets_df = assets_df[assets_df["fractionable"]]
+        assets_df = assets_df[assets_df["tradable"]]
+        assets_df = assets_df[assets_df["exchange"] != "OTC"]
+        assets_df.reset_index(drop=True, inplace=True)
 
-            return res_df
-        else:
-            raise ValueError(f"Failed to get asset information. Response: {response.text}")
+        return assets_df
 
     #####################################################
     # \\\\\\\\\\\\\\\\\\\  Get Asset ////////////////////#
@@ -81,12 +78,9 @@ class Asset:
         Raises:
             ValueError: If the request to the Alpaca API fails.
         """
-
         url = f"{self.trade_url}/assets/{symbol}"
-        response = requests.get(url, headers=self.headers)
 
-        if response.status_code == 200:
-            res = json.loads(response.text)
-            return asset_class_from_dict(res)
-        else:
-            raise ValueError(f"Failed to get asset information. Response: {response.text}")
+        request = Requests().get(url, headers=self.headers)
+
+        response = json.loads(request.text)
+        return asset_class_from_dict(response)

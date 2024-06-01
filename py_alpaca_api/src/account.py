@@ -3,9 +3,9 @@ from typing import Dict
 
 import pandas as pd
 import pendulum
-import requests
 
 from .data_classes import AccountClass, account_class_from_dict
+from .requests import Requests
 
 
 class Account:
@@ -48,11 +48,12 @@ class Account:
             "until_date": until_date if until_date else None,
         }
 
-        request = requests.get(url=url, headers=self.headers, params=params)
+        # request = requests.get(url=url, headers=self.headers, params=params)
 
-        if request.status_code != 200:
-            raise Exception(f"Failed to get account activities. Response: {request.text}")
+        # if request.status_code != 200:
+        #     raise Exception(f"Failed to get account activities. Response: {request.text}")
 
+        request = Requests().get(url=url, headers=self.headers, params=params)
         response = json.loads(request.text)
 
         activity_df = pd.DataFrame()
@@ -124,16 +125,10 @@ class Account:
         # Alpaca API URL for account information
         url = f"{self.trade_url}/account"
         # Get request to Alpaca API for account information
-        response = requests.get(url, headers=self.headers)
-        # Check if response is successful
-        if response.status_code == 200:
-            # Convert JSON response to dictionary
-            res = json.loads(response.text)
-            # Return account information as an AccountClass object
-            return account_class_from_dict(res)
-        # If response is not successful, raise an exception
-        else:
-            raise Exception(f"Failed to get account information. Response: {response.text}")
+        request = Requests().get(url=url, headers=self.headers)
+        response = json.loads(request.text)
+
+        return account_class_from_dict(response)
 
     ########################################################
     # \\\\\\\\\\\\\  Get Portfolio History ///////////////#
@@ -160,34 +155,29 @@ class Account:
 
         url = f"{self.trade_url}/account/portfolio/history"
 
-        response = requests.get(
-            url,
-            headers=self.headers,
-            params={
-                "period": period,
-                "timeframe": timeframe,
-                "intraday_reporting": intraday_reporting,
-            },
+        params = {
+            "period": period,
+            "timeframe": timeframe,
+            "intraday_reporting": intraday_reporting,
+        }
+
+        request = Requests().get(url=url, headers=self.headers, params=params)
+        response = json.loads(request.text)
+
+        portfolio_df = pd.DataFrame(
+            response,
+            columns=[
+                "timestamp",
+                "equity",
+                "profit_loss",
+                "profit_loss_pct",
+                "base_value",
+            ],
         )
 
-        if response.status_code == 200:
-            res = json.loads(response.text)
-            res_df = pd.DataFrame(
-                res,
-                columns=[
-                    "timestamp",
-                    "equity",
-                    "profit_loss",
-                    "profit_loss_pct",
-                    "base_value",
-                ],
-            )
-
-            timestamp_transformed = (
-                pd.to_datetime(res_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
-            )
-            res_df["timestamp"] = timestamp_transformed
-            res_df["profit_loss_pct"] = res_df["profit_loss_pct"] * 100
-            return res_df
-        else:
-            raise Exception(f"Failed to get portfolio information. Response: {response.text}")
+        timestamp_transformed = (
+            pd.to_datetime(portfolio_df["timestamp"], unit="s").dt.tz_localize("America/New_York").dt.tz_convert("UTC").apply(lambda x: x.date())
+        )
+        portfolio_df["timestamp"] = timestamp_transformed
+        portfolio_df["profit_loss_pct"] = portfolio_df["profit_loss_pct"] * 100
+        return portfolio_df

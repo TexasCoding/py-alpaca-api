@@ -1,9 +1,7 @@
 import os
-from datetime import datetime, timedelta
 
 import numpy as np
 import pytest
-from pytz import timezone
 
 from py_alpaca_api.alpaca import PyAlpacaApi
 
@@ -14,11 +12,6 @@ from py_alpaca_api.alpaca import PyAlpacaApi
 # Create a .env file in the root directory of the project for the following:
 api_key = os.environ.get("API_KEY")
 api_secret = os.environ.get("API_SECRET")
-
-tz = timezone("US/Eastern")
-ctime = datetime.now(tz)
-previous_day = (ctime - timedelta(days=1)).strftime("%Y-%m-%d")
-month_ago = (ctime - timedelta(days=200)).strftime("%Y-%m-%d")
 
 
 @pytest.fixture

@@ -1,9 +1,8 @@
 import json
 from typing import Dict, Union
 
-import requests
-
 from .data_classes import WatchlistClass, watchlist_class_from_dict
+from .requests import Requests
 
 
 class Watchlist:
@@ -61,19 +60,17 @@ class Watchlist:
         Raises:
             Exception: If the response status code is not 200 or 204.
         """
-        response = requests.request(
+        request = Requests().request(
             method=method,
             url=url,
             headers=self.headers,
             json=payload,
             params=params,
         )
-        if response.status_code in {200, 204}:
-            if response.text:
-                return json.loads(response.text)
-            return {}
-        else:
-            raise Exception(response.text)
+
+        if request.text:
+            return json.loads(request.text)
+        return {}
 
     ########################################################
     # //////////////// Get a  watchlist ///////////////////#
@@ -120,17 +117,15 @@ class Watchlist:
             Exception: If the API request fails.
         """
         url = f"{self.trade_url}/watchlists"
-        response = requests.get(url, headers=self.headers)
-        res = json.loads(response.text)
+        request = Requests().get(url, headers=self.headers)
+
+        response = json.loads(request.text)
 
         watchlists = []
-        if response.status_code == 200:
-            if res:
-                for watchlist in res:
-                    watchlists.append(self.get(watchlist_id=watchlist["id"]))
-            return watchlists
-        else:
-            raise Exception(response.text)
+        if response:
+            for watchlist in response:
+                watchlists.append(self.get(watchlist_id=watchlist["id"]))
+        return watchlists
 
     ########################################################
     # ///////////// Create a new watchlist ////////////////#
