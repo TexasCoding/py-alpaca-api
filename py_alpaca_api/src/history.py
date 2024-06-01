@@ -1,12 +1,11 @@
-import json
 from collections import defaultdict
 from typing import Dict
 
 import pandas as pd
-import requests
 
 from .asset import Asset
 from .data_classes import AssetClass
+from .requests import Requests
 
 
 class History:
@@ -188,10 +187,10 @@ class History:
         symbols_data = defaultdict(list)
         while True:
             params["page_token"] = page_token
-            response = requests.get(url, headers=self.headers, params=params)
-            if response.status_code != 200:
-                raise Exception(json.loads(response.text)["message"])
-            res_data = response.json()
+
+            request = Requests().get(url, headers=self.headers, params=params)
+
+            res_data = request.json()
             symbols_data[symbol].extend(res_data.get("bars", []))
             page_token = res_data.get("next_page_token", "")
             if not page_token:

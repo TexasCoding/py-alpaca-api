@@ -2,9 +2,9 @@ import json
 from typing import Dict
 
 import pandas as pd
-import requests
 
 from .data_classes import ClockClass, clock_class_from_dict
+from .requests import Requests
 
 
 class Market:
@@ -24,10 +24,9 @@ class Market:
     ########################################################
     @staticmethod
     def get_api_response(url: str, headers: Dict[str, str], params: Dict[str, str] = None) -> Dict:
-        response = requests.get(url, headers=headers, params=params)
-        data = json.loads(response.text)
-        if response.status_code != 200:
-            raise Exception(f'Failed to get data from API. Response: {data["message"]}')
+        # response = requests.get(url, headers=headers, params=params)
+        request = Requests().get(url=url, headers=headers, params=params)
+        data = json.loads(request.text)
         return data
 
     ########################################################

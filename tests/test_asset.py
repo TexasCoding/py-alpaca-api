@@ -23,7 +23,7 @@ def alpaca():
 # Test cases for PyAlpacaApi.get_asset #
 ########################################
 def test_get_asset_invalid_symbol(alpaca):
-    with pytest.raises(ValueError):
+    with pytest.raises(Exception):
         alpaca.asset.get("INVALID")
 
 

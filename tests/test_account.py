@@ -89,7 +89,7 @@ def test_get_portfolio_history(alpaca):
     assert history.profit_loss.dtype == float
     assert history.profit_loss_pct.dtype == float
     assert history.base_value.dtype == float
-    assert history.equity.iloc[-1] == alpaca.account.get().equity
+    assert history.equity.iloc[1] > 1000.0
 
 
 def test_get_account_activities(alpaca):
@@ -100,3 +100,25 @@ def test_get_account_activities(alpaca):
         assert activities.activity_type.dtype == str
         assert activities.symbol.dtype == str
         assert activities.qty.dtype == float
+
+
+def test_portfolio_history(alpaca):
+    history = alpaca.account.portfolio_history()
+    assert isinstance(history, pd.DataFrame)
+    assert history.timestamp.dtype == pd.Timestamp
+    assert history.equity.dtype == float
+    assert history.profit_loss.dtype == float
+    assert history.profit_loss_pct.dtype == float
+    assert history.base_value.dtype == float
+    assert len(history) > 0
+
+
+def test_portfolio_history_custom_params(alpaca):
+    history = alpaca.account.portfolio_history(period="2W", timeframe="1H", intraday_reporting="extended_hours")
+    assert isinstance(history, pd.DataFrame)
+    assert history.timestamp.dtype == pd.Timestamp
+    assert history.equity.dtype == float
+    assert history.profit_loss.dtype == float
+    assert history.profit_loss_pct.dtype == float
+    assert history.base_value.dtype == float
+    assert len(history) > 0

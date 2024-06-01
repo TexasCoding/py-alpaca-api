@@ -1,10 +1,10 @@
 import json
 
 import pandas as pd
-import requests
 
 from .account import Account
 from .data_classes import PositionClass, position_class_from_dict
+from .requests import Requests
 
 
 class Position:
@@ -39,12 +39,10 @@ class Position:
         """
 
         url = f"{self.trade_url}/positions"
-        response = requests.get(url, headers=self.headers)
+        request = Requests().get(url=url, headers=self.headers)
+        # response = requests.get(url, headers=self.headers)
 
-        if response.status_code != 200:
-            raise Exception(response.text)
-
-        res_data_df = pd.json_normalize(json.loads(response.text))
+        res_data_df = pd.json_normalize(json.loads(request.text))
 
         pos_data_df = pd.DataFrame(
             {
@@ -148,12 +146,9 @@ class Position:
             return position_class_from_dict(symbol_dict)
 
         url = f"{self.trade_url}/positions/{symbol}"
-        response = requests.get(url, headers=self.headers)
+        request = Requests().get(url=url, headers=self.headers)
 
-        if response.status_code != 200:
-            raise ValueError(response.text)
-
-        res_dict = json.loads(response.text)
+        res_dict = json.loads(request.text)
 
         equity = self.account.get().equity
         res_dict["portfolio_pct"] = round(float(res_dict["market_value"]) / equity, 4)
@@ -193,14 +188,11 @@ class Position:
 
         url = f"{self.trade_url}/positions"
         params = {"cancel_orders": cancel_orders}
-        response = requests.delete(url, headers=self.headers, params=params)
 
-        if response.status_code == 207:
-            res = json.loads(response.text)
-            return f"{len(res)} positions have been closed"
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to close positions. Response: {res["message"]}')
+        request = Requests().delete(url=url, headers=self.headers, params=params)
+
+        response = json.loads(request.text)
+        return f"{len(response)} positions have been closed"
 
     ########################################################
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
@@ -236,10 +228,6 @@ class Position:
 
         url = f"{self.trade_url}/positions/{symbol_or_id}"
         params = {"qty": qty, "percentage": percentage}
-        response = requests.delete(url, headers=self.headers, params=params)
+        Requests().delete(url=url, headers=self.headers, params=params)
 
-        if response.status_code == 200:
-            return f"Position {symbol_or_id} has been closed"
-        else:
-            res = json.loads(response.text)
-            raise Exception(f'Failed to close position. Response: {res["message"]}')
+        return f"Position {symbol_or_id} has been closed"
