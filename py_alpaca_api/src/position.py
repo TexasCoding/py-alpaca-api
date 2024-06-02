@@ -39,10 +39,8 @@ class Position:
         """
 
         url = f"{self.trade_url}/positions"
-        request = Requests().get(url=url, headers=self.headers)
-        # response = requests.get(url, headers=self.headers)
 
-        res_data_df = pd.json_normalize(json.loads(request.text))
+        res_data_df = pd.json_normalize(json.loads(Requests().get(url=url, headers=self.headers).text))
 
         pos_data_df = pd.DataFrame(
             {
@@ -146,9 +144,8 @@ class Position:
             return position_class_from_dict(symbol_dict)
 
         url = f"{self.trade_url}/positions/{symbol}"
-        request = Requests().get(url=url, headers=self.headers)
 
-        res_dict = json.loads(request.text)
+        res_dict = json.loads(Requests().get(url=url, headers=self.headers).text)
 
         equity = self.account.get().equity
         res_dict["portfolio_pct"] = round(float(res_dict["market_value"]) / equity, 4)
@@ -189,9 +186,7 @@ class Position:
         url = f"{self.trade_url}/positions"
         params = {"cancel_orders": cancel_orders}
 
-        request = Requests().delete(url=url, headers=self.headers, params=params)
-
-        response = json.loads(request.text)
+        response = json.loads(Requests().delete(url=url, headers=self.headers, params=params).text)
         return f"{len(response)} positions have been closed"
 
     ########################################################

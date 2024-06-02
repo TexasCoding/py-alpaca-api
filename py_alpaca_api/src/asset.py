@@ -50,14 +50,11 @@ class Asset:
             "exchange": exchange,
         }
 
-        request = Requests().get(url, headers=self.headers, params=params)
+        assets_df = pd.json_normalize(json.loads(Requests().get(url, headers=self.headers, params=params).text))
 
-        assets_df = pd.json_normalize(json.loads(request.text))
-
-        assets_df = assets_df[assets_df["status"] == "active"]
-        assets_df = assets_df[assets_df["fractionable"]]
-        assets_df = assets_df[assets_df["tradable"]]
-        assets_df = assets_df[assets_df["exchange"] != "OTC"]
+        assets_df = assets_df[
+            (assets_df["status"] == "active") & (assets_df["fractionable"]) & (assets_df["tradable"]) & (assets_df["exchange"] != "OTC")
+        ]
         assets_df.reset_index(drop=True, inplace=True)
 
         return assets_df
@@ -79,8 +76,5 @@ class Asset:
             ValueError: If the request to the Alpaca API fails.
         """
         url = f"{self.trade_url}/assets/{symbol}"
-
-        request = Requests().get(url, headers=self.headers)
-
-        response = json.loads(request.text)
+        response = json.loads(Requests().get(url, headers=self.headers).text)
         return asset_class_from_dict(response)

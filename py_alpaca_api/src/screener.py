@@ -196,17 +196,14 @@ class Screener:
             "sort": "asc",
         }
 
-        request = Requests().get(url=url, headers=self.headers, params=params)
-
-        res = json.loads(request.text)
+        res = json.loads(Requests().get(url=url, headers=self.headers, params=params).text)
 
         bars_df = pd.DataFrame.from_dict(res["bars"], orient="index")
         page_token = res["next_page_token"]
 
         while page_token:
             params["page_token"] = page_token
-            request = Requests().get(url=url, headers=self.headers, params=params)
-            res = json.loads(request.text)
+            res = json.loads(Requests().get(url=url, headers=self.headers, params=params).text)
             bars_df = pd.concat(
                 [
                     bars_df,
