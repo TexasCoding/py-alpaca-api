@@ -140,7 +140,6 @@ class Account:
 
         Raises:
             Exception: If the request to the Alpaca API fails.
-
         """
 
         url = f"{self.trade_url}/account/portfolio/history"
