@@ -24,9 +24,7 @@ class Market:
     ########################################################
     @staticmethod
     def get_api_response(url: str, headers: Dict[str, str], params: Dict[str, str] = None) -> Dict:
-        # response = requests.get(url, headers=headers, params=params)
-        request = Requests().get(url=url, headers=headers, params=params)
-        data = json.loads(request.text)
+        data = json.loads(Requests().get(url=url, headers=headers, params=params).text)
         return data
 
     ########################################################

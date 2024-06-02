@@ -48,8 +48,7 @@ class Account:
             "until_date": until_date if until_date else None,
         }
 
-        request = Requests().get(url=url, headers=self.headers, params=params)
-        response = json.loads(request.text)
+        response = json.loads(Requests().get(url=url, headers=self.headers, params=params).text)
 
         activity_df = pd.DataFrame()
         activity_df.assign(
@@ -117,12 +116,8 @@ class Account:
             Example:
                 >>> account = account.get()
         """
-        # Alpaca API URL for account information
         url = f"{self.trade_url}/account"
-        # Get request to Alpaca API for account information
-        request = Requests().get(url=url, headers=self.headers)
-        response = json.loads(request.text)
-
+        response = json.loads(Requests().get(url=url, headers=self.headers).text)
         return account_class_from_dict(response)
 
     ########################################################
@@ -156,8 +151,7 @@ class Account:
             "intraday_reporting": intraday_reporting,
         }
 
-        request = Requests().get(url=url, headers=self.headers, params=params)
-        response = json.loads(request.text)
+        response = json.loads(Requests().get(url=url, headers=self.headers, params=params).text)
 
         portfolio_df = pd.DataFrame(
             response,

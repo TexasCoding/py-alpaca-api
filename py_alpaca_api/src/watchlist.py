@@ -60,7 +60,7 @@ class Watchlist:
         Raises:
             Exception: If the response status code is not 200 or 204.
         """
-        request = Requests().request(
+        response = Requests().request(
             method=method,
             url=url,
             headers=self.headers,
@@ -68,8 +68,8 @@ class Watchlist:
             params=params,
         )
 
-        if request.text:
-            return json.loads(request.text)
+        if response.text:
+            return json.loads(response.text)
         return {}
 
     ########################################################
@@ -117,9 +117,8 @@ class Watchlist:
             Exception: If the API request fails.
         """
         url = f"{self.trade_url}/watchlists"
-        request = Requests().get(url, headers=self.headers)
 
-        response = json.loads(request.text)
+        response = json.loads(Requests().get(url, headers=self.headers).text)
 
         watchlists = []
         if response:

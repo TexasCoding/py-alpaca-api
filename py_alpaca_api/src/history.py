@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from typing import Dict
 
@@ -188,9 +189,7 @@ class History:
         while True:
             params["page_token"] = page_token
 
-            request = Requests().get(url, headers=self.headers, params=params)
-
-            res_data = request.json()
+            res_data = json.loads(Requests().get(url, headers=self.headers, params=params).text)
             symbols_data[symbol].extend(res_data.get("bars", []))
             page_token = res_data.get("next_page_token", "")
             if not page_token:

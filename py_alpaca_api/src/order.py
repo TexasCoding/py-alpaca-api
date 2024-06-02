@@ -40,9 +40,7 @@ class Order:
         params = {"nested": nested}
         url = f"{self.trade_url}/orders/{order_id}"
 
-        request = Requests().get(url=url, headers=self.headers, params=params)
-
-        response = json.loads(request.text)
+        response = json.loads(Requests().get(url=url, headers=self.headers, params=params).text)
         return order_class_from_dict(response)
 
     ########################################################
@@ -81,9 +79,8 @@ class Order:
             Exception: If the request to cancel orders is not successful, an exception is raised with the error message.
         """
         url = f"{self.trade_url}/orders"
-        request = Requests().delete(url=url, headers=self.headers)
 
-        response = json.loads(request.text)
+        response = json.loads(Requests().delete(url=url, headers=self.headers).text)
         return f"{len(response)} orders have been cancelled"
 
     @staticmethod
@@ -462,7 +459,5 @@ class Order:
 
         url = f"{self.trade_url}/orders"
 
-        request = Requests().post(url=url, headers=self.headers, payload=payload)
-
-        response = json.loads(request.text)
+        response = json.loads(Requests().post(url=url, headers=self.headers, payload=payload).text)
         return order_class_from_dict(response)
