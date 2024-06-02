@@ -16,6 +16,8 @@ pandas = "^2.2.2"
 requests = "^2.31.0"
 numpy = "^1.26.4"
 pendulum = "^3.0.0"
+prophet = "^1.1.5"
+plotly = "^5.22.0"
 
 
 [tool.poetry.group.dev.dependencies]
