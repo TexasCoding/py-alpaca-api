@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-alpaca-api"
-version = "1.0.1"
+version = "1.0.2"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
 license = "MIT"
