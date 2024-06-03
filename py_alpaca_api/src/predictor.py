@@ -11,7 +11,6 @@ from .screener import Screener
 yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
 four_years_ago = pendulum.now().subtract(years=2).format("YYYY-MM-DD")
 
-
 logger = logging.getLogger("cmdstanpy")
 logger.disabled = True
 logger.propagate = False
