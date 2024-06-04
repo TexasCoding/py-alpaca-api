@@ -92,7 +92,7 @@ class Predictor:
 
         return round(two_week_forecast, 2)
 
-    def get_losers_to_gainers(self, losers_to_scan: int = 200) -> list:
+    def get_losers_to_gainers(self, gain_ratio: float = 0.1, losers_to_scan: int = 200) -> list:
         """
         Retrieves a list of future gainers by predicting stock prices using Prophet.
 
@@ -116,7 +116,7 @@ class Predictor:
                 symbol_model = self.train_prophet_model(symbol_data)
                 symbol_forecast = self.generate_forecast(symbol_model)
                 previous_price = previous_day_losers[previous_day_losers["symbol"] == ticker].iloc[0]["price"]
-                if symbol_forecast > previous_price:
+                if symbol_forecast > previous_price * (1 + gain_ratio):
                     future_gainers.append(ticker)
             except Exception as e:
                 logger.error(f"Error predicting {ticker}: {e}")

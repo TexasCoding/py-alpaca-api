@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "py-alpaca-api"
-version = "1.0.2"
+version = "1.0.3"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/TexasCoding/py-alpaca-api"
+homepage = "https://pypi.org/project/py-alpaca-api/"
 repository = "https://github.com/TexasCoding/py-alpaca-api"
 documentation = "https://py-alpaca-api.readthedocs.io/en/latest/"
 keywords = ["alpaca", "python"]
