@@ -7,8 +7,8 @@ on:
   
 env:
     POETRY_VERSION: 1.8.3
-    ALPACA_API_KEY: ${{ secrets.API_KEY }}
-    ALPACA_API_SECRET: ${{ secrets.API_SECRET }}
+    ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+    ALPACA_API_SECRET: ${{ secrets.ALPACA_API_SECRET }}
 jobs:
     build:
       runs-on: ${{ matrix.os }}
