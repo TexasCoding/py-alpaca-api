@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-alpaca-api"
-version = "0.1.0"
+version = "2.0.0"
 description = "Python package, for communicating with Alpaca Markets REST API."
 authors = ["TexasCoding <jeff10278@me.com>"]
 readme = "README.md"
@@ -19,6 +19,11 @@ pandas = "^2.2.2"
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.8"
 pre-commit = "^3.7.1"
+
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^8.2.2"
+hypothesis = "^6.103.1"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
