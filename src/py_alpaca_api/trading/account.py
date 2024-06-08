@@ -9,7 +9,7 @@ from py_alpaca_api.models.account_activity_model import (
 from py_alpaca_api.models.account_model import AccountModel, account_class_from_dict
 
 
-class AccountApi:
+class Account:
     def __init__(self, headers: Dict[str, str], base_url: str) -> None:
         self.headers = headers
         self.base_url = base_url

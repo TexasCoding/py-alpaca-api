@@ -1,7 +1,7 @@
-from .account import AccountApi
+from .account import Account
 
 
-class TradingApi:
+class Trading:
     def __init__(self, api_key: str, api_secret: str, api_paper: bool = True) -> None:
         self.headers = {
             "APCA-API-KEY-ID": api_key,
@@ -15,4 +15,4 @@ class TradingApi:
         self._initialize_components()
 
     def _initialize_components(self):
-        self.account = AccountApi(headers=self.headers, base_url=self.base_url)
+        self.account = Account(headers=self.headers, base_url=self.base_url)

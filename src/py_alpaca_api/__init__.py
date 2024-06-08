@@ -1,4 +1,4 @@
-from .trading import TradingApi
+from .trading import Trading
 
 
 class PyAlpacaAPI:
@@ -11,6 +11,6 @@ class PyAlpacaAPI:
         self._initialize_components()
 
     def _initialize_components(self):
-        self.trading = TradingApi(
+        self.trading = Trading(
             api_key=self.api_key, api_secret=self.api_secret, api_paper=self.api_paper
         )
