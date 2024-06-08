@@ -71,7 +71,7 @@ def test_account_class_from_dict():
         account_blocked=False,
         created_at=pendulum.DateTime(
             2022, 1, 1, tzinfo=pendulum.Timezone("America/New_York")
-        ),
+        ).strftime("%Y-%m-%d %H:%M:%S"),
         trade_suspended_by_user=False,
         multiplier=1,
         shorting_enabled=True,

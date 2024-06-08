@@ -1,3 +1,4 @@
+from py_alpaca_api.trading.market import Market
 from py_alpaca_api.trading.stock import Stock
 from py_alpaca_api.trading.account import Account
 
@@ -21,3 +22,4 @@ class Trading:
         self.stock = Stock(
             headers=self.headers, base_url=self.base_url, data_url=self.data_url
         )
+        self.market = Market(headers=self.headers, base_url=self.base_url)

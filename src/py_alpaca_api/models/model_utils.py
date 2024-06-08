@@ -33,9 +33,11 @@ def parse_date(data_dict: dict, key: str) -> datetime:
 
     """
     return (
-        pendulum.parse(data_dict[key], tz="America/New_York")
+        pendulum.parse(data_dict[key], tz="America/New_York").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
         if data_dict.get(key)
-        else pendulum.DateTime.min
+        else pendulum.DateTime.min.strftime("%Y-%m-%d")
     )
 
 

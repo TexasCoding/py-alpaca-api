@@ -81,10 +81,10 @@ def test_watchlist_class_from_dict_with_valid_data():
         ],
         created_at=pendulum.DateTime(
             2021, 1, 1, 0, 0, 0, tzinfo=pendulum.Timezone("UTC")
-        ),
+        ).strftime("%Y-%m-%d %H:%M:%S"),
         updated_at=pendulum.DateTime(
             2021, 1, 1, 0, 0, 0, tzinfo=pendulum.Timezone("UTC")
-        ),
+        ).strftime("%Y-%m-%d %H:%M:%S"),
     )
     assert watchlist_class_from_dict(data_dict) == expected_watchlist
 
