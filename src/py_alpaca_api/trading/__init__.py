@@ -1,4 +1,4 @@
-from py_alpaca_api.trading.assets import Assets
+from py_alpaca_api.trading.stock import Stock
 from py_alpaca_api.trading.account import Account
 
 
@@ -13,8 +13,11 @@ class Trading:
             if api_paper
             else "https://api.alpaca.markets/v2"
         )
+        self.data_url = "https://data.alpaca.markets/v2"
         self._initialize_components()
 
     def _initialize_components(self):
         self.account = Account(headers=self.headers, base_url=self.base_url)
-        self.assets = Assets(headers=self.headers, base_url=self.base_url)
+        self.stock = Stock(
+            headers=self.headers, base_url=self.base_url, data_url=self.data_url
+        )

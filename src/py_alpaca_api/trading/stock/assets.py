@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -17,39 +17,50 @@ class Assets:
     ############################################
     def get(self, symbol: str) -> AssetModel:
         """
-        Retrieves an asset model for the given symbol from the Alpaca API.
+        Retrieves an AssetModel for the specified symbol.
 
         Args:
             symbol (str): The symbol of the asset to retrieve.
 
         Returns:
-            AssetModel: The asset model for the given symbol.
+            AssetModel: The AssetModel for the specified asset.
+
+        Raises:
+            Exception: If the asset is not a US Equity (stock).
         """
 
         url = f"{self.base_url}/assets/{symbol}"
         response = json.loads(Requests().request("GET", url, headers=self.headers).text)
+
+        if response.get("class") != "us_equity":
+            raise Exception("Asset is not a US Equity (stock)")
+
         return asset_class_from_dict(response)
 
     ############################################
     # Get All Assets
     ############################################
     def get_all(
-        self, status: str = "active", asset_class: str = "us_equity", exchange: str = ""
+        self,
+        status: str = "active",
+        exchange: str = "",
+        excluded_exchanges: List[str] = ["OTC"],
     ) -> pd.DataFrame:
         """
-        Retrieves a DataFrame of all active, fractionable, and tradable assets from the Alpaca API.
+        Retrieves a DataFrame of all active, fractionable, and tradable US equity assets, excluding those from the OTC exchange.
 
         Args:
             status (str, optional): The status of the assets to retrieve. Defaults to "active".
-            asset_class (str, optional): The asset class of the assets to retrieve. Defaults to "us_equity".
-            exchange (str, optional): The exchange of the assets to retrieve. Defaults to an empty string, which retrieves assets from all exchanges.
+            exchange (str, optional): The exchange to filter the assets by. Defaults to an empty string, which retrieves assets from all exchanges.
+            excluded_exchanges (List[str], optional): A list of exchanges to exclude from the results. Defaults to ["OTC"].
 
         Returns:
             pd.DataFrame: A DataFrame containing the retrieved assets.
         """
 
         url = f"{self.base_url}/assets"
-        params = {"status": status, "asset_class": asset_class, "exchange": exchange}
+
+        params = {"status": status, "asset_class": "us_equity", "exchange": exchange}
         response = json.loads(
             Requests().request("GET", url, headers=self.headers, params=params).text
         )
@@ -59,7 +70,7 @@ class Assets:
             (assets_df["status"] == "active")
             & (assets_df["fractionable"])
             & (assets_df["tradable"])
-            & (assets_df["exchange"] != "OTC")
+            & (~assets_df["exchange"].isin(excluded_exchanges))
         ]
         assets_df.reset_index(drop=True, inplace=True)
         return assets_df

@@ -1,7 +1,7 @@
 import json
 from unittest.mock import Mock, patch
 import pytest
-from py_alpaca_api.trading.assets import Assets
+from py_alpaca_api.trading.stock.assets import Assets
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.http.requests import Requests
 
@@ -27,7 +27,7 @@ def test_get_asset_successful(assets_obj):
             "shortable": True,
             "status": "active",
             "tradable": True,
-            "asset_class": "us_equity",
+            "class": "us_equity",
             "exchange": "NASDAQ",
         }
     )
