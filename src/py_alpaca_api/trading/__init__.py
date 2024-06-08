@@ -1,4 +1,5 @@
-from .account import Account
+from py_alpaca_api.trading.assets import Assets
+from py_alpaca_api.trading.account import Account
 
 
 class Trading:
@@ -16,3 +17,4 @@ class Trading:
 
     def _initialize_components(self):
         self.account = Account(headers=self.headers, base_url=self.base_url)
+        self.assets = Assets(headers=self.headers, base_url=self.base_url)
