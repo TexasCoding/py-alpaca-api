@@ -4,6 +4,7 @@ from py_alpaca_api.trading.positions import Positions
 
 # from py_alpaca_api.trading.stock import Stock
 from py_alpaca_api.trading.account import Account
+from py_alpaca_api.trading.orders import Orders
 
 
 class Trading:
@@ -25,3 +26,4 @@ class Trading:
         self.positions = Positions(
             headers=headers, base_url=base_url, account=self.account
         )
+        self.orders = Orders(headers=headers, base_url=base_url)
