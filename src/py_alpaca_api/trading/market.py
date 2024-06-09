@@ -53,11 +53,9 @@ class Market:
         time_cols = ["open", "close"]
 
         for col in date_cols:
-            calendar_df[col] = pd.to_datetime(
-                calendar_df[col], infer_datetime_format=True
-            )
+            calendar_df[col] = pd.to_datetime(calendar_df[col])
 
         for col in time_cols:
-            calendar_df[col] = pd.to_datetime(calendar_df[col], errors="coerce").dt.time
+            calendar_df[col] = pd.to_datetime(calendar_df[col], format="mixed").dt.time
 
         return calendar_df
