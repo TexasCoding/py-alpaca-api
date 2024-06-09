@@ -1,4 +1,5 @@
 from typing import Dict
+from py_alpaca_api.stock.predictor import Predictor
 from py_alpaca_api.trading.market import Market
 from py_alpaca_api.stock.assets import Assets
 from py_alpaca_api.stock.history import History
@@ -42,3 +43,4 @@ class Stock:
         self.screener = Screener(
             data_url=data_url, headers=headers, market=market, asset=self.assets
         )
+        self.predictor = Predictor(history=self.history, screener=self.screener)
