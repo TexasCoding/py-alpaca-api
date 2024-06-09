@@ -7,7 +7,7 @@ import pendulum
 
 from py_alpaca_api.http.requests import Requests
 from py_alpaca_api.trading.market import Market
-from py_alpaca_api.trading.stock.assets import Assets
+from py_alpaca_api.stock.assets import Assets
 
 
 class Screener:

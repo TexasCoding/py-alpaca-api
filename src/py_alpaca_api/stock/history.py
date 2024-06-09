@@ -6,7 +6,7 @@ import pandas as pd
 
 from py_alpaca_api.http.requests import Requests
 from py_alpaca_api.models.asset_model import AssetModel
-from py_alpaca_api.trading.stock.assets import Assets
+from py_alpaca_api.stock.assets import Assets
 
 
 class History:

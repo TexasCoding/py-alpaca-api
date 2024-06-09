@@ -1,7 +1,7 @@
 import json
 from unittest.mock import Mock, patch
 import pytest
-from py_alpaca_api.trading.stock.assets import Assets
+from py_alpaca_api.stock.assets import Assets
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.http.requests import Requests
 

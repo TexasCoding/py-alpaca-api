@@ -20,7 +20,7 @@ def alpaca():
 
 
 def test_get_top_50_gainers(alpaca):
-    gainers = alpaca.trading.stock.screener.gainers(total_gainers_returned=50)
+    gainers = alpaca.stock.screener.gainers(total_gainers_returned=50)
     assert not gainers.empty
     assert len(gainers) == 50
     assert isinstance(gainers["symbol"][0], str)
@@ -35,7 +35,7 @@ def test_get_top_50_gainers(alpaca):
 
 
 def test_get_top_50_losers(alpaca):
-    losers = alpaca.trading.stock.screener.losers(total_losers_returned=50)
+    losers = alpaca.stock.screener.losers(total_losers_returned=50)
     assert not losers.empty
     assert len(losers) == 50
     assert isinstance(losers["symbol"][0], str)
@@ -50,7 +50,7 @@ def test_get_top_50_losers(alpaca):
 
 
 def test_losers_by_volume(alpaca):
-    losers = alpaca.trading.stock.screener.losers(
+    losers = alpaca.stock.screener.losers(
         total_losers_returned=10, volume_greater_than=50000
     )
     assert not losers.empty
@@ -58,7 +58,7 @@ def test_losers_by_volume(alpaca):
 
 
 def test_gainers_by_volume(alpaca):
-    gainers = alpaca.trading.stock.screener.gainers(
+    gainers = alpaca.stock.screener.gainers(
         total_gainers_returned=10, volume_greater_than=50000
     )
     assert not gainers.empty
