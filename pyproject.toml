@@ -24,6 +24,7 @@ pre-commit = "^3.7.1"
 [tool.poetry.group.tests.dependencies]
 pytest = "^8.2.2"
 hypothesis = "^6.103.1"
+pytest-mock = "^3.14.0"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
