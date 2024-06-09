@@ -103,28 +103,28 @@ class TestOrderClassFromDict:
         assert order.client_order_id == "client_order_123"
         assert order.created_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 0, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.updated_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 1, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.submitted_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 2, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.filled_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 3, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.expired_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 4, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.canceled_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 5, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.failed_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 6, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.replaced_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 7, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.replaced_by == "order_456"
         assert order.replaces == "order_789"
         assert order.asset_id == "asset_123"
@@ -148,28 +148,28 @@ class TestOrderClassFromDict:
         assert order.legs[0].client_order_id == "client_order_leg_1"
         assert order.legs[0].created_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 0, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].updated_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 1, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].submitted_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 2, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].filled_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 3, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].expired_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 4, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].canceled_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 5, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].failed_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 6, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].replaced_at == pendulum.DateTime(
             2023, 5, 1, 12, 0, 7, tzinfo=pendulum.Timezone("UTC")
-        )
+        ).strftime("%Y-%m-%d %H:%M:%S")
         assert order.legs[0].replaced_by == "leg_2"
         assert order.legs[0].replaces == "leg_3"
         assert order.legs[0].asset_id == "asset_123"

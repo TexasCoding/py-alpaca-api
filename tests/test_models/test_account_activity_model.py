@@ -27,7 +27,9 @@ def test_account_activity_class_from_dict_valid_data():
     expected_activity = AccountActivityModel(
         activity_type="FILL",
         id="12345678",
-        transaction_time=pendulum.parse("2023-04-01T12:00:00Z"),
+        transaction_time=pendulum.parse("2023-04-01T12:00:00Z").strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
         price=100.0,
         qty=10,
         side="buy",
@@ -37,7 +39,7 @@ def test_account_activity_class_from_dict_valid_data():
         type="market",
         cum_qty=10,
         order_status="filled",
-        date=pendulum.parse("2023-04-01T12:00:00Z"),
+        date=pendulum.parse("2023-04-01T12:00:00Z").strftime("%Y-%m-%d %H:%M:%S"),
         net_amount=1000.0,
         per_share_amount=100.0,
     )

@@ -1,4 +1,3 @@
-from datetime import datetime
 from py_alpaca_api.models.clock_model import ClockModel, clock_class_from_dict
 import pendulum
 
@@ -13,9 +12,13 @@ def test_clock_class_from_dict():
     expected_clock = ClockModel(
         market_time=pendulum.DateTime(
             2022, 1, 1, 10, 0, 0, tzinfo=pendulum.Timezone("UTC")
-        ),
+        ).strftime("%Y-%m-%d %H:%M:%S"),
         is_open=True,
-        next_open=datetime(2022, 1, 1, 12, 0, 0, tzinfo=pendulum.Timezone("UTC")),
-        next_close=datetime(2022, 1, 1, 16, 0, 0, tzinfo=pendulum.Timezone("UTC")),
+        next_open=pendulum.DateTime(
+            2022, 1, 1, 12, 0, 0, tzinfo=pendulum.Timezone("UTC")
+        ).strftime("%Y-%m-%d %H:%M:%S"),
+        next_close=pendulum.DateTime(
+            2022, 1, 1, 16, 0, 0, tzinfo=pendulum.Timezone("UTC")
+        ).strftime("%Y-%m-%d %H:%M:%S"),
     )
     assert clock_class_from_dict(data_dict) == expected_clock
