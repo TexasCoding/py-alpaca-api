@@ -16,6 +16,77 @@ class Positions:
         self.headers = headers
         self.account = account
 
+    ########################################################
+    # \\\\\\\\\\\\\\\\ Close All Positions ////////////////#
+    ########################################################
+    def close_all(self, cancel_orders: bool = False) -> str:
+        """
+        Close all positions.
+
+        Args:
+            cancel_orders (bool, optional): Whether to cancel open orders associated with the positions.
+                Defaults to False.
+
+        Returns:
+            str: A message indicating the number of positions that have been closed.
+
+        Raises:
+            Exception: If the request to close positions is not successful, an exception is raised with
+                the error message from the API response.
+        """
+
+        url = f"{self.base_url}/positions"
+        params = {"cancel_orders": cancel_orders}
+
+        response = json.loads(
+            Requests()
+            .request(method="DELETE", url=url, headers=self.headers, params=params)
+            .text
+        )
+        return f"{len(response)} positions have been closed"
+
+    ########################################################
+    # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
+    ########################################################
+    def close(
+        self, symbol_or_id: str, qty: float = None, percentage: int = None
+    ) -> str:
+        """
+        Closes a position for a given symbol or asset ID.
+
+        Args:
+            symbol_or_id (str): The symbol or asset ID of the position to be closed.
+            qty (float, optional): The quantity of the position to be closed. Defaults to None.
+            percentage (int, optional): The percentage of the position to be closed. Defaults to None.
+
+        Returns:
+            str: A message indicating the success or failure of closing the position.
+
+        Raises:
+            ValueError: If neither quantity nor percentage is provided.
+            ValueError: If both quantity and percentage are provided.
+            ValueError: If the percentage is not between 0 and 100.
+            ValueError: If symbol_or_id is not provided.
+            Exception: If the request to close the position fails.
+        """
+
+        if not qty and not percentage:
+            raise ValueError("Quantity or percentage is required.")
+        if qty and percentage:
+            raise ValueError("Quantity or percentage is required, not both.")
+        if percentage and (percentage < 0 or percentage > 100):
+            raise ValueError("Percentage must be between 0 and 100.")
+        if not symbol_or_id:
+            raise ValueError("Symbol or asset_id is required.")
+
+        url = f"{self.base_url}/positions/{symbol_or_id}"
+        params = {"qty": qty, "percentage": percentage}
+        Requests().request(
+            method="DELETE", url=url, headers=self.headers, params=params
+        )
+
+        return f"Position {symbol_or_id} has been closed"
+
     def get(self, symbol: str) -> PositionModel:
         """
         Retrieves the position for the specified symbol.
