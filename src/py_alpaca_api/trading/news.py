@@ -2,7 +2,7 @@ import json
 import logging
 import textwrap
 import time
-from typing import Dict
+from typing import Dict, List
 import pendulum
 from bs4 import BeautifulSoup as bs
 import yfinance as yf
@@ -24,6 +24,15 @@ class News:
 
     @staticmethod
     def strip_html(content: str):
+        """
+        Removes HTML tags and returns the stripped content.
+
+        Args:
+            content (str): The HTML content to be stripped.
+
+        Returns:
+            str: The stripped content without HTML tags.
+        """
         soup = bs(content, "html.parser")
         for data in soup(["style", "script"]):
             data.decompose()
@@ -78,9 +87,19 @@ class News:
             else text
         )
 
-    def get_news(self, symbol: str, limit: int = 5):
-        yahoo_news = self.get_yahoo_news(symbol=symbol, limit=limit)
-        benzinga_news = self.get_benzinga_news(symbol=symbol, limit=limit)
+    def get_news(self, symbol: str, limit: int = 5) -> List[Dict[str, str]]:
+        """
+        Retrieves news articles related to a given symbol.
+
+        Args:
+            symbol (str): The symbol for which to retrieve news articles.
+            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 5.
+
+        Returns:
+            list: A list of news articles, sorted by publish date in descending order.
+        """
+        yahoo_news = self._get_yahoo_news(symbol=symbol, limit=limit)
+        benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
 
         news = yahoo_news + benzinga_news
 
@@ -90,7 +109,18 @@ class News:
 
         return sorted_news[:limit]
 
-    def get_yahoo_news(self, symbol: str, limit: int = 5):
+    def _get_yahoo_news(self, symbol: str, limit: int = 5) -> List[Dict[str, str]]:
+        """
+        Retrieves the latest news articles related to a given symbol from Yahoo Finance.
+
+        Args:
+            symbol (str): The symbol for which to retrieve news articles.
+            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 5.
+
+        Returns:
+            list: A list of dictionaries containing the news article details, including title, URL, source, content,
+                  publish date, and symbol.
+        """
         ticker = yf.Ticker(symbol)
         news_response = ticker.news
 
@@ -117,7 +147,7 @@ class News:
 
         return yahoo_news
 
-    def get_benzinga_news(
+    def _get_benzinga_news(
         self,
         symbol: str,
         start_date: str = START_DATE,
@@ -125,7 +155,7 @@ class News:
         include_content: bool = True,
         exclude_contentless: bool = True,
         limit: int = 10,
-    ):
+    ) -> List[Dict[str, str]]:
         """
         Retrieves Benzinga news articles for a given symbol and date range.
 
