@@ -1,5 +1,6 @@
 from typing import Dict
 from py_alpaca_api.trading.market import Market
+from py_alpaca_api.trading.news import News
 from py_alpaca_api.trading.positions import Positions
 
 # from py_alpaca_api.trading.stock import Stock
@@ -29,3 +30,4 @@ class Trading:
         )
         self.orders = Orders(headers=headers, base_url=base_url)
         self.watchlists = Watchlist(headers=headers, base_url=base_url)
+        self.news = News(headers=headers)

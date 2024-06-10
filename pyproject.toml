@@ -16,6 +16,8 @@ pendulum = "^3.0.0"
 pandas = "^2.2.2"
 tqdm = "^4.66.4"
 prophet = "^1.1.5"
+beautifulsoup4 = "^4.12.3"
+yfinance = "^0.2.40"
 
 
 [tool.poetry.group.dev.dependencies]
