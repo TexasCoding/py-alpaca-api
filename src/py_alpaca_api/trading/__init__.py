@@ -6,6 +6,7 @@ from py_alpaca_api.trading.positions import Positions
 # from py_alpaca_api.trading.stock import Stock
 from py_alpaca_api.trading.account import Account
 from py_alpaca_api.trading.orders import Orders
+from py_alpaca_api.trading.recommendations import Recommendations
 from py_alpaca_api.trading.watchlists import Watchlist
 
 
@@ -31,3 +32,4 @@ class Trading:
         self.orders = Orders(headers=headers, base_url=base_url)
         self.watchlists = Watchlist(headers=headers, base_url=base_url)
         self.news = News(headers=headers)
+        self.recommendations = Recommendations()

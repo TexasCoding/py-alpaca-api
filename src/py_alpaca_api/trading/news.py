@@ -49,7 +49,7 @@ class News:
         Returns:
             str: The text content of the article, or None if the article body is not found.
         """
-        time.sleep(1)
+        time.sleep(1)  # Sleep for 1 second to avoid rate limiting
         headers = {
             "accept": "*/*",
             "accept-encoding": "gzip, deflate, br",
