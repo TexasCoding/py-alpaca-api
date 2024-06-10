@@ -176,6 +176,8 @@ class Positions:
             positions_df = pd.concat(
                 [self.cash_position_df(), positions_df], ignore_index=True
             )
+        else:
+            positions_df = self.cash_position_df()
 
         positions_df = self.modify_position_df(positions_df)
 
