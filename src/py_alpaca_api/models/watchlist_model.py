@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.models.model_utils import KEY_PROCESSORS, extract_class_data
@@ -13,7 +13,7 @@ class WatchlistModel:
     created_at: datetime
     updated_at: datetime
     name: str
-    assets: List[object]
+    assets: List[Union[object | AssetModel]]
 
 
 ############################################

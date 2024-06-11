@@ -21,7 +21,7 @@ class Requests:
         method: str,
         url: str,
         headers: Optional[Dict[str, str]] = None,
-        params: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, str] | Dict[str, bool] | Dict[str, float]] = None,
         json: Optional[Dict[str, str]] = None,
     ):
         """

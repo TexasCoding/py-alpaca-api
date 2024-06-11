@@ -105,13 +105,18 @@ class Predictor:
         future_periods: int = 14,
     ) -> list:
         """
-        Retrieves a list of future gainers by predicting stock prices using Prophet.
+        Predicts future gainers based on the previous day's losers using Prophet forecasting.
 
         Args:
-            losers_to_scan (int): The number of previous day losers to scan. Defaults to 200.
+            gain_ratio: The minimum gain ratio required for a stock to be considered a future gainer.
+            losers_to_scan: The number of previous day's losers to scan.
+            future_periods: The number of future periods to forecast.
 
         Returns:
-            list: A list of symbols representing the future gainers.
+            A list of future gainers.
+
+        Raises:
+            Exception: If there is an error while predicting future gainers for a stock.
         """
         previous_day_losers = self.screener.losers(total_losers_returned=losers_to_scan)
         losers_list = previous_day_losers["symbol"].tolist()

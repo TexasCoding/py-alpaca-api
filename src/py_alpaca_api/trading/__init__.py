@@ -13,6 +13,7 @@ from py_alpaca_api.trading.watchlists import Watchlist
 class Trading:
     def __init__(self, api_key: str, api_secret: str, api_paper: bool) -> None:
         headers = {
+            "accept": "application/json",
             "APCA-API-KEY-ID": api_key,
             "APCA-API-SECRET-KEY": api_secret,
         }
