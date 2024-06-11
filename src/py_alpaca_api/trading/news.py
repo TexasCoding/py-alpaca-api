@@ -173,7 +173,7 @@ class News:
                 - "url": The URL of the news article.
                 - "source": The source of the news article (in this case, "benzinga").
                 - "content": The content of the news article, or None if there is no content.
-                - "publish_date": The publish date of the news article.
+                - "publish_date": The publishing date of the news article.
                 - "symbol": The symbol associated with the news article.
         """
         url = f"{self.news_url}"
