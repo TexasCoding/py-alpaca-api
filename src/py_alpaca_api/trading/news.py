@@ -143,7 +143,7 @@ class News:
                 )
             except Exception as e:
                 logging.error(f"Error scraping article: {e}")
-                pass
+                continue
 
         return yahoo_news
 

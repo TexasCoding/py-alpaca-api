@@ -11,6 +11,7 @@ class Stock:
         self, api_key: str, api_secret: str, api_paper: bool, market: Market
     ) -> None:
         headers = {
+            "accept": "application/json",
             "APCA-API-KEY-ID": api_key,
             "APCA-API-SECRET-KEY": api_secret,
         }
