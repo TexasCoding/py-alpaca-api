@@ -5,9 +5,13 @@ from typing import Dict
 import pandas as pd
 import pendulum
 
+from rich.console import Console
+
 from py_alpaca_api.http.requests import Requests
 from py_alpaca_api.trading.market import Market
 from py_alpaca_api.stock.assets import Assets
+
+console = Console()
 
 
 class Screener:
@@ -111,14 +115,15 @@ class Screener:
         Returns:
             pd.DataFrame: A filtered DataFrame containing stocks that meet the specified conditions for losers.
         """
-        return self.filter_stocks(
-            price_greater_than,
-            lambda df: df["change"] < change_less_than,
-            volume_greater_than,
-            trade_count_greater_than,
-            total_losers_returned,
-            ascending_order=True,
-        )
+        with console.status("[bold green]Getting previous day's losers..."):
+            return self.filter_stocks(
+                price_greater_than,
+                lambda df: df["change"] < change_less_than,
+                volume_greater_than,
+                trade_count_greater_than,
+                total_losers_returned,
+                ascending_order=True,
+            )
 
     ##################################################
     # //////////////// Get Gainers \\\\\\\\\\\\\\\\\ #
@@ -148,14 +153,15 @@ class Screener:
             pd.DataFrame: A Pandas DataFrame containing the stocks that satisfy the criteria for being gainers.
 
         """
-        return self.filter_stocks(
-            price_greater_than,
-            lambda df: df["change"] > change_greater_than,
-            volume_greater_than,
-            trade_count_greater_than,
-            total_gainers_returned,
-            ascending_order=False,
-        )
+        with console.status("[bold green]Getting previous day's biggest gainers..."):
+            return self.filter_stocks(
+                price_greater_than,
+                lambda df: df["change"] > change_greater_than,
+                volume_greater_than,
+                trade_count_greater_than,
+                total_gainers_returned,
+                ascending_order=False,
+            )
 
     ##################################################
     # /////////// Calculate Percentages \\\\\\\\\\\\ #
