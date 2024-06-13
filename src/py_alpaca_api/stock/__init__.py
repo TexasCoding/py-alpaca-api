@@ -1,4 +1,5 @@
 from typing import Dict
+from py_alpaca_api.stock.latest_quote import LatestQuote
 from py_alpaca_api.stock.predictor import Predictor
 from py_alpaca_api.trading.market import Market
 from py_alpaca_api.stock.assets import Assets
@@ -45,3 +46,4 @@ class Stock:
             data_url=data_url, headers=headers, market=market, asset=self.assets
         )
         self.predictor = Predictor(history=self.history, screener=self.screener)
+        self.quotes = LatestQuote(headers=headers)
