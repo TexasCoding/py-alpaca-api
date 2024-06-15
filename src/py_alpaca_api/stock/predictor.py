@@ -3,34 +3,9 @@ import logging
 import pandas as pd
 import pendulum
 from prophet import Prophet
-# from tqdm import tqdm
 
 from py_alpaca_api.stock.history import History
 from py_alpaca_api.stock.screener import Screener
-
-from rich.console import Console
-
-from rich.progress import (
-    BarColumn,
-    MofNCompleteColumn,
-    Progress,
-    TextColumn,
-    TimeElapsedColumn,
-    TimeRemainingColumn,
-)
-
-# Define custom progress bar
-progress_bar = Progress(
-    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-    BarColumn(),
-    MofNCompleteColumn(),
-    TextColumn("•"),
-    TimeElapsedColumn(),
-    TextColumn("•"),
-    TimeRemainingColumn(),
-)
-
-console = Console()
 
 yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
 four_years_ago = pendulum.now().subtract(years=2).format("YYYY-MM-DD")
@@ -147,37 +122,23 @@ class Predictor:
 
         future_gainers = []
 
-        with progress_bar as progress:
-            # for i, ticker in tqdm(
-            #     enumerate(losers_list),
-            #     desc=f"• Predicting {len(losers_list)} future gainers with Prophet: ",
-            # ):
-            console.print(
-                f"Getting predictions for [bold]{len(losers_list)}[/bold] future gainers with Prophet: ",
-                style="green",
-            )
-            for i, ticker in progress.track(
-                enumerate(losers_list), total=len(losers_list)
-            ):
-                try:
-                    symbol_data = self.get_stock_data(ticker)
-                    symbol_model = self.train_prophet_model(symbol_data)
-                    symbol_forecast = self.generate_forecast(
-                        symbol_model, future_periods=future_periods
-                    )
-                    previous_price = previous_day_losers[
-                        previous_day_losers["symbol"] == ticker
-                    ].iloc[0]["price"]
-                    gain_prediction = round(
-                        ((symbol_forecast - previous_price) / previous_price) * 100, 2
-                    )
-                    if gain_prediction >= gain_ratio:
-                        future_gainers.append(ticker)
-                except Exception as e:
-                    logger.error(f"Error predicting {ticker}: {e}")
-                    continue
-        console.print(
-            f"Predicted [bold]{len(future_gainers)}[/bold] future gainers.",
-            style="yellow",
-        )
+        for i, ticker in enumerate(losers_list):
+            try:
+                symbol_data = self.get_stock_data(ticker)
+                symbol_model = self.train_prophet_model(symbol_data)
+                symbol_forecast = self.generate_forecast(
+                    symbol_model, future_periods=future_periods
+                )
+                previous_price = previous_day_losers[
+                    previous_day_losers["symbol"] == ticker
+                ].iloc[0]["price"]
+                gain_prediction = round(
+                    ((symbol_forecast - previous_price) / previous_price) * 100, 2
+                )
+                if gain_prediction >= gain_ratio:
+                    future_gainers.append(ticker)
+            except Exception as e:
+                logger.error(f"Error predicting {ticker}: {e}")
+                continue
+        print(f"Predicted [bold]{len(future_gainers)}[/bold] future gainers.")
         return future_gainers

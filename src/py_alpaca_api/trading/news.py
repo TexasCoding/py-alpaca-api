@@ -8,10 +8,6 @@ from bs4 import BeautifulSoup as bs
 import yfinance as yf
 from py_alpaca_api.http.requests import Requests
 
-from rich.console import Console
-
-console = Console()
-
 logger = logging.getLogger("yfinance")
 logger.disabled = True
 logger.propagate = False
@@ -102,10 +98,8 @@ class News:
         Returns:
             list: A list of news articles, sorted by publish date in descending order.
         """
-        with console.status("[bold green]Getting latest news from Yahoo Finance..."):
-            yahoo_news = self._get_yahoo_news(symbol=symbol, limit=limit)
-        with console.status("[bold red]Getting latest news from Benzinga..."):
-            benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
+        yahoo_news = self._get_yahoo_news(symbol=symbol, limit=limit)
+        benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
 
         news = yahoo_news + benzinga_news
 
