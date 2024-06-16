@@ -105,3 +105,62 @@ def test_handle_invalid_stock_symbols_gracefully(mocker):
     mock_history.get_stock_data.assert_called_once_with(
         symbol="INVALID", start="2020-01-01", end="2020-01-05", timeframe="1d"
     )
+
+
+class TestGetLosersToGainers:
+    def test_get_losers_to_gainers_with_no_losers(self, mocker):
+        mock_screener = mocker.Mock()
+        mock_history = mocker.Mock()
+        mock_screener.losers.return_value = pd.DataFrame(columns=["symbol", "price"])
+        predictor = Predictor(history=mock_history, screener=mock_screener)
+        result = predictor.get_losers_to_gainers()
+        assert result == []
+
+    def test_get_losers_to_gainers_with_all_gainers(self, mocker):
+        mock_screener = mocker.Mock()
+        mock_history = mocker.Mock()
+        mock_screener.losers.return_value = pd.DataFrame(
+            {"symbol": ["AAPL", "MSFT"], "price": [150, 250]}
+        )
+        mock_history.get_stock_data.return_value = pd.DataFrame(
+            {"ds": pd.date_range(start="2020-01-01", periods=100), "y": range(100, 200)}
+        )
+        predictor = Predictor(history=mock_history, screener=mock_screener)
+        mock_model = mocker.Mock()
+        mocker.patch.object(Predictor, "train_prophet_model", return_value=mock_model)
+        mocker.patch.object(Predictor, "generate_forecast", side_effect=[300, 400])
+        result = predictor.get_losers_to_gainers()
+        assert result == ["AAPL", "MSFT"]
+
+    def test_get_losers_to_gainers_with_mixed_gainers_and_losers(self, mocker):
+        mock_screener = mocker.Mock()
+        mock_history = mocker.Mock()
+        mock_screener.losers.return_value = pd.DataFrame(
+            {"symbol": ["AAPL", "MSFT", "GOOG"], "price": [150, 250, 350]}
+        )
+        mock_history.get_stock_data.side_effect = [
+            pd.DataFrame(
+                {
+                    "ds": pd.date_range(start="2020-01-01", periods=100),
+                    "y": range(100, 200),
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "ds": pd.date_range(start="2020-01-01", periods=100),
+                    "y": range(200, 100, -1),
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "ds": pd.date_range(start="2020-01-01", periods=100),
+                    "y": range(100, 200),
+                }
+            ),
+        ]
+        predictor = Predictor(history=mock_history, screener=mock_screener)
+        mock_model = mocker.Mock()
+        mocker.patch.object(Predictor, "train_prophet_model", return_value=mock_model)
+        mocker.patch.object(Predictor, "generate_forecast", side_effect=[300, 200, 400])
+        result = predictor.get_losers_to_gainers()
+        assert result == ["AAPL", "GOOG"]

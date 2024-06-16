@@ -47,12 +47,15 @@ class Assets:
         excluded_exchanges: List[str] = ["OTC"],
     ) -> pd.DataFrame:
         """
-        Retrieves a DataFrame of all active, fractionable, and tradable US equity assets, excluding those from the OTC exchange.
+        Retrieves a DataFrame of all active, fractionable, and tradable US equity assets, excluding those from the
+        OTC exchange.
 
         Args:
             status (str, optional): The status of the assets to retrieve. Defaults to "active".
-            exchange (str, optional): The exchange to filter the assets by. Defaults to an empty string, which retrieves assets from all exchanges.
-            excluded_exchanges (List[str], optional): A list of exchanges to exclude from the results. Defaults to ["OTC"].
+            exchange (str, optional): The exchange to filter the assets by. Defaults to an empty string,
+            which retrieves assets from all exchanges.
+            excluded_exchanges (List[str], optional): A list of exchanges to exclude from the results.
+            Defaults to ["OTC"].
 
         Returns:
             pd.DataFrame: A DataFrame containing the retrieved assets.
@@ -68,9 +71,26 @@ class Assets:
 
         assets_df = assets_df[
             (assets_df["status"] == "active")
-            & (assets_df["fractionable"])
-            & (assets_df["tradable"])
-            & (~assets_df["exchange"].isin(excluded_exchanges))
-        ]
-        assets_df.reset_index(drop=True, inplace=True)
+            & assets_df["fractionable"]
+            & assets_df["tradable"]
+            & ~assets_df["exchange"].isin(excluded_exchanges)
+        ].reset_index(drop=True)
+
+        assets_df = assets_df.astype(
+            {
+                "id": "string",
+                "class": "string",
+                "exchange": "string",
+                "symbol": "string",
+                "name": "string",
+                "status": "string",
+                "tradable": "bool",
+                "marginable": "bool",
+                "shortable": "bool",
+                "easy_to_borrow": "bool",
+                "fractionable": "bool",
+                "maintenance_margin_requirement": "float",
+            }
+        )
+
         return assets_df

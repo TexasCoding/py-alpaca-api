@@ -1,9 +1,16 @@
 import json
+import os
 from unittest.mock import Mock, patch
+import pandas as pd
 import pytest
+from py_alpaca_api import PyAlpacaAPI
 from py_alpaca_api.stock.assets import Assets
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.http.requests import Requests
+
+
+api_key = os.environ.get("ALPACA_API_KEY")
+api_secret = os.environ.get("ALPACA_SECRET_KEY")
 
 
 @pytest.fixture
@@ -11,6 +18,48 @@ def assets_obj():
     return Assets(
         base_url="https://example.com", headers={"Authorization": "Bearer token"}
     )
+
+
+@pytest.fixture
+def alpaca():
+    return PyAlpacaAPI(api_key=api_key, api_secret=api_secret, api_paper=True)
+
+
+def test_get_asset_invalid_symbol(alpaca):
+    with pytest.raises(Exception):
+        alpaca.stock.assets.get("INVALID")
+
+
+def test_get_all_assets_successful(alpaca):
+    assets = alpaca.stock.assets.get_all()
+    assert isinstance(assets, pd.DataFrame)
+    assert len(assets) > 0
+    assert isinstance(assets.iloc[0].id, str)
+    assert isinstance(assets.iloc[0].exchange, str)
+    assert isinstance(assets.iloc[0].symbol, str)
+    assert isinstance(assets.iloc[0].status, str)
+    assert assets.dtypes.tradable == "bool"
+    assert assets.dtypes.easy_to_borrow == "bool"
+    assert assets.dtypes.fractionable == "bool"
+    assert assets.dtypes.marginable == "bool"
+    assert assets.dtypes.shortable == "bool"
+
+
+def test_get_asset_attributes(alpaca):
+    asset = alpaca.stock.assets.get("AAPL")
+    assert asset.symbol == "AAPL"
+    assert isinstance(asset, AssetModel)
+    assert isinstance(asset.id, str)
+    assert isinstance(asset.easy_to_borrow, bool)
+    assert isinstance(asset.exchange, str)
+    assert isinstance(asset.fractionable, bool)
+    assert isinstance(asset.maintenance_margin_requirement, float)
+    assert isinstance(asset.marginable, bool)
+    assert isinstance(asset.name, str)
+    assert isinstance(asset.shortable, bool)
+    assert isinstance(asset.status, str)
+    assert isinstance(asset.symbol, str)
+    assert isinstance(asset.tradable, bool)
 
 
 def test_get_asset_successful(assets_obj):
