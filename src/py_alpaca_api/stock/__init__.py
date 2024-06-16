@@ -46,4 +46,4 @@ class Stock:
             data_url=data_url, headers=headers, market=market, asset=self.assets
         )
         self.predictor = Predictor(history=self.history, screener=self.screener)
-        self.quotes = LatestQuote(headers=headers)
+        self.latest_quote = LatestQuote(headers=headers)
