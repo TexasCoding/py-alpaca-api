@@ -12,11 +12,12 @@ from py_alpaca_api.stock.assets import Assets
 class History:
     def __init__(self, data_url: str, headers: Dict[str, str], asset: Assets) -> None:
         """
+        Initializes an instance of the History class.
+
         Args:
             data_url: A string representing the URL of the data.
             headers: A dictionary containing the headers to be included in the request.
             asset: An instance of the Asset class representing the asset.
-
         """
         self.data_url = data_url
         self.headers = headers
@@ -26,9 +27,10 @@ class History:
     # /////// Check if Asset is Stock \\\\\\\ #
     ###########################################
     def check_if_stock(self, symbol: str) -> AssetModel:
-        """Check if asset is stock
+        """Check if the asset corresponding to the symbol is a stock.
+
         Args:
-            symbol: The symbol of the asset to be checked.
+            symbol (str): The symbol of the asset to be checked.
 
         Returns:
             AssetModel: The asset information for the given symbol.
@@ -36,13 +38,14 @@ class History:
         Raises:
             ValueError: If there is an error getting the asset information or if the asset is not a stock.
         """
-
         try:
             asset = self.asset.get(symbol)
         except Exception as e:
-            raise ValueError(e)
+            raise ValueError(str(e))
+
         if asset.asset_class != "us_equity":
             raise ValueError(f"{symbol} is not a stock.")
+
         return asset
 
     ###########################################
@@ -61,12 +64,13 @@ class History:
         adjustment: str = "raw",
     ) -> pd.DataFrame:
         """
+        Retrieves historical stock data for a given symbol within a specified date range and timeframe.
+
         Args:
             symbol: The stock symbol to fetch data for.
             start: The start date for historical data in the format "YYYY-MM-DD".
             end: The end date for historical data in the format "YYYY-MM-DD".
             timeframe: The timeframe for the historical data. Default is "1d".
-            Possible values are "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1M".
             feed: The data feed source. Default is "sip".
             currency: The currency for historical data. Default is "USD".
             limit: The number of data points to fetch. Default is 1000.
@@ -100,17 +104,15 @@ class History:
                 'Invalid timeframe. Must be "1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", or "1M"'
             )
 
-        params = {
-            "timeframe": timeframe_mapping[
-                timeframe
-            ],  # Timeframe for historical data, default: 1d
-            "start": start,  # Start date for historical data
-            "end": end,  # End date for historical data
-            "currency": currency,  # Currency for historical data, default: USD
-            "limit": limit,  # Limit number of data points, default: 1000
-            "adjustment": adjustment,  # Adjustment for historical data, default: raw
-            "feed": feed,  # Data feed source, default: iex
-            "sort": sort,  # Sort order, default: asc
+        params: dict = {
+            "timeframe": timeframe_mapping[timeframe],
+            "start": start,
+            "end": end,
+            "currency": currency,
+            "limit": limit,
+            "adjustment": adjustment,
+            "feed": feed,
+            "sort": sort,
         }
         symbol_data = self.get_historical_data(symbol, url, params)
         bar_data_df = self.preprocess_data(symbol_data, symbol)

@@ -94,7 +94,6 @@ class Predictor:
             .iloc[0]
             .yhat
         )
-
         return round(two_week_forecast, 2)
 
     def get_losers_to_gainers(
@@ -103,42 +102,36 @@ class Predictor:
         losers_to_scan: int = 200,
         future_periods: int = 5,
     ) -> list:
-        """
-        Predicts future gainers based on the previous day's losers using Prophet forecasting.
-
-        Args:
-            gain_ratio: The minimum gain ratio required for a stock to be considered a future gainer.
-            losers_to_scan: The number of previous day's losers to scan.
-            future_periods: The number of future periods to forecast.
-
-        Returns:
-            A list of future gainers.
-
-        Raises:
-            Exception: If there is an error while predicting future gainers for a stock.
-        """
         previous_day_losers = self.screener.losers(total_losers_returned=losers_to_scan)
         losers_list = previous_day_losers["symbol"].tolist()
-
         future_gainers = []
-
-        for i, ticker in enumerate(losers_list):
-            try:
-                symbol_data = self.get_stock_data(ticker)
-                symbol_model = self.train_prophet_model(symbol_data)
-                symbol_forecast = self.generate_forecast(
-                    symbol_model, future_periods=future_periods
-                )
-                previous_price = previous_day_losers[
-                    previous_day_losers["symbol"] == ticker
-                ].iloc[0]["price"]
-                gain_prediction = round(
-                    ((symbol_forecast - previous_price) / previous_price) * 100, 2
-                )
-                if gain_prediction >= gain_ratio:
-                    future_gainers.append(ticker)
-            except Exception as e:
-                logger.error(f"Error predicting {ticker}: {e}")
-                continue
+        for _, ticker in enumerate(losers_list):
+            is_gainer, gainer = self._handle_ticker(
+                ticker, gain_ratio, future_periods, previous_day_losers
+            )
+            if is_gainer:
+                future_gainers.append(gainer)
         print(f"Predicted [bold]{len(future_gainers)}[/bold] future gainers.")
         return future_gainers
+
+    @staticmethod
+    def _get_gain_prediction(symbol_forecast, previous_price):
+        return round(((symbol_forecast - previous_price) / previous_price) * 100, 2)
+
+    def _handle_ticker(self, ticker, gain_ratio, future_periods, previous_day_losers):
+        try:
+            symbol_data = self.get_stock_data(ticker)
+            symbol_model = self.train_prophet_model(symbol_data)
+            symbol_forecast = self.generate_forecast(
+                symbol_model, future_periods=future_periods
+            )
+            previous_price = previous_day_losers[
+                previous_day_losers["symbol"] == ticker
+            ].iloc[0]["price"]
+            gain_prediction = self._get_gain_prediction(symbol_forecast, previous_price)
+            if gain_prediction >= gain_ratio:
+                return True, ticker
+        except Exception as e:
+            logger.error(f"Error predicting {ticker}: {e}")
+
+        return False, None
