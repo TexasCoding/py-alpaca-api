@@ -74,6 +74,23 @@ class Assets:
             & assets_df["fractionable"]
             & assets_df["tradable"]
             & ~assets_df["exchange"].isin(excluded_exchanges)
-        ].reset_index(drop=True, inplace=True)
+        ].reset_index(drop=True)
+
+        assets_df = assets_df.astype(
+            {
+                "id": "string",
+                "class": "string",
+                "exchange": "string",
+                "symbol": "string",
+                "name": "string",
+                "status": "string",
+                "tradable": "bool",
+                "marginable": "bool",
+                "shortable": "bool",
+                "easy_to_borrow": "bool",
+                "fractionable": "bool",
+                "maintenance_margin_requirement": "float",
+            }
+        )
 
         return assets_df

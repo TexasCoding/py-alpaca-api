@@ -8,6 +8,26 @@ from bs4 import BeautifulSoup as bs
 import yfinance as yf
 from py_alpaca_api.http.requests import Requests
 
+
+from requests import Session
+from requests_cache import CacheMixin, SQLiteCache
+from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
+from pyrate_limiter import Duration, RequestRate, Limiter
+
+
+class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
+    pass
+
+
+session = CachedLimiterSession(
+    limiter=Limiter(
+        RequestRate(2, Duration.SECOND * 5)
+    ),  # max 2 requests per 5 seconds
+    bucket_class=MemoryQueueBucket,
+    backend=SQLiteCache("yfinance.cache"),
+)
+
+
 logger = logging.getLogger("yfinance")
 logger.disabled = True
 logger.propagate = False
@@ -98,10 +118,20 @@ class News:
         Returns:
             list: A list of news articles, sorted by publish date in descending order.
         """
-        yahoo_news = self._get_yahoo_news(symbol=symbol, limit=limit)
         benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
+        yahoo_news = self._get_yahoo_news(
+            symbol=symbol, limit=(limit - len(benzinga_news[:3]))
+        )
 
-        news = yahoo_news + benzinga_news
+        news = benzinga_news[:3] + yahoo_news[: (limit - len(benzinga_news[:3]))]
+
+        # if len(benzinga_news) == 0:
+        #     news = yahoo_news
+        # else:
+        #     news = benzinga_news[:3]
+        #     news.append(yahoo_news[:(limit - len(benzinga_news))])
+
+        # news = yahoo_news + benzinga_news
 
         sorted_news = sorted(
             news, key=lambda x: pendulum.parse(x["publish_date"]), reverse=True
@@ -109,7 +139,7 @@ class News:
 
         return sorted_news[:limit]
 
-    def _get_yahoo_news(self, symbol: str, limit: int = 5) -> List[Dict[str, str]]:
+    def _get_yahoo_news(self, symbol: str, limit: int = 6) -> List[Dict[str, str]]:
         """
         Retrieves the latest news articles related to a given symbol from Yahoo Finance.
 
@@ -121,7 +151,7 @@ class News:
             list: A list of dictionaries containing the news article details, including title, URL, source, content,
                   publish date, and symbol.
         """
-        ticker = yf.Ticker(symbol)
+        ticker = yf.Ticker(symbol, session=session)
         news_response = ticker.news
 
         yahoo_news = []

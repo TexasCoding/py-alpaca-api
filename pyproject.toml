@@ -16,8 +16,10 @@ pendulum = "^3.0.0"
 pandas = "^2.2.2"
 prophet = "^1.1.5"
 beautifulsoup4 = "^4.12.3"
-yfinance = "^0.2.40"
 numpy = "^1.26.0"
+yfinance = {extras = ["optional"], version = "^0.2.40"}
+requests-cache = "^1.2.0"
+requests-ratelimiter = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
