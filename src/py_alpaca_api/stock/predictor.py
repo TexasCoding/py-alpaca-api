@@ -111,7 +111,7 @@ class Predictor:
             )
             if is_gainer:
                 future_gainers.append(gainer)
-        print(f"Predicted [bold]{len(future_gainers)}[/bold] future gainers.")
+        print(f"Predicted {len(future_gainers)} future gainers.")
         return future_gainers
 
     @staticmethod
