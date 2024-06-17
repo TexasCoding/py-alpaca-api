@@ -2,6 +2,7 @@ import json
 import logging
 import textwrap
 import time
+import math
 from typing import Dict, List
 import pendulum
 from bs4 import BeautifulSoup as bs
@@ -120,18 +121,10 @@ class News:
         """
         benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
         yahoo_news = self._get_yahoo_news(
-            symbol=symbol, limit=(limit - len(benzinga_news[:3]))
+            symbol=symbol, limit=(limit - len(benzinga_news[: (math.floor(limit / 2))]))
         )
 
-        news = benzinga_news[:3] + yahoo_news[: (limit - len(benzinga_news[:3]))]
-
-        # if len(benzinga_news) == 0:
-        #     news = yahoo_news
-        # else:
-        #     news = benzinga_news[:3]
-        #     news.append(yahoo_news[:(limit - len(benzinga_news))])
-
-        # news = yahoo_news + benzinga_news
+        news = benzinga_news[: (math.floor(limit / 2))] + yahoo_news
 
         sorted_news = sorted(
             news, key=lambda x: pendulum.parse(x["publish_date"]), reverse=True
@@ -155,10 +148,13 @@ class News:
         news_response = ticker.news
 
         yahoo_news = []
-        for news in news_response[:limit]:
+        news_count = 0
+        for news in news_response:
             try:
                 content = self.strip_html(self.scrape_article(news["link"]))
-
+                if not content:
+                    continue
+                news_count += 1
                 yahoo_news.append(
                     {
                         "title": news["title"],
@@ -174,6 +170,10 @@ class News:
             except Exception as e:
                 logging.error(f"Error scraping article: {e}")
                 continue
+            else:
+                if news_count == limit:
+                    news_count = 0
+                    break
 
         return yahoo_news
 

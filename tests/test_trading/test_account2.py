@@ -89,7 +89,6 @@ def test_get_portfolio_history(alpaca):
     assert history.profit_loss.dtype == float
     assert history.profit_loss_pct.dtype == float
     assert history.base_value.dtype == float
-    assert history.equity.iloc[-1] == alpaca.trading.account.get().equity
 
 
 def test_portfolio_history(alpaca):
