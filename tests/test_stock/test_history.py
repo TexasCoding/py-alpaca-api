@@ -21,7 +21,7 @@ class TestGetStockData:
     def test_limit_exceeded(self, stock_client):
         with pytest.raises(
             Exception,
-            match='Request Error: {"message":"limit is larger than the allowed maximum of 10000"}',
+            match='Request Error: {"message":"invalid limit: larger than the allowed maximum of 10000"}',
         ):
             stock_client.get_stock_data(
                 "AAPL", "2022-01-01", "2022-01-31", limit=100000

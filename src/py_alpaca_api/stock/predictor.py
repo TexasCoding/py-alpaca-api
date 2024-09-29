@@ -2,10 +2,12 @@ import logging
 
 import pandas as pd
 import pendulum
-from prophet import Prophet
+import numpy as np
+np.float_ = np.float64 
+from prophet import Prophet  # noqa: E402
 
-from py_alpaca_api.stock.history import History
-from py_alpaca_api.stock.screener import Screener
+from py_alpaca_api.stock.history import History  # noqa: E402
+from py_alpaca_api.stock.screener import Screener  # noqa: E402
 
 yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
 four_years_ago = pendulum.now().subtract(years=2).format("YYYY-MM-DD")
