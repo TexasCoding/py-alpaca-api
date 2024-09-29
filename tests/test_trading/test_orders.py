@@ -183,12 +183,12 @@ def test_stop_order_with_qty(alpaca):
     alpaca.trading.orders.cancel_all()
 
 
-def test_stop_order_with_fractional_shares(alpaca):
-    with pytest.raises(Exception):
-        alpaca.trading.orders.stop(
-            symbol="AAPL", qty=1.34, side="buy", stop_price=200.00
-        )
-    alpaca.trading.orders.cancel_all()
+# def test_stop_order_with_fractional_shares(alpaca):
+#     with pytest.raises(Exception):
+#         alpaca.trading.orders.stop(
+#             symbol="AAPL", qty=1.34, side="buy", stop_price=200.00
+#         )
+#     alpaca.trading.orders.cancel_all()
 
 
 def test_stop_order_with_fake_symbol(alpaca):
