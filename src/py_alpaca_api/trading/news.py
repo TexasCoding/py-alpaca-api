@@ -10,23 +10,7 @@ import yfinance as yf
 from py_alpaca_api.http.requests import Requests
 
 
-from requests import Session
-from requests_cache import CacheMixin, SQLiteCache
-from requests_ratelimiter import LimiterMixin, MemoryQueueBucket
-from pyrate_limiter import Duration, RequestRate, Limiter
 
-
-class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
-    pass
-
-
-session = CachedLimiterSession(
-    limiter=Limiter(
-        RequestRate(2, Duration.SECOND * 5)
-    ),  # max 2 requests per 5 seconds
-    bucket_class=MemoryQueueBucket,
-    backend=SQLiteCache("yfinance.cache"),
-)
 
 
 logger = logging.getLogger("yfinance")
@@ -110,18 +94,22 @@ class News:
 
     def get_news(self, symbol: str, limit: int = 6) -> List[Dict[str, str]]:
         """
-        Retrieves news articles related to a given symbol.
+        Retrieves news articles related to a given symbol from Benzinga and Yahoo Finance.
+
+        Note: Yahoo Finance has implemented anti-scraping measures that prevent fetching 
+        full article content. Yahoo news will include title, URL, publish date, and 
+        summary/description when available, but not full article text.
 
         Args:
             symbol (str): The symbol for which to retrieve news articles.
-            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 5.
+            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 6.
 
         Returns:
             list: A list of news articles, sorted by publish date in descending order.
         """
         benzinga_news = self._get_benzinga_news(symbol=symbol, limit=limit)
         yahoo_news = self._get_yahoo_news(
-            symbol=symbol, limit=(limit - len(benzinga_news[: (math.floor(limit / 2))]))
+            symbol=symbol, limit=(limit - len(benzinga_news[: (math.floor(limit / 2))])), scrape_content=False
         )
 
         news = benzinga_news[: (math.floor(limit / 2))] + yahoo_news
@@ -132,48 +120,69 @@ class News:
 
         return sorted_news[:limit]
 
-    def _get_yahoo_news(self, symbol: str, limit: int = 6) -> List[Dict[str, str]]:
+    def _get_yahoo_news(self, symbol: str, limit: int = 6, scrape_content: bool = False) -> List[Dict[str, str]]:
         """
         Retrieves the latest news articles related to a given symbol from Yahoo Finance.
 
         Args:
             symbol (str): The symbol for which to retrieve news articles.
-            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 5.
+            limit (int, optional): The maximum number of news articles to retrieve. Defaults to 6.
+            scrape_content (bool, optional): Whether to attempt scraping full article content. 
+                                            Defaults to False due to Yahoo's anti-scraping measures.
 
         Returns:
-            list: A list of dictionaries containing the news article details, including title, URL, source, content,
-                  publish date, and symbol.
+            list: A list of dictionaries containing the news article details, including title, URL, source, 
+                  content (if available), publish date, and symbol.
         """
-        ticker = yf.Ticker(symbol, session=session)
+        ticker = yf.Ticker(symbol)
         news_response = ticker.news
 
         yahoo_news = []
         news_count = 0
-        for news in news_response:
+        for news in news_response[:limit]:  # Limit the iteration
             try:
-                content = self.strip_html(self.scrape_article(news["link"]))
+                news_content = news.get('content', {})
+                
+                # Extract the summary/description if available
+                content = None
+                if scrape_content:
+                    # Only attempt scraping if explicitly requested
+                    try:
+                        scraped_article = self.scrape_article(news_content.get("canonicalUrl", {}).get('url', ''))
+                        if scraped_article:
+                            content = self.truncate(self.strip_html(scraped_article), 8000)
+                    except Exception as scrape_error:
+                        logging.debug(f"Could not scrape article content: {scrape_error}")
+                
+                # Use the summary from the API if scraping failed or wasn't attempted
                 if not content:
-                    continue
-                news_count += 1
+                    # Try to get summary from the news data itself
+                    summary = news_content.get('summary', '')
+                    if not summary:
+                        # Some news items have description instead of summary
+                        summary = news.get('summary', '')
+                    content = self.truncate(summary, 8000) if summary else None
+                
                 yahoo_news.append(
                     {
-                        "title": news["title"],
-                        "url": news["link"],
+                        "title": news_content.get("title", news.get("title", "No title")),
+                        "url": news_content.get("canonicalUrl", {}).get('url', news.get("link", "")),
                         "source": "yahoo",
-                        "content": self.truncate(content, 8000) if content else None,
+                        "content": content,
                         "publish_date": pendulum.from_timestamp(
-                            news["providerPublishTime"]
-                        ).to_datetime_string(),
+                            news_content.get("pubDate", news.get("providerPublishTime", 0))
+                        ).to_datetime_string() if news_content.get("pubDate") or news.get("providerPublishTime") else pendulum.now().to_datetime_string(),
                         "symbol": symbol,
                     }
                 )
+                news_count += 1
+                
             except Exception as e:
-                logging.error(f"Error scraping article: {e}")
+                logging.error(f"Error processing Yahoo news item: {e}")
                 continue
-            else:
-                if news_count == limit:
-                    news_count = 0
-                    break
+                
+            if news_count >= limit:
+                break
 
         return yahoo_news
 
