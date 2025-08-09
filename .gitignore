@@ -164,4 +164,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+<<<<<<< HEAD
 test.sh
+=======
+# test.sh
+>>>>>>> e0e18b93a48f51c1ed656a62155be25a128e460c

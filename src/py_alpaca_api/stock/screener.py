@@ -215,21 +215,22 @@ class Screener:
         sceener_df = pd.DataFrame()
         for symbol in symbols_data.items():
             try:
-                sym = symbol[0]
-                last_day = symbol[1][-1]
-                prev_day = symbol[1][-2]
+                if len(symbol[1]) > 1:
+                    sym = symbol[0]
+                    last_day = symbol[1][-1]
+                    prev_day = symbol[1][-2]
 
-                sym_data = {
-                    "symbol": sym,
-                    "change": round(
-                        ((last_day["c"] - prev_day["c"]) / prev_day["c"]) * 100, 2
-                    ),
-                    "price": last_day["c"],
-                    "volume": last_day["v"],
-                    "trades": last_day["n"],
-                }
-                sceener_df = pd.concat([sceener_df, pd.DataFrame([sym_data])])
-            except TypeError or KeyError:
+                    sym_data = {
+                        "symbol": sym,
+                        "change": round(
+                            ((last_day["c"] - prev_day["c"]) / prev_day["c"]) * 100, 2
+                        ),
+                        "price": last_day["c"],
+                        "volume": last_day["v"],
+                        "trades": last_day["n"],
+                    }
+                    sceener_df = pd.concat([sceener_df, pd.DataFrame([sym_data])])
+            except (TypeError, KeyError, IndexError):
                 pass
 
         sceener_df.reset_index(drop=True, inplace=True)
