@@ -1,10 +1,8 @@
 import time
-from typing import Any, Dict, Union
+from typing import Any
+
 import pandas as pd
 import yfinance as yf
-
-
-
 
 
 class Recommendations:
@@ -12,25 +10,31 @@ class Recommendations:
         pass
 
     @staticmethod
-    def get_recommendations(symbol: str) -> Union[Dict[Any, Any], pd.DataFrame]:
-        """
-        Retrieves the latest recommendations for a given stock symbol.
+    def get_recommendations(symbol: str) -> dict[Any, Any] | pd.DataFrame:
+        """Retrieves the latest recommendations for a given stock symbol.
 
         Args:
             symbol (str): The stock symbol for which to retrieve recommendations.
 
         Returns:
-            dict: A dictionary containing the latest recommendations for the stock symbol.
+            Union[dict, pd.DataFrame]: A dictionary or DataFrame containing the latest recommendations for the stock symbol.
         """
         time.sleep(1)  # To avoid hitting the API rate limit
         ticker = yf.Ticker(symbol)
         recommendations = ticker.recommendations
 
-        return recommendations.head(2)
+        # Handle the case where recommendations could be None or empty
+        if recommendations is None or not isinstance(recommendations, pd.DataFrame):
+            return {}
+
+        # Ensure we return a DataFrame, not a Series
+        result = recommendations.head(2)
+        if isinstance(result, pd.Series):
+            return result.to_frame()
+        return result
 
     def get_sentiment(self, symbol: str) -> str:
-        """
-        Retrieves the sentiment for a given stock symbol based on the latest recommendations.
+        """Retrieves the sentiment for a given stock symbol based on the latest recommendations.
 
         Args:
             symbol (str): The stock symbol for which to retrieve the sentiment.
@@ -38,10 +42,16 @@ class Recommendations:
         Returns:
             str: The sentiment for the stock symbol, either "BULLISH", "BEARISH", or "NEUTRAL".
         """
-
         recommendations = self.get_recommendations(symbol)
-        if recommendations.empty:
+
+        # Type guard: check if recommendations is a DataFrame and not empty
+        if isinstance(recommendations, dict) or (
+            isinstance(recommendations, pd.DataFrame) and recommendations.empty
+        ):
             return "NEUTRAL"
+
+        # At this point we know recommendations is a non-empty DataFrame
+        assert isinstance(recommendations, pd.DataFrame)
         buy = recommendations["strongBuy"].sum() + recommendations["buy"].sum()
         sell = (
             recommendations["strongSell"].sum()

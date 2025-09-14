@@ -1,5 +1,5 @@
-import pytest
 import pendulum
+
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.models.watchlist_model import (
     WatchlistModel,
@@ -99,5 +99,13 @@ def test_watchlist_class_from_dict_with_invalid_data():
             {"id": "asset2", "symbol": "GOOG"},
         ],
     }
-    with pytest.raises(Exception):
-        watchlist_class_from_dict(data_dict)
+    # The function handles type conversion internally - integers are converted to strings
+    watchlist = watchlist_class_from_dict(data_dict)
+    assert watchlist.id == "12345678"
+    assert watchlist.account_id == "87654321"
+    assert watchlist.name == "My Watchlist"
+    assert len(watchlist.assets) == 2
+    assert watchlist.assets[0].id == "asset1"
+    assert watchlist.assets[0].symbol == "AAPL"
+    assert watchlist.assets[1].id == "asset2"
+    assert watchlist.assets[1].symbol == "GOOG"

@@ -2,12 +2,10 @@ import logging
 
 import pandas as pd
 import pendulum
-import numpy as np
-np.float_ = np.float64 
-from prophet import Prophet  # noqa: E402
+from prophet import Prophet
 
-from py_alpaca_api.stock.history import History  # noqa: E402
-from py_alpaca_api.stock.screener import Screener  # noqa: E402
+from py_alpaca_api.stock.history import History
+from py_alpaca_api.stock.screener import Screener
 
 yesterday = pendulum.now().subtract(days=1).format("YYYY-MM-DD")
 four_years_ago = pendulum.now().subtract(years=2).format("YYYY-MM-DD")
@@ -29,8 +27,7 @@ class Predictor:
         start: str = four_years_ago,
         end: str = yesterday,
     ) -> pd.DataFrame:
-        """
-        Retrieves historical stock data for a given symbol within a specified timeframe.
+        """Retrieves historical stock data for a given symbol within a specified timeframe.
 
         Args:
             symbol (str): The stock symbol to retrieve data for.
@@ -49,12 +46,13 @@ class Predictor:
         )
         stock_df.rename(columns={"date": "ds", "vwap": "y"}, inplace=True)
 
-        return stock_df[["ds", "y"]]
+        result = stock_df[["ds", "y"]].copy()
+        assert isinstance(result, pd.DataFrame)
+        return result
 
     @staticmethod
     def train_prophet_model(data):
-        """
-        Trains a Prophet model using the provided data.
+        """Trains a Prophet model using the provided data.
 
         Args:
             data: The input data used for training the model.
@@ -66,9 +64,9 @@ class Predictor:
             changepoint_prior_scale=0.05,
             holidays_prior_scale=15,
             seasonality_prior_scale=10,
-            weekly_seasonality=True,
-            yearly_seasonality=True,
-            daily_seasonality=False,
+            weekly_seasonality="auto",
+            yearly_seasonality="auto",
+            daily_seasonality="auto",
         )
         model.add_country_holidays(country_name="US")
         model.fit(data)
@@ -76,8 +74,7 @@ class Predictor:
 
     @staticmethod
     def generate_forecast(model, future_periods=14):
-        """
-        Generates a forecast using the specified model for a given number of future periods.
+        """Generates a forecast using the specified model for a given number of future periods.
 
         Args:
             model: The model used for forecasting.
@@ -133,7 +130,7 @@ class Predictor:
             gain_prediction = self._get_gain_prediction(symbol_forecast, previous_price)
             if gain_prediction >= gain_ratio:
                 return True, ticker
-        except Exception as e:
-            logger.error(f"Error predicting {ticker}: {e}")
+        except Exception:
+            logger.exception(f"Error predicting {ticker}")
 
         return False, None

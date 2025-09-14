@@ -12,8 +12,8 @@ from py_alpaca_api import PyAlpacaAPI
 # Instead, you should use environment variables
 # to store your keys and access them in your code
 # Create a .env file in the root directory of the project for the following:
-api_key = os.environ.get("ALPACA_API_KEY")
-api_secret = os.environ.get("ALPACA_SECRET_KEY")
+api_key = os.environ.get("ALPACA_API_KEY", "")
+api_secret = os.environ.get("ALPACA_SECRET_KEY", "")
 
 today = pendulum.now(tz="America/New_York")
 

@@ -18,8 +18,7 @@ class QuoteModel:
 # Data Class Quote Conversion Functions
 ############################################
 def quote_class_from_dict(data_dict: dict) -> QuoteModel:
-    """
-    Args:
+    """Args:
         data_dict: A dictionary containing data for creating an instance of `QuoteModel`.
 
     Returns:

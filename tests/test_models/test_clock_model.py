@@ -1,5 +1,6 @@
-from py_alpaca_api.models.clock_model import ClockModel, clock_class_from_dict
 import pendulum
+
+from py_alpaca_api.models.clock_model import ClockModel, clock_class_from_dict
 
 
 def test_clock_class_from_dict():

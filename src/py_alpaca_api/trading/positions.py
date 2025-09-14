@@ -1,5 +1,4 @@
 import json
-from typing import Dict
 
 import pandas as pd
 
@@ -10,7 +9,7 @@ from py_alpaca_api.trading.account import Account
 
 class Positions:
     def __init__(
-        self, base_url: str, headers: Dict[str, str], account: Account
+        self, base_url: str, headers: dict[str, str], account: Account
     ) -> None:
         self.base_url = base_url
         self.headers = headers
@@ -20,8 +19,7 @@ class Positions:
     # \\\\\\\\\\\\\\\\ Close All Positions ////////////////#
     ########################################################
     def close_all(self, cancel_orders: bool = False) -> str:
-        """
-        Close all positions.
+        """Close all positions.
 
         Args:
             cancel_orders (bool, optional): Whether to cancel open orders associated with the positions.
@@ -34,9 +32,8 @@ class Positions:
             Exception: If the request to close positions is not successful, an exception is raised with
                 the error message from the API response.
         """
-
         url = f"{self.base_url}/positions"
-        params = {"cancel_orders": cancel_orders}
+        params: dict[str, str | bool | float | int] = {"cancel_orders": cancel_orders}
 
         response = json.loads(
             Requests()
@@ -49,10 +46,9 @@ class Positions:
     # \\\\\\\\\\\\\\\\\\ Close Position ///////////////////#
     ########################################################
     def close(
-        self, symbol_or_id: str, qty: float = None, percentage: int = None
+        self, symbol_or_id: str, qty: float | None = None, percentage: int | None = None
     ) -> str:
-        """
-        Closes a position for a given symbol or asset ID.
+        """Closes a position for a given symbol or asset ID.
 
         Args:
             symbol_or_id (str): The symbol or asset ID of the position to be closed.
@@ -69,7 +65,6 @@ class Positions:
             ValueError: If symbol_or_id is not provided.
             Exception: If the request to close the position fails.
         """
-
         if not qty and not percentage:
             raise ValueError("Quantity or percentage is required.")
         if qty and percentage:
@@ -80,7 +75,12 @@ class Positions:
             raise ValueError("Symbol or asset_id is required.")
 
         url = f"{self.base_url}/positions/{symbol_or_id}"
-        params = {"qty": qty, "percentage": percentage}
+        # Filter out None values for params
+        params: dict[str, str | float | int] = {}
+        if qty is not None:
+            params["qty"] = qty
+        if percentage is not None:
+            params["percentage"] = percentage
         Requests().request(
             method="DELETE", url=url, headers=self.headers, params=params
         )
@@ -88,8 +88,7 @@ class Positions:
         return f"Position {symbol_or_id} has been closed"
 
     def get(self, symbol: str) -> PositionModel:
-        """
-        Retrieves the position for the specified symbol.
+        """Retrieves the position for the specified symbol.
 
         Args:
             symbol (str): The symbol of the asset for which to retrieve the position.
@@ -100,16 +99,17 @@ class Positions:
         Raises:
             ValueError: If the symbol is not provided or if a position for the specified symbol is not found.
         """
-
         if not symbol:
             raise ValueError("Symbol is required.")
 
         try:
             position = self.get_all().query(f"symbol == '{symbol}'").iloc[0]
         except IndexError:
-            raise ValueError(f"Position for symbol '{symbol}' not found.")
+            raise ValueError(
+                f"Position for symbol '{symbol}' not found."
+            ) from IndexError
 
-        return position_class_from_dict(position)
+        return position_class_from_dict(position.to_dict())
 
     ############################################
     # Get All Positions
@@ -117,8 +117,7 @@ class Positions:
     def get_all(
         self, order_by: str = "profit_pct", order_asc: bool = False
     ) -> pd.DataFrame:
-        """
-        Retrieves all positions for the user's Alpaca account, including cash positions.
+        """Retrieves all positions for the user's Alpaca account, including cash positions.
 
         The positions are returned as a pandas DataFrame, with the following columns:
         - asset_id: The unique identifier for the asset
@@ -190,8 +189,7 @@ class Positions:
     ############################################
     @staticmethod
     def modify_position_df(positions_df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Modifies the given positions DataFrame by renaming columns, converting data types,
+        """Modifies the given positions DataFrame by renaming columns, converting data types,
         and rounding values.
 
         Args:
@@ -241,12 +239,8 @@ class Positions:
         round_2 = ["profit_dol", "intraday_profit_dol", "market_value"]
         round_4 = ["profit_pct", "intraday_profit_pct", "portfolio_pct"]
 
-        positions_df[round_2] = positions_df[round_2].apply(
-            lambda x: pd.Series.round(x, 2)
-        )
-        positions_df[round_4] = positions_df[round_4].apply(
-            lambda x: pd.Series.round(x, 4) * 100
-        )
+        positions_df[round_2] = positions_df[round_2].apply(lambda x: x.round(2))
+        positions_df[round_4] = positions_df[round_4].apply(lambda x: x.round(4) * 100)
 
         return positions_df
 
@@ -254,32 +248,30 @@ class Positions:
     # Cash Position DataFrame
     ############################################
     def cash_position_df(self):
-        """
-        Retrieves the user's cash position data as a DataFrame.
+        """Retrieves the user's cash position data as a DataFrame.
 
         Returns:
             pd.DataFrame: A DataFrame containing the user's cash position data.
         """
         return pd.DataFrame(
-            {
-                "asset_id": "",
-                "symbol": "Cash",
-                "exchange": "",
-                "asset_class": "",
-                "avg_entry_price": 0,
-                "qty": 0,
-                "qty_available": 0,
-                "side": "",
-                "market_value": self.account.get().cash,
-                "cost_basis": 0,
-                "unrealized_pl": 0,
-                "unrealized_plpc": 0,
-                "unrealized_intraday_pl": 0,
-                "unrealized_intraday_plpc": 0,
-                "current_price": 0,
-                "lastday_price": 0,
-                "change_today": 0,
-                "asset_marginable": False,
-            },
-            index=[0],
+            data={
+                "asset_id": [""],
+                "symbol": ["Cash"],
+                "exchange": [""],
+                "asset_class": [""],
+                "avg_entry_price": [0],
+                "qty": [0],
+                "qty_available": [0],
+                "side": [""],
+                "market_value": [self.account.get().cash],
+                "cost_basis": [0],
+                "unrealized_pl": [0],
+                "unrealized_plpc": [0],
+                "unrealized_intraday_pl": [0],
+                "unrealized_intraday_plpc": [0],
+                "current_price": [0],
+                "lastday_price": [0],
+                "change_today": [0],
+                "asset_marginable": [False],
+            }
         )

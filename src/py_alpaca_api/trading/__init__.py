@@ -1,11 +1,8 @@
-from typing import Dict
+from py_alpaca_api.trading.account import Account
 from py_alpaca_api.trading.market import Market
 from py_alpaca_api.trading.news import News
-from py_alpaca_api.trading.positions import Positions
-
-# from py_alpaca_api.trading.stock import Stock
-from py_alpaca_api.trading.account import Account
 from py_alpaca_api.trading.orders import Orders
+from py_alpaca_api.trading.positions import Positions
 from py_alpaca_api.trading.recommendations import Recommendations
 from py_alpaca_api.trading.watchlists import Watchlist
 
@@ -24,7 +21,7 @@ class Trading:
         )
         self._initialize_components(headers=headers, base_url=base_url)
 
-    def _initialize_components(self, headers: Dict[str, str], base_url: str):
+    def _initialize_components(self, headers: dict[str, str], base_url: str):
         self.account = Account(headers=headers, base_url=base_url)
         self.market = Market(headers=headers, base_url=base_url)
         self.positions = Positions(

@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Union
 
 from py_alpaca_api.models.asset_model import AssetModel
 from py_alpaca_api.models.model_utils import KEY_PROCESSORS, extract_class_data
@@ -13,13 +12,13 @@ class WatchlistModel:
     created_at: datetime
     updated_at: datetime
     name: str
-    assets: List[Union[object | AssetModel]]
+    assets: list[AssetModel]
 
 
 ############################################
 # Data Class Watchlist Conversion Functions
 ############################################
-def process_assets(assets: List[Dict]) -> List[AssetModel]:
+def process_assets(assets: list[dict]) -> list[AssetModel]:
     """Process a list of assets.
 
     This function takes a list of asset dictionaries and returns a list of AssetModel objects.
@@ -44,8 +43,7 @@ def process_assets(assets: List[Dict]) -> List[AssetModel]:
 
 
 def watchlist_class_from_dict(data_dict: dict) -> WatchlistModel:
-    """
-    Args:
+    """Args:
         data_dict: A dictionary containing the data needed to create a WatchlistModel object.
 
     Returns:

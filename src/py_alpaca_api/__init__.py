@@ -1,11 +1,12 @@
-from .trading import Trading
+from .exceptions import AuthenticationError
 from .stock import Stock
+from .trading import Trading
 
 
 class PyAlpacaAPI:
     def __init__(self, api_key: str, api_secret: str, api_paper: bool = True) -> None:
         if not api_key or not api_secret:
-            raise Exception("API Key and Secret are required")
+            raise AuthenticationError()
         self._initialize_components(
             api_key=api_key, api_secret=api_secret, api_paper=api_paper
         )

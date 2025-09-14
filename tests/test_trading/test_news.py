@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from py_alpaca_api import PyAlpacaAPI
 
 api_key = os.environ.get("ALPACA_API_KEY")
@@ -13,7 +15,7 @@ def news():
 
 def test_get_yahoo_news(news):
     yahoo_news = news._get_yahoo_news("AAPL", limit=2, scrape_content=False)
-    
+
     # Should now reliably return news items without scraping
     assert len(yahoo_news) <= 2  # May return fewer if Yahoo API returns less
     assert isinstance(yahoo_news, list)

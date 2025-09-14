@@ -23,9 +23,11 @@ class AssetModel:
 # Data Class Asset Conversion Functions
 ############################################
 def asset_class_from_dict(data_dict: dict) -> AssetModel:
-    """
+    """Create AssetModel from dictionary data.
+
     Args:
-        data_dict: A dictionary containing the data for creating an instance of AssetModel.
+        data_dict: A dictionary containing the data for creating an instance of
+            AssetModel.
 
     Returns:
         An instance of the AssetModel class.

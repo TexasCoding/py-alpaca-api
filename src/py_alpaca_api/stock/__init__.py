@@ -1,10 +1,9 @@
-from typing import Dict
-from py_alpaca_api.stock.latest_quote import LatestQuote
-from py_alpaca_api.stock.predictor import Predictor
-from py_alpaca_api.trading.market import Market
 from py_alpaca_api.stock.assets import Assets
 from py_alpaca_api.stock.history import History
+from py_alpaca_api.stock.latest_quote import LatestQuote
+from py_alpaca_api.stock.predictor import Predictor
 from py_alpaca_api.stock.screener import Screener
+from py_alpaca_api.trading.market import Market
 
 
 class Stock:
@@ -35,7 +34,7 @@ class Stock:
 
     def _initialize_components(
         self,
-        headers: Dict[str, str],
+        headers: dict[str, str],
         base_url: str,
         data_url: str,
         market: Market,

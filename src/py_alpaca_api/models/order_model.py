@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List
 
 from py_alpaca_api.models.model_utils import KEY_PROCESSORS, extract_class_data
 
@@ -35,7 +34,7 @@ class OrderModel:
     stop_price: float
     status: str
     extended_hours: bool
-    legs: List[object]
+    legs: list[object]
     trail_percent: float
     trail_price: float
     hwm: float
@@ -46,9 +45,8 @@ class OrderModel:
 ############################################
 # Data Class Order Conversion Functions
 ############################################
-def process_legs(legs: List[Dict]) -> List[OrderModel]:
-    """
-    Process the legs and create a list of OrderModel objects based on the provided data.
+def process_legs(legs: list[dict]) -> list[OrderModel]:
+    """Process the legs and create a list of OrderModel objects based on the provided data.
 
     Args:
         legs (List[Dict]): A list of dictionaries representing the legs.
@@ -71,9 +69,8 @@ def process_legs(legs: List[Dict]) -> List[OrderModel]:
     )
 
 
-def order_class_from_dict(data_dict: Dict) -> OrderModel:
-    """
-    Creates an instance of `OrderModel` using the provided dictionary data.
+def order_class_from_dict(data_dict: dict) -> OrderModel:
+    """Creates an instance of `OrderModel` using the provided dictionary data.
 
     Args:
         data_dict (Dict): A dictionary containing the data used to create the `OrderModel` instance.

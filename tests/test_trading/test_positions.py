@@ -1,5 +1,6 @@
 # Retrieves all positions successfully with correct sorting by profit_pct in descending order
 import json
+
 from py_alpaca_api.trading.positions import Positions
 
 

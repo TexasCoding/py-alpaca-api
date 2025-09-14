@@ -1,6 +1,5 @@
 import json
 from collections import defaultdict
-from typing import Dict
 
 import pandas as pd
 
@@ -10,9 +9,8 @@ from py_alpaca_api.stock.assets import Assets
 
 
 class History:
-    def __init__(self, data_url: str, headers: Dict[str, str], asset: Assets) -> None:
-        """
-        Initializes an instance of the History class.
+    def __init__(self, data_url: str, headers: dict[str, str], asset: Assets) -> None:
+        """Initializes an instance of the History class.
 
         Args:
             data_url: A string representing the URL of the data.
@@ -41,7 +39,7 @@ class History:
         try:
             asset = self.asset.get(symbol)
         except Exception as e:
-            raise ValueError(str(e))
+            raise ValueError(str(e)) from e
 
         if asset.asset_class != "us_equity":
             raise ValueError(f"{symbol} is not a stock.")
@@ -63,8 +61,7 @@ class History:
         sort: str = "asc",
         adjustment: str = "raw",
     ) -> pd.DataFrame:
-        """
-        Retrieves historical stock data for a given symbol within a specified date range and timeframe.
+        """Retrieves historical stock data for a given symbol within a specified date range and timeframe.
 
         Args:
             symbol: The stock symbol to fetch data for.
@@ -115,8 +112,7 @@ class History:
             "sort": sort,
         }
         symbol_data = self.get_historical_data(symbol, url, params)
-        bar_data_df = self.preprocess_data(symbol_data, symbol)
-        return bar_data_df
+        return self.preprocess_data(symbol_data, symbol)
 
     ###########################################
     # /////////// PreProcess Data \\\\\\\\\\\ #
@@ -134,7 +130,6 @@ class History:
         Returns:
             A pandas DataFrame containing the preprocessed historical stock data.
         """
-
         bar_data_df = pd.DataFrame(symbol_data)
 
         bar_data_df.insert(0, "symbol", symbol)
@@ -156,7 +151,7 @@ class History:
             inplace=True,
         )
 
-        bar_data_df = bar_data_df.astype(
+        return bar_data_df.astype(
             {
                 "open": "float",
                 "high": "float",
@@ -170,16 +165,13 @@ class History:
             }
         )
 
-        return bar_data_df
-
     ###########################################
     # ///////// Get Historical Data \\\\\\\\\ #
     ###########################################
     def get_historical_data(
         self, symbol: str, url: str, params: dict
     ) -> list[defaultdict]:
-        """
-        Retrieves historical data for a given symbol.
+        """Retrieves historical data for a given symbol.
 
         Args:
             symbol (str): The symbol for which to retrieve historical data.

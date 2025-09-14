@@ -246,14 +246,14 @@ This project is mainly for fun and my personal use. Hopefully others find it hel
 > import os
 > from py_alpaca_api import PyAlpacaAPI
 >
-> api_key = os.environ.get("ALPACA_API_KEY") 
-> api_secret = os.environ.get("ALPACA_SECRET_KEY") 
+> api_key = os.environ.get("ALPACA_API_KEY")
+> api_secret = os.environ.get("ALPACA_SECRET_KEY")
 >
 > api = PyAlpacaAPI(api_key=api_key, api_secret=api_secret)
 >
 > # Get the account information for the authenticated account.
 > account = api.trading.account.get()
-> 
+>
 > # Get stock asset information
 > asset = api.stock.assets.get("AAPL")
 >

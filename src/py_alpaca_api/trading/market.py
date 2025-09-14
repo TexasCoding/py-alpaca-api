@@ -1,5 +1,4 @@
 import json
-from typing import Dict
 
 import pandas as pd
 
@@ -8,13 +7,12 @@ from py_alpaca_api.models.clock_model import ClockModel, clock_class_from_dict
 
 
 class Market:
-    def __init__(self, base_url: str, headers: Dict[str, str]) -> None:
+    def __init__(self, base_url: str, headers: dict[str, str]) -> None:
         self.base_url = base_url
         self.headers = headers
 
     def clock(self) -> ClockModel:
-        """
-        Retrieves the current market clock.
+        """Retrieves the current market clock.
 
         Returns:
             ClockModel: A model containing the current market clock data.
@@ -28,8 +26,7 @@ class Market:
         return clock_class_from_dict(response)
 
     def calendar(self, start_date: str, end_date: str) -> pd.DataFrame:
-        """
-        Retrieves the market calendar for the specified date range.
+        """Retrieves the market calendar for the specified date range.
 
         Args:
             start_date (str): The start date of the calendar range in the format "YYYY-MM-DD".
@@ -38,9 +35,11 @@ class Market:
         Returns:
             pd.DataFrame: A DataFrame containing the market calendar data, with columns for the date, settlement date, open time, and close time.
         """
-
         url = f"{self.base_url}/calendar"
-        params = {"start": start_date, "end": end_date}
+        params: dict[str, str | bool | float | int] = {
+            "start": start_date,
+            "end": end_date,
+        }
         response = json.loads(
             Requests()
             .request(method="GET", url=url, headers=self.headers, params=params)
