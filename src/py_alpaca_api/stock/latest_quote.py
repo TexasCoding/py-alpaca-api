@@ -1,20 +1,19 @@
 import json
-from typing import Dict, List, Optional
 
 from py_alpaca_api.http.requests import Requests
-from py_alpaca_api.models.quote_model import quote_class_from_dict
+from py_alpaca_api.models.quote_model import QuoteModel, quote_class_from_dict
 
 
 class LatestQuote:
-    def __init__(self, headers: Dict[str, str]) -> None:
+    def __init__(self, headers: dict[str, str]) -> None:
         self.headers = headers
 
     def get(
         self,
-        symbol: Optional[List[str] | str],
+        symbol: list[str] | str | None,
         feed: str = "iex",
         currency: str = "USD",
-    ) -> dict:
+    ) -> list[QuoteModel] | QuoteModel:
         if symbol is None or symbol == "":
             raise ValueError("Symbol is required. Must be a string or list of strings.")
 
@@ -29,7 +28,11 @@ class LatestQuote:
 
         url = "https://data.alpaca.markets/v2/stocks/quotes/latest"
 
-        params = {"symbols": symbol, "feed": feed, "currency": currency}
+        params: dict[str, str | bool | float | int] = {
+            "symbols": symbol,
+            "feed": feed,
+            "currency": currency,
+        }
 
         response = json.loads(
             Requests()

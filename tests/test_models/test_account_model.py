@@ -1,5 +1,6 @@
-from py_alpaca_api.models.account_model import AccountModel, account_class_from_dict
 import pendulum
+
+from py_alpaca_api.models.account_model import AccountModel, account_class_from_dict
 
 
 def test_account_class_from_dict():

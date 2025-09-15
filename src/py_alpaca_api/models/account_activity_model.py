@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+
 from py_alpaca_api.models.model_utils import KEY_PROCESSORS, extract_class_data
 
 
@@ -26,7 +27,8 @@ class AccountActivityModel:
 # Data Class Asset Conversion Functions
 ############################################
 def account_activity_class_from_dict(data_dict: dict) -> AccountActivityModel:
-    """
+    """Converts a dictionary into an instance of the `AccountActivityModel`.
+
     Args:
         data_dict: A dictionary containing the data for creating an instance of AccountActivityModel.
 

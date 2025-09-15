@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 project = "PyAlpacaAPI"
 copyright = "MIT 2024, TexasCoding"
 author = "TexasCoding"
@@ -19,7 +18,7 @@ autoapi_type = "python"
 autoapi_dirs = [f"{Path(__file__).parents[2]}/src"]
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns: list[str] = []
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]

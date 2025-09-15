@@ -16,9 +16,11 @@ class ClockModel:
 # Data Class Clock Conversion Functions
 ############################################
 def clock_class_from_dict(data_dict: dict) -> ClockModel:
-    """
+    """Create ClockModel from dictionary data.
+
     Args:
-        data_dict: A dictionary containing data for creating an instance of `ClockModel`.
+        data_dict: A dictionary containing data for creating an instance of
+            `ClockModel`.
 
     Returns:
         An instance of `ClockModel` created using the data from `data_dict`.

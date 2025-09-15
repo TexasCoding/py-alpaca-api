@@ -1,6 +1,8 @@
 import os
+
 import pandas as pd
 import pytest
+
 from py_alpaca_api import PyAlpacaAPI
 
 api_key = os.environ.get("ALPACA_API_KEY")

@@ -1,16 +1,16 @@
-import pytest
 import os
+
+import pytest
+
+from py_alpaca_api import PyAlpacaAPI
 
 
 class TestGetStockData:
     @pytest.fixture
     def stock_client(self):
-        from py_alpaca_api import PyAlpacaAPI
-
-        api_key = os.environ.get("ALPACA_API_KEY")
-        api_secret = os.environ.get("ALPACA_SECRET_KEY")
-        stock_client = PyAlpacaAPI(api_key=api_key, api_secret=api_secret).stock.history
-        return stock_client
+        api_key = os.environ.get("ALPACA_API_KEY", "")
+        api_secret = os.environ.get("ALPACA_SECRET_KEY", "")
+        return PyAlpacaAPI(api_key=api_key, api_secret=api_secret).stock.history
 
     def test_invalid_timeframe(self, stock_client):
         with pytest.raises(ValueError, match="Invalid timeframe"):

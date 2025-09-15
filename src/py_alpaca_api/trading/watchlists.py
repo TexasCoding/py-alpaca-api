@@ -1,6 +1,6 @@
 import json
-from typing import Dict, Union
 
+from py_alpaca_api.exceptions import ValidationError
 from py_alpaca_api.http.requests import Requests
 from py_alpaca_api.models.watchlist_model import (
     WatchlistModel,
@@ -9,9 +9,8 @@ from py_alpaca_api.models.watchlist_model import (
 
 
 class Watchlist:
-    def __init__(self, base_url: str, headers: Dict[str, str]) -> None:
-        """
-        Initialize a Watchlist object.
+    def __init__(self, base_url: str, headers: dict[str, str]) -> None:
+        """Initialize a Watchlist object.
 
         Args:
             base_url (str): The URL for trading.
@@ -27,11 +26,8 @@ class Watchlist:
     # ///////////// Helper functions //////////////////////#
     ########################################################
     @staticmethod
-    def _handle_response(
-        response: dict, no_content_msg: str
-    ) -> Union[WatchlistModel, str]:
-        """
-        Handles the response from the API and returns a WatchlistModel object
+    def _handle_response(response: dict, no_content_msg: str) -> WatchlistModel | str:
+        """Handles the response from the API and returns a WatchlistModel object
         if the response is not empty, otherwise returns the specified no_content_msg.
 
         Args:
@@ -43,17 +39,19 @@ class Watchlist:
         """
         if response:
             return watchlist_class_from_dict(response)
-        else:
-            return no_content_msg
+        return no_content_msg
 
     ########################################################
     # ///////////// Send a request to the API //////////////#
     ########################################################
     def _request(
-        self, method: str, url: str, payload: dict = None, params: dict = None
-    ) -> Dict:
-        """
-        Sends a request to the specified URL using the specified HTTP method.
+        self,
+        method: str,
+        url: str,
+        payload: dict | None = None,
+        params: dict | None = None,
+    ) -> dict:
+        """Sends a request to the specified URL using the specified HTTP method.
 
         Args:
             method (str): The HTTP method to use for the request (e.g., 'GET', 'POST', 'PUT', 'DELETE').
@@ -83,10 +81,9 @@ class Watchlist:
     # //////////////// Get a  watchlist ///////////////////#
     ########################################################
     def get(
-        self, watchlist_id: str = None, watchlist_name: str = None
-    ) -> WatchlistModel:
-        """
-        Retrieves a watchlist based on the provided watchlist ID or name.
+        self, watchlist_id: str | None = None, watchlist_name: str | None = None
+    ) -> WatchlistModel | str:
+        """Retrieves a watchlist based on the provided watchlist ID or name.
 
         Args:
             watchlist_id (str, optional): The ID of the watchlist to retrieve.
@@ -99,7 +96,9 @@ class Watchlist:
             ValueError: If both watchlist_id and watchlist_name are provided, or if neither is provided.
 
         """
-        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
+        if (watchlist_id and watchlist_name) or (
+            not watchlist_id and not watchlist_name
+        ):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if watchlist_id:
@@ -117,9 +116,8 @@ class Watchlist:
     ########################################################
     # ///////////// Get all watchlists ////////////////////#
     ########################################################
-    def get_all(self) -> list[WatchlistModel]:
-        """
-        Retrieves all watchlists.
+    def get_all(self) -> list[WatchlistModel | str]:
+        """Retrieves all watchlists.
 
         Returns:
             A list of WatchlistModel objects representing all the watchlists.
@@ -142,9 +140,10 @@ class Watchlist:
     ########################################################
     # ///////////// Create a new watchlist ////////////////#
     ########################################################
-    def create(self, name: str, symbols: Union[list, str] = None) -> WatchlistModel:
-        """
-        Creates a new watchlist with the given name and symbols.
+    def create(
+        self, name: str, symbols: list | str | None = None
+    ) -> WatchlistModel | str:
+        """Creates a new watchlist with the given name and symbols.
 
         Args:
             name (str): The name of the watchlist.
@@ -174,13 +173,12 @@ class Watchlist:
     ########################################################
     def update(
         self,
-        watchlist_id: str = None,
-        watchlist_name: str = None,
+        watchlist_id: str | None = None,
+        watchlist_name: str | None = None,
         name: str = "",
-        symbols: Union[list, str] = None,
-    ) -> WatchlistModel:
-        """
-        Update a watchlist with the specified parameters.
+        symbols: list | str | None = None,
+    ) -> WatchlistModel | str:
+        """Update a watchlist with the specified parameters.
 
         Args:
             watchlist_id (str, optional): The ID of the watchlist to update. Either `watchlist_id` or `watchlist_name`
@@ -200,8 +198,9 @@ class Watchlist:
             `watchlist_name` are provided.
 
         """
-
-        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
+        if (watchlist_id and watchlist_name) or (
+            not watchlist_id and not watchlist_name
+        ):
             raise ValueError("Watchlist ID or Name is required, not both.")
         # Check if watchlist_id is provided
         if watchlist_id:
@@ -211,12 +210,16 @@ class Watchlist:
             watchlist = self.get(watchlist_name=watchlist_name)
             url = f"{self.base_url}/watchlists:by_name"
 
+        # Type guard to ensure watchlist is a WatchlistModel
+        if isinstance(watchlist, str):
+            raise TypeError(f"Failed to retrieve watchlist: {watchlist}")
+
         name = name if name else watchlist.name
 
         if isinstance(symbols, str):
             symbols = symbols.replace(" ", "").split(",")
         elif isinstance(symbols, list):
-            symbols = symbols
+            pass
         else:
             symbols = ",".join([o.symbol for o in watchlist.assets])
 
@@ -231,9 +234,10 @@ class Watchlist:
     ########################################################
     # ///////////// Delete a watchlist ////////////////////#
     ########################################################
-    def delete(self, watchlist_id: str = None, watchlist_name: str = None) -> str:
-        """
-        Deletes a watchlist.
+    def delete(
+        self, watchlist_id: str | None = None, watchlist_name: str | None = None
+    ) -> str:
+        """Deletes a watchlist.
 
         Args:
             watchlist_id (str, optional): The ID of the watchlist to delete.
@@ -246,7 +250,9 @@ class Watchlist:
             ValueError: If both watchlist_id and watchlist_name are provided or if neither is provided.
 
         """
-        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
+        if (watchlist_id and watchlist_name) or (
+            not watchlist_id and not watchlist_name
+        ):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if watchlist_id:
@@ -257,22 +263,23 @@ class Watchlist:
         params = {"name": watchlist_name} if watchlist_name else None
 
         response = self._request(method="DELETE", url=url, params=params)
-        return self._handle_response(
+        result = self._handle_response(
             response=response,
             no_content_msg=f"Watchlist {watchlist_id if watchlist_id else watchlist_name} deleted successfully.",
         )
+        # Delete operations should return the success message string
+        return str(result) if isinstance(result, WatchlistModel) else result
 
     ########################################################
     # ///////////// Add Asset to  watchlist ///////////////#
     ########################################################
     def add_asset(
         self,
-        watchlist_id: str = None,
-        watchlist_name: str = None,
+        watchlist_id: str | None = None,
+        watchlist_name: str | None = None,
         symbol: str = "",
-    ) -> WatchlistModel:
-        """
-        Adds an asset to a watchlist.
+    ) -> WatchlistModel | str:
+        """Adds an asset to a watchlist.
 
         Args:
             watchlist_id (str): The ID of the watchlist to add the asset to. If `watchlist_id` is provided,
@@ -289,7 +296,9 @@ class Watchlist:
             ValueError: If `symbol` is not provided.
 
         """
-        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
+        if (watchlist_id and watchlist_name) or (
+            not watchlist_id and not watchlist_name
+        ):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if not symbol:
@@ -314,12 +323,11 @@ class Watchlist:
     ########################################################
     def remove_asset(
         self,
-        watchlist_id: str = None,
-        watchlist_name: str = None,
+        watchlist_id: str | None = None,
+        watchlist_name: str | None = None,
         symbol: str = "",
-    ) -> WatchlistModel:
-        """
-        Removes an asset from a watchlist.
+    ) -> WatchlistModel | str:
+        """Removes an asset from a watchlist.
 
         Args:
             watchlist_id (str, optional): The ID of the watchlist. If not provided, the watchlist_name parameter
@@ -336,14 +344,19 @@ class Watchlist:
         Raises:
             ValueError: If both watchlist_id and watchlist_name are provided, or if symbol is not provided.
         """
-        if watchlist_id and watchlist_name or (not watchlist_id and not watchlist_name):
+        if (watchlist_id and watchlist_name) or (
+            not watchlist_id and not watchlist_name
+        ):
             raise ValueError("Watchlist ID or Name is required, not both.")
 
         if not symbol:
             raise ValueError("Symbol is required")
 
         if not watchlist_id:
-            watchlist_id = self.get(watchlist_name=watchlist_name).id
+            watchlist = self.get(watchlist_name=watchlist_name)
+            if isinstance(watchlist, str):
+                raise TypeError(f"Failed to retrieve watchlist: {watchlist}")
+            watchlist_id = watchlist.id
 
         url = f"{self.base_url}/watchlists/{watchlist_id}/{symbol}"
 
@@ -356,9 +369,10 @@ class Watchlist:
     ########################################################
     # /////////// Get Assets from a watchlist /////////////#
     ########################################################
-    def get_assets(self, watchlist_id: str = None, watchlist_name: str = None) -> list:
-        """
-        Retrieves the symbols of assets in a watchlist.
+    def get_assets(
+        self, watchlist_id: str | None = None, watchlist_name: str | None = None
+    ) -> list:
+        """Retrieves the symbols of assets in a watchlist.
 
         Args:
             watchlist_id (str, optional): The ID of the watchlist. Either `watchlist_id` or `watchlist_name`
@@ -375,17 +389,18 @@ class Watchlist:
             ValueError: If both `watchlist_id` and `watchlist_name` are provided, or if neither `watchlist_id` nor
             `watchlist_name` are provided.
         """
-
         if watchlist_id and watchlist_name:
-            raise ValueError("Watchlist ID or Name is required, not both.")
+            raise ValidationError()
 
         if watchlist_id:
             watchlist = self.get(watchlist_id=watchlist_id)
         elif watchlist_name:
             watchlist = self.get(watchlist_name=watchlist_name)
         else:
-            raise ValueError("Watchlist ID or Name is required")
+            raise ValidationError()
 
-        symbols = [o.symbol for o in watchlist.assets]
+        # Type guard to ensure watchlist is a WatchlistModel
+        if isinstance(watchlist, str):
+            raise TypeError(f"Failed to retrieve watchlist: {watchlist}")
 
-        return symbols
+        return [o.symbol for o in watchlist.assets]

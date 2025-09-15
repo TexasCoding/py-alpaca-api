@@ -1,9 +1,12 @@
 import json
 from unittest.mock import Mock, patch
+
 import pytest
-from py_alpaca_api.trading.account import Account
+
+from py_alpaca_api.exceptions import APIRequestError
 from py_alpaca_api.http.requests import Requests
 from py_alpaca_api.models.account_model import AccountModel
+from py_alpaca_api.trading.account import Account
 
 
 @pytest.fixture
@@ -38,15 +41,19 @@ def test_get_account_error(account_obj):
     mock_response = Mock()
     mock_response.status_code = 400
     mock_response.text = "Error"
-    with patch.object(Requests, "request", return_value=mock_response):
-        with pytest.raises(Exception):
-            account_obj.get()
+    with (
+        patch.object(Requests, "request", return_value=mock_response),
+        pytest.raises(APIRequestError),
+    ):
+        account_obj.get()
 
 
 def test_get_account_invalid_response(account_obj):
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.text = "Invalid response"
-    with patch.object(Requests, "request", return_value=mock_response):
-        with pytest.raises(ValueError):
-            account_obj.get()
+    with (
+        patch.object(Requests, "request", return_value=mock_response),
+        pytest.raises(ValueError),
+    ):
+        account_obj.get()

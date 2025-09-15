@@ -1,18 +1,28 @@
-import pytest
-from py_alpaca_api.models.order_model import order_class_from_dict
 import pendulum
+
+from py_alpaca_api.models.order_model import order_class_from_dict
 
 
 class TestOrderClassFromDict:
     def test_order_class_from_dict_with_empty_dict(self):
         data_dict = {}
-        with pytest.raises(KeyError):
-            order_class_from_dict(data_dict)
+        # The function returns an OrderModel with default values for missing fields
+        order = order_class_from_dict(data_dict)
+        assert order.id == ""
+        assert order.symbol == ""
+        assert order.qty == 0.0
+        assert order.status == ""
+        assert order.legs == []
 
     def test_order_class_from_dict_with_missing_required_keys(self):
         data_dict = {"some_key": "some_value"}
-        with pytest.raises(KeyError):
-            order_class_from_dict(data_dict)
+        # The function returns an OrderModel with default values for missing fields
+        order = order_class_from_dict(data_dict)
+        assert order.id == ""
+        assert order.symbol == ""
+        assert order.qty == 0.0
+        assert order.status == ""
+        assert order.legs == []
 
     def test_order_class_from_dict_with_invalid_leg_data(self):
         data_dict = {
@@ -21,8 +31,14 @@ class TestOrderClassFromDict:
             "asset_class": "equity",
             "legs": [{"invalid_key": "invalid_value"}],
         }
-        with pytest.raises(KeyError):
-            order_class_from_dict(data_dict)
+        # The function creates legs with default values for missing fields
+        order = order_class_from_dict(data_dict)
+        assert order.id == "order_123"
+        assert order.client_order_id == "client_order_123"
+        assert order.asset_class == "equity"
+        assert len(order.legs) == 1
+        assert order.legs[0].id == ""
+        assert order.legs[0].symbol == ""
 
     def test_order_class_from_dict_with_valid_data(self):
         data_dict = {

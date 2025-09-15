@@ -1,8 +1,10 @@
-from typing import Dict, Optional
+from typing import Any
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
+
+from ..exceptions import APIRequestError
 
 
 class Requests:
@@ -20,23 +22,26 @@ class Requests:
         self,
         method: str,
         url: str,
-        headers: Optional[Dict[str, str]] = None,
-        params: Optional[Dict[str, str] | Dict[str, bool] | Dict[str, float]] = None,
-        json: Optional[Dict[str, str]] = None,
+        headers: dict[str, str] | None = None,
+        params: dict[str, str | bool | float | int] | None = None,
+        json: dict[str, Any] | None = None,
     ):
-        """
+        """Execute HTTP request with retry logic.
+
         Args:
             method: A string representing the HTTP method to be used in the request.
             url: A string representing the URL to send the request to.
             headers: An optional dictionary containing the headers for the request.
-            params: An optional dictionary containing the query parameters for the request.
+            params: An optional dictionary containing the query parameters for the
+                request.
             json: An optional dictionary containing the JSON payload for the request.
 
         Returns:
             The response object returned by the server.
 
         Raises:
-            Exception: If the response status code is not one of the acceptable statuses (200, 204, 207).
+            APIRequestError: If the response status code is not one of the
+                acceptable statuses (200, 204, 207).
         """
         response = self.session.request(
             method=method,
@@ -47,5 +52,7 @@ class Requests:
         )
         acceptable_statuses = [200, 204, 207]
         if response.status_code not in acceptable_statuses:
-            raise Exception(f"Request Error: {response.text}")
+            raise APIRequestError(
+                status_code=response.status_code, message=response.text
+            )
         return response

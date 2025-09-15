@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+
+    - name: Set up Python
+      run: uv python install 3.10
+
+    - name: Install dependencies
+      run: uv sync --all-extras --dev
+
+    - name: Run ruff format check
+      run: uv run ruff format --check src
+
+    - name: Run ruff linter
+      run: uv run ruff check src
+
+    - name: Run mypy
+      run: uv run mypy src/
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1  # Run tests sequentially to avoid rate limiting
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: uv sync --all-extras --dev
+
+    - name: Add delay to avoid rate limiting
+      run: |
+        echo "Waiting 30 seconds to avoid API rate limiting..."
+        sleep 30
+
+    - name: Run tests with coverage
+      env:
+        ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+        ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      run: |
+        uv run pytest --cov=py_alpaca_api --cov-report=xml --cov-report=term-missing tests
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+        verbose: true

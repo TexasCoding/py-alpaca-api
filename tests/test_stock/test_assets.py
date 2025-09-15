@@ -1,16 +1,18 @@
 import json
 import os
 from unittest.mock import Mock, patch
+
 import pandas as pd
 import pytest
+
 from py_alpaca_api import PyAlpacaAPI
-from py_alpaca_api.stock.assets import Assets
-from py_alpaca_api.models.asset_model import AssetModel
+from py_alpaca_api.exceptions import APIRequestError
 from py_alpaca_api.http.requests import Requests
+from py_alpaca_api.models.asset_model import AssetModel
+from py_alpaca_api.stock.assets import Assets
 
-
-api_key = os.environ.get("ALPACA_API_KEY")
-api_secret = os.environ.get("ALPACA_SECRET_KEY")
+api_key = os.environ.get("ALPACA_API_KEY", "")
+api_secret = os.environ.get("ALPACA_SECRET_KEY", "")
 
 
 @pytest.fixture
@@ -26,7 +28,7 @@ def alpaca():
 
 
 def test_get_asset_invalid_symbol(alpaca):
-    with pytest.raises(Exception):
+    with pytest.raises(APIRequestError):
         alpaca.stock.assets.get("INVALID")
 
 
@@ -92,15 +94,19 @@ def test_get_asset_not_found(assets_obj):
     mock_response = Mock()
     mock_response.status_code = 404
     mock_response.text = "Not Found"
-    with patch.object(Requests, "request", return_value=mock_response):
-        with pytest.raises(Exception):
-            assets_obj.get("INVALID")
+    with (
+        patch.object(Requests, "request", return_value=mock_response),
+        pytest.raises(APIRequestError),
+    ):
+        assets_obj.get("INVALID")
 
 
 def test_get_asset_server_error(assets_obj):
     mock_response = Mock()
     mock_response.status_code = 500
     mock_response.text = "Internal Server Error"
-    with patch.object(Requests, "request", return_value=mock_response):
-        with pytest.raises(Exception):
-            assets_obj.get("AAPL")
+    with (
+        patch.object(Requests, "request", return_value=mock_response),
+        pytest.raises(APIRequestError),
+    ):
+        assets_obj.get("AAPL")

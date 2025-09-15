@@ -1,6 +1,8 @@
 # Retrieves watchlist successfully using watchlist_id
 import json
+
 import pytest
+
 from py_alpaca_api.trading.watchlists import Watchlist
 
 

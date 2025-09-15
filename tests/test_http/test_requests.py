@@ -1,5 +1,8 @@
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
+
+from py_alpaca_api.exceptions import APIRequestError
 from py_alpaca_api.http.requests import Requests
 
 
@@ -21,9 +24,11 @@ def test_request_error(requests_obj):
     mock_response = Mock()
     mock_response.status_code = 400
     mock_response.text = "Error"
-    with patch("requests.Session.request", return_value=mock_response):
-        with pytest.raises(Exception):
-            requests_obj.request("GET", "https://example.com")
+    with (
+        patch("requests.Session.request", return_value=mock_response),
+        pytest.raises(APIRequestError),
+    ):
+        requests_obj.request("GET", "https://example.com")
 
 
 def test_request_with_headers(requests_obj):

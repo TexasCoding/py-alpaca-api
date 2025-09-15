@@ -1,24 +1,24 @@
-from collections import defaultdict
 import json
-from typing import Dict
+from collections import defaultdict
+from collections.abc import Callable
 
 import pandas as pd
 import pendulum
 
 from py_alpaca_api.http.requests import Requests
-from py_alpaca_api.trading.market import Market
 from py_alpaca_api.stock.assets import Assets
+from py_alpaca_api.trading.market import Market
 
 
 class Screener:
     def __init__(
         self,
         data_url: str,
-        headers: Dict[str, str],
+        headers: dict[str, str],
         asset: Assets,
         market: Market,
     ) -> None:
-        """Initialize Screener class3
+        """Initialize Screener class3.
 
         Parameters:
         ___________
@@ -52,18 +52,17 @@ class Screener:
     def filter_stocks(
         self,
         price_greater_than: float,
-        change_condition: callable,
+        change_condition: Callable[[pd.DataFrame], pd.Series],
         volume_greater_than: int,
         trade_count_greater_than: int,
         total_returned: int,
         ascending_order: bool,
     ) -> pd.DataFrame:
-        """
-        Filter stocks based on given parameters.
+        """Filter stocks based on given parameters.
 
         Args:
             price_greater_than: The minimum price threshold for the stocks.
-            change_condition: A callable function that takes in a DataFrame and returns a boolean value.
+            change_condition: A callable function that takes in a DataFrame and returns a boolean Series.
                 This function is used to filter the stocks based on a specific change condition.
             volume_greater_than: The minimum volume threshold for the stocks.
             trade_count_greater_than: The minimum trade count threshold for the stocks.
@@ -75,10 +74,23 @@ class Screener:
         """
         self.set_dates()
         df = self._get_percentages(start=self.day_before_yesterday, end=self.yesterday)
-        df = df[df["price"] > price_greater_than]
-        df = df[change_condition(df)]
-        df = df[df["volume"] > volume_greater_than]
-        df = df[df["trades"] > trade_count_greater_than]
+
+        # Apply filters step by step, ensuring DataFrame type is preserved
+        price_filter = df["price"] > price_greater_than
+        df = df.loc[price_filter].copy()
+
+        # Apply the change condition (returns a boolean Series)
+        change_filter = change_condition(df)
+        df = df.loc[change_filter].copy()
+
+        volume_filter = df["volume"] > volume_greater_than
+        df = df.loc[volume_filter].copy()
+
+        trades_filter = df["trades"] > trade_count_greater_than
+        df = df.loc[trades_filter].copy()
+
+        # Ensure df is a DataFrame before sorting
+        assert isinstance(df, pd.DataFrame)
         return (
             df.sort_values(by="change", ascending=ascending_order)
             .reset_index(drop=True)
@@ -96,8 +108,7 @@ class Screener:
         trade_count_greater_than: int = 2000,
         total_losers_returned: int = 100,
     ) -> pd.DataFrame:
-        """
-        Returns a filtered DataFrame of stocks that meet the specified conditions for losers.
+        """Returns a filtered DataFrame of stocks that meet the specified conditions for losers.
 
         Args:
             price_greater_than (float): The minimum price threshold for stocks to be considered losers. Default is 5.0.
@@ -111,7 +122,6 @@ class Screener:
         Returns:
             pd.DataFrame: A filtered DataFrame containing stocks that meet the specified conditions for losers.
         """
-
         return self.filter_stocks(
             price_greater_than,
             lambda df: df["change"] < change_less_than,
@@ -132,8 +142,7 @@ class Screener:
         trade_count_greater_than: int = 2000,
         total_gainers_returned: int = 100,
     ) -> pd.DataFrame:
-        """
-        Args:
+        """Args:
             price_greater_than (float): The minimum price threshold for the stocks to be included in the gainers list.
             Default is 5.0.
             change_greater_than (float): The minimum change (in percentage) threshold for the stocks to be included in
@@ -167,8 +176,7 @@ class Screener:
         end: str,
         timeframe: str = "1Day",
     ) -> pd.DataFrame:
-        """
-        Retrieves stock data for a set of symbols and calculates the percentage change, price, volume, and trade count for each symbol.
+        """Retrieves stock data for a set of symbols and calculates the percentage change, price, volume, and trade count for each symbol.
 
         Args:
             start (str): The start date for the data retrieval, in the format "YYYY-MM-DD".
@@ -178,10 +186,9 @@ class Screener:
         Returns:
             pd.DataFrame: A Pandas DataFrame containing the calculated data for each symbol, including the symbol, percentage change, price, volume, and trade count.
         """
-
         url = f"{self.data_url}/stocks/bars"
 
-        params = {
+        params: dict[str, str | bool | float | int] = {
             "symbols": ",".join(self.asset.get_all()["symbol"].tolist()),
             "limit": 10000,
             "timeframe": timeframe,
@@ -197,7 +204,7 @@ class Screener:
         symbols_data = defaultdict(list)
 
         while True:
-            params["page_token"] = page_token
+            params["page_token"] = page_token or ""
             response = json.loads(
                 Requests()
                 .request(method="GET", url=url, headers=self.headers, params=params)
@@ -240,8 +247,7 @@ class Screener:
     # ///////////////// Set Dates \\\\\\\\\\\\\\\\\\ #
     ##################################################
     def set_dates(self):
-        """
-        Sets the dates for the screener.
+        """Sets the dates for the screener.
 
         This method retrieves the last two trading dates from the market calendar
         and assigns them to the `yesterday` and `day_before_yesterday` attributes.

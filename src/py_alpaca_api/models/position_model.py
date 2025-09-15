@@ -30,8 +30,7 @@ class PositionModel:
 # Data Class Position Conversion Functions
 ############################################
 def position_class_from_dict(data_dict: dict) -> PositionModel:
-    """
-    Returns a PositionModel object created from a given data dictionary.
+    """Returns a PositionModel object created from a given data dictionary.
 
     Args:
         data_dict: A dictionary containing the data for creating a PositionModel object.

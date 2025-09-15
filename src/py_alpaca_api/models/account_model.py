@@ -52,8 +52,7 @@ class AccountModel:
 # Data Class Account Conversion Functions
 ############################################
 def account_class_from_dict(data_dict: dict) -> AccountModel:
-    """
-    Converts a dictionary into an instance of the `AccountModel`.
+    """Converts a dictionary into an instance of the `AccountModel`.
 
     Args:
         data_dict (dict): A dictionary containing the data for the `AccountModel` instance.

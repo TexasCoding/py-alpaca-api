@@ -2,7 +2,21 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+.coverage.xml
+.coverage.html
+.coverage.json
+.coverage.yaml
+.coverage.yml
+.coverage.xml
+.coverage.html
+.coverage.json
+.coverage.yaml
+.coverage.yml
 # C extensions
 *.so
 .idea/
@@ -164,8 +178,20 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-<<<<<<< HEAD
-test.sh
-=======
-# test.sh
->>>>>>> e0e18b93a48f51c1ed656a62155be25a128e460c
+# test.sh - keep this file for local testing
+
+# Ruff
+.ruff_cache/
+
+# UV
+.venv/
+
+# MacOS
+.DS_Store
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

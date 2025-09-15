@@ -5,10 +5,11 @@ import pandas as pd
 import pytest
 
 from py_alpaca_api import PyAlpacaAPI
+from py_alpaca_api.exceptions import APIRequestError
 from py_alpaca_api.models.account_model import AccountModel
 
-api_key = os.environ.get("ALPACA_API_KEY")
-api_secret = os.environ.get("ALPACA_SECRET_KEY")
+api_key = os.environ.get("ALPACA_API_KEY", "")
+api_secret = os.environ.get("ALPACA_SECRET_KEY", "")
 
 
 @pytest.fixture
@@ -25,7 +26,7 @@ def alpaca_wrong_keys():
 # Test cases for PyAlpacaAPI.get_account #
 ##########################################
 def test_get_account_wrong_keys(alpaca_wrong_keys):
-    with pytest.raises(Exception):
+    with pytest.raises(APIRequestError):
         alpaca_wrong_keys.trading.account.get()
 
 

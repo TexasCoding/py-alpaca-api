@@ -1,10 +1,12 @@
 # Retrieve historical stock data for a valid symbol and timeframe
+import logging
+
 import pandas as pd
 import pytest
+
 from py_alpaca_api.stock.history import History
 from py_alpaca_api.stock.predictor import Predictor
 from py_alpaca_api.stock.screener import Screener
-import logging
 
 logger = logging.getLogger("cmdstanpy")
 logger.disabled = True
