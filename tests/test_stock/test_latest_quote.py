@@ -2,14 +2,13 @@ import os
 
 import pytest
 
+from py_alpaca_api import PyAlpacaAPI
 from py_alpaca_api.models.quote_model import QuoteModel
 
 
 class TestLatestQuote:
     @pytest.fixture
     def latest_quote(self):
-        from py_alpaca_api import PyAlpacaAPI
-
         api_key = os.environ.get("ALPACA_API_KEY", "")
         api_secret = os.environ.get("ALPACA_SECRET_KEY", "")
         return PyAlpacaAPI(api_key=api_key, api_secret=api_secret).stock.latest_quote

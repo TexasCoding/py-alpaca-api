@@ -34,19 +34,19 @@ test-file:
 
 # Run linter
 lint:
-	uv run ruff check src tests
+	uv run ruff check src
 
 # Fix linting issues automatically
 lint-fix:
-	uv run ruff check --fix src tests
+	uv run ruff check --fix src
 
 # Format code
 format:
-	uv run ruff format src tests
+	uv run ruff format src
 
 # Check if code is formatted correctly
 format-check:
-	uv run ruff format --check src tests
+	uv run ruff format --check src
 
 # Run type checker
 type-check:
