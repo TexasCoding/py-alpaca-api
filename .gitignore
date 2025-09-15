@@ -2,7 +2,21 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+.coverage.xml
+.coverage.html
+.coverage.json
+.coverage.yaml
+.coverage.yml
+.coverage.xml
+.coverage.html
+.coverage.json
+.coverage.yaml
+.coverage.yml
 # C extensions
 *.so
 .idea/
