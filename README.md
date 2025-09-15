@@ -245,6 +245,52 @@ all_actions = api.trading.corporate_actions.get_announcements(
 )
 ```
 
+### Trade Data
+
+```python
+# Get historical trades for a symbol
+trades_response = api.stock.trades.get_trades(
+    symbol="AAPL",
+    start="2024-01-15T09:30:00Z",
+    end="2024-01-15T10:00:00Z",
+    limit=100
+)
+
+for trade in trades_response.trades:
+    print(f"Trade: {trade.size} shares @ ${trade.price} on {trade.exchange}")
+
+# Get latest trade for a symbol
+latest_trade = api.stock.trades.get_latest_trade("MSFT")
+print(f"Latest MSFT trade: ${latest_trade.price} x {latest_trade.size}")
+
+# Get trades for multiple symbols
+multi_trades = api.stock.trades.get_trades_multi(
+    symbols=["AAPL", "MSFT", "GOOGL"],
+    start="2024-01-15T09:30:00Z",
+    end="2024-01-15T10:00:00Z",
+    limit=10
+)
+
+for symbol, trades_data in multi_trades.items():
+    print(f"{symbol}: {len(trades_data.trades)} trades")
+
+# Get all trades with automatic pagination
+all_trades = api.stock.trades.get_all_trades(
+    symbol="SPY",
+    start="2024-01-15T09:30:00Z",
+    end="2024-01-15T09:35:00Z"
+)
+print(f"Total SPY trades: {len(all_trades)}")
+
+# Use different data feeds (requires subscription)
+sip_trades = api.stock.trades.get_trades(
+    symbol="AAPL",
+    start="2024-01-15T09:30:00Z",
+    end="2024-01-15T10:00:00Z",
+    feed="sip"  # or "iex", "otc"
+)
+```
+
 ### Advanced Order Types
 
 ```python
