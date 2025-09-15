@@ -1,6 +1,7 @@
 from py_alpaca_api.stock.assets import Assets
 from py_alpaca_api.stock.history import History
 from py_alpaca_api.stock.latest_quote import LatestQuote
+from py_alpaca_api.stock.metadata import Metadata
 from py_alpaca_api.stock.predictor import Predictor
 from py_alpaca_api.stock.screener import Screener
 from py_alpaca_api.stock.snapshots import Snapshots
@@ -41,5 +42,6 @@ class Stock:
         )
         self.predictor = Predictor(history=self.history, screener=self.screener)
         self.latest_quote = LatestQuote(headers=headers)
+        self.metadata = Metadata(headers=headers)
         self.snapshots = Snapshots(headers=headers)
         self.trades = Trades(headers=headers)
