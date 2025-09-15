@@ -201,6 +201,50 @@ api.trading.watchlists.add_assets_to_watchlist(
 watchlists = api.trading.watchlists.get_all_watchlists()
 ```
 
+### Corporate Actions
+
+```python
+# Get dividend announcements
+dividends = api.trading.corporate_actions.get_announcements(
+    since="2024-01-01",
+    until="2024-03-31",
+    ca_types=["dividend"],
+    symbol="AAPL"  # Optional: filter by symbol
+)
+
+for dividend in dividends:
+    print(f"{dividend.initiating_symbol}: ${dividend.cash_amount} on {dividend.payable_date}")
+
+# Get stock splits
+splits = api.trading.corporate_actions.get_announcements(
+    since="2024-01-01",
+    until="2024-03-31",
+    ca_types=["split"]
+)
+
+for split in splits:
+    print(f"{split.initiating_symbol}: {split.split_from}:{split.split_to} split")
+
+# Get mergers and acquisitions
+mergers = api.trading.corporate_actions.get_announcements(
+    since="2024-01-01",
+    until="2024-03-31",
+    ca_types=["merger"]
+)
+
+# Get specific announcement by ID
+announcement = api.trading.corporate_actions.get_announcement_by_id("123456")
+print(f"Corporate Action: {announcement.ca_type} for {announcement.initiating_symbol}")
+
+# Get all types of corporate actions
+all_actions = api.trading.corporate_actions.get_announcements(
+    since="2024-01-01",
+    until="2024-03-31",
+    ca_types=["dividend", "split", "merger", "spinoff"],
+    date_type="ex_dividend"  # Filter by specific date type
+)
+```
+
 ### Advanced Order Types
 
 ```python
