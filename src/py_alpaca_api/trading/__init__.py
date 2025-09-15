@@ -1,4 +1,5 @@
 from py_alpaca_api.trading.account import Account
+from py_alpaca_api.trading.corporate_actions import CorporateActions
 from py_alpaca_api.trading.market import Market
 from py_alpaca_api.trading.news import News
 from py_alpaca_api.trading.orders import Orders
@@ -23,6 +24,7 @@ class Trading:
 
     def _initialize_components(self, headers: dict[str, str], base_url: str):
         self.account = Account(headers=headers, base_url=base_url)
+        self.corporate_actions = CorporateActions(headers=headers, base_url=base_url)
         self.market = Market(headers=headers, base_url=base_url)
         self.positions = Positions(
             headers=headers, base_url=base_url, account=self.account
