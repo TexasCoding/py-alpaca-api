@@ -124,6 +124,7 @@ class TestOrderEnhancementsIntegration:
                 qty=1,
                 side="buy",
                 order_class="oto",
+                take_profit=150.00,  # OTO needs either take_profit OR stop_loss
                 client_order_id=client_id,
             )
 
@@ -137,26 +138,37 @@ class TestOrderEnhancementsIntegration:
 
     def test_order_class_oco(self, alpaca):
         """Test One-Cancels-Other (OCO) order class."""
-        # Note: OCO orders require specific account permissions
-        # This test may fail if the account doesn't support OCO orders
+        # Note: OCO orders are exit-only orders and require an existing position
+        # Since we may not have a position, we'll test that the API properly rejects
+        # OCO orders when no position exists, or skip if we get the expected error
         try:
             client_id = f"test-oco-{int(time.time())}"
             order = alpaca.trading.orders.limit(
                 symbol="AAPL",
                 limit_price=100.00,  # Low price to avoid fill
                 qty=1,
-                side="buy",
+                side="sell",  # OCO orders are exit orders, so we'd sell to close a long position
                 order_class="oco",
+                take_profit=150.00,  # Take profit at higher price for sell order
+                stop_loss=80.00,  # Stop loss at lower price for sell order
                 client_order_id=client_id,
             )
 
+            # If we somehow have a position and the order succeeds
             if order:
                 assert order.order_class in ["oco", "simple"]  # May fallback to simple
                 alpaca.trading.orders.cancel_by_id(order.id)
         except APIRequestError as e:
-            # OCO might not be supported
-            if "order class" not in str(e).lower():
-                raise
+            # Expected errors since OCO orders are exit-only
+            error_msg = str(e).lower()
+            if "oco orders must be exit orders" in error_msg:
+                pass  # Expected since we don't have a position
+            elif "insufficient" in error_msg or "position" in error_msg:
+                pass  # Also expected if no position exists
+            elif "order class" in error_msg:
+                pass  # OCO might not be supported on account
+            else:
+                raise  # Unexpected error
 
     def test_bracket_order_with_explicit_class(self, alpaca):
         """Test bracket order with explicit order_class."""
@@ -165,7 +177,7 @@ class TestOrderEnhancementsIntegration:
             symbol="AAPL",
             qty=1,
             side="buy",
-            take_profit=200.00,  # High take profit
+            take_profit=500.00,  # High take profit (well above current price ~$240)
             stop_loss=50.00,  # Low stop loss
             order_class="bracket",  # Explicitly set
             client_order_id=client_id,
