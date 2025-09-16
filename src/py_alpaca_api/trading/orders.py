@@ -245,8 +245,11 @@ class Orders:
         if not (qty or notional) or (qty and notional):
             raise ValueError()
 
-        if (take_profit and not stop_loss) or (stop_loss and not take_profit):
-            raise ValueError()
+        # Note: This validation was removed because different order classes have different requirements:
+        # - Bracket orders need both take_profit and stop_loss
+        # - OTO orders need EITHER take_profit OR stop_loss
+        # - OCO orders have other specific requirements
+        # The API will validate based on order_class
 
         if (
             take_profit
