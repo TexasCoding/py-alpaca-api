@@ -11,6 +11,7 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 
 ## ✨ Features
 
+### Core Features
 - **🔐 Complete Alpaca API Coverage**: Trading, market data, account management, and more
 - **📊 Stock Market Analysis**: Built-in screeners for gainers/losers, historical data analysis
 - **🚀 Batch Operations**: Efficient multi-symbol data fetching with automatic batching (200+ symbols)
@@ -18,8 +19,18 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 - **📰 Financial News Integration**: Real-time news from Yahoo Finance and Benzinga
 - **📈 Technical Analysis**: Stock recommendations and sentiment analysis
 - **🎯 Type Safety**: Full type annotations with mypy strict mode
-- **🧪 Battle-Tested**: 100+ tests with comprehensive coverage
-- **⚡ Modern Python**: Async-ready, Python 3.10+ with latest best practices
+- **🧪 Battle-Tested**: 300+ tests with comprehensive coverage
+- **⚡ Modern Python**: Python 3.10+ with latest best practices
+
+### New in v3.0.0
+- **📸 Market Snapshots**: Get complete market snapshots with latest trade, quote, and bar data
+- **⚙️ Account Configuration**: Manage PDT settings, trade confirmations, and margin configurations
+- **📋 Market Metadata**: Access condition codes, exchange information, and trading metadata
+- **🔄 Enhanced Orders**: Replace orders, client order IDs, and advanced order management
+- **🎯 Smart Feed Management**: Automatic feed selection and fallback (SIP → IEX → OTC)
+- **💾 Intelligent Caching**: Built-in caching system with configurable TTLs for optimal performance
+- **🏢 Corporate Actions**: Track dividends, splits, mergers, and other corporate events
+- **📊 Trade Data API**: Access historical and real-time trade data with pagination
 
 ## 📦 Installation
 
@@ -306,6 +317,162 @@ sip_trades = api.stock.trades.get_trades(
 )
 ```
 
+### Market Snapshots
+
+```python
+# Get snapshot for a single symbol
+snapshot = api.stock.snapshots.get_snapshot("AAPL")
+print(f"Latest trade: ${snapshot.latest_trade.price}")
+print(f"Latest quote: Bid ${snapshot.latest_quote.bid} / Ask ${snapshot.latest_quote.ask}")
+print(f"Daily bar: Open ${snapshot.daily_bar.open} / Close ${snapshot.daily_bar.close}")
+print(f"Previous daily: Open ${snapshot.prev_daily_bar.open} / Close ${snapshot.prev_daily_bar.close}")
+
+# Get snapshots for multiple symbols (efficient batch operation)
+symbols = ["AAPL", "GOOGL", "MSFT", "TSLA", "NVDA"]
+snapshots = api.stock.snapshots.get_snapshots(symbols)
+for symbol, snapshot in snapshots.items():
+    print(f"{symbol}: ${snapshot.latest_trade.price} ({snapshot.daily_bar.volume:,} volume)")
+
+# Get snapshots with specific feed
+snapshots = api.stock.snapshots.get_snapshots(
+    symbols=["SPY", "QQQ"],
+    feed="iex"  # or "sip", "otc"
+)
+```
+
+### Account Configuration
+
+```python
+# Get current account configuration
+config = api.trading.account.get_configuration()
+print(f"PDT Check: {config.pdt_check}")
+print(f"Trade Confirm Email: {config.trade_confirm_email}")
+print(f"Suspend Trade: {config.suspend_trade}")
+print(f"No Shorting: {config.no_shorting}")
+
+# Update account configuration
+updated_config = api.trading.account.update_configuration(
+    trade_confirm_email=True,
+    suspend_trade=False,
+    pdt_check="both",  # "both", "entry", or "exit"
+    no_shorting=False
+)
+print("Account configuration updated successfully")
+```
+
+### Market Metadata
+
+```python
+# Get condition codes for trades
+condition_codes = api.stock.metadata.get_condition_codes(tape="A")
+for code in condition_codes:
+    print(f"Code {code.code}: {code.description}")
+
+# Get exchange codes
+exchanges = api.stock.metadata.get_exchange_codes()
+for exchange in exchanges:
+    print(f"{exchange.code}: {exchange.name} ({exchange.type})")
+
+# Get all condition codes at once (cached for performance)
+all_codes = api.stock.metadata.get_all_condition_codes()
+print(f"Loaded {len(all_codes)} condition codes")
+
+# Lookup specific codes
+code_info = api.stock.metadata.lookup_condition_code("R")
+print(f"Code R means: {code_info.description}")
+```
+
+### Enhanced Order Management
+
+```python
+# Place order with client order ID for tracking
+order = api.trading.orders.market(
+    symbol="AAPL",
+    qty=1,
+    side="buy",
+    client_order_id="my-app-order-123"
+)
+
+# Replace an existing order (modify price, quantity, etc.)
+replaced_order = api.trading.orders.replace_order(
+    order_id=order.id,
+    qty=2,  # Change quantity
+    limit_price=155.00  # Add/change limit price
+)
+
+# Get order by client order ID (useful for tracking)
+orders = api.trading.orders.get_all(status="open")
+my_order = next((o for o in orders if o.client_order_id == "my-app-order-123"), None)
+
+# Advanced OCO/OTO orders
+oco_order = api.trading.orders.limit(
+    symbol="TSLA",
+    qty=1,
+    side="buy",
+    limit_price=200.00,
+    order_class="oco",  # One-Cancels-Other
+    take_profit={"limit_price": 250.00},
+    stop_loss={"stop_price": 180.00}
+)
+```
+
+### Smart Feed Management
+
+```python
+# The library automatically manages feed selection based on your subscription
+# No configuration needed - it automatically detects and falls back as needed
+
+# Manual feed configuration (optional)
+from py_alpaca_api.http.feed_manager import FeedManager, FeedConfig, FeedType
+
+# Configure preferred feeds
+feed_config = FeedConfig(
+    preferred_feed=FeedType.SIP,  # Try SIP first
+    fallback_feeds=[FeedType.IEX],  # Fall back to IEX if needed
+    auto_fallback=True  # Automatically handle permission errors
+)
+
+# The feed manager automatically:
+# - Detects your subscription level (Basic/Unlimited/Business)
+# - Falls back to available feeds on permission errors
+# - Caches failed feeds to avoid repeated attempts
+# - Provides clear logging for debugging
+```
+
+### Intelligent Caching System
+
+```python
+# Caching is built-in and automatic for improved performance
+# Configure caching (optional - sensible defaults are provided)
+from py_alpaca_api.cache import CacheManager, CacheConfig
+
+# Custom cache configuration
+cache_config = CacheConfig(
+    max_size=1000,  # Maximum items in cache
+    default_ttl=300,  # Default time-to-live in seconds
+    data_ttls={
+        "market_hours": 86400,  # 1 day
+        "assets": 3600,  # 1 hour
+        "quotes": 1,  # 1 second
+        "positions": 10,  # 10 seconds
+    }
+)
+
+# Cache manager automatically:
+# - Caches frequently accessed data
+# - Reduces API calls and improves response times
+# - Manages memory efficiently with LRU eviction
+# - Supports optional Redis backend for distributed caching
+
+# Use the @cached decorator for custom caching
+cache_manager = CacheManager(cache_config)
+
+@cache_manager.cached("custom_data", ttl=600)
+def expensive_calculation(symbol: str):
+    # This result will be cached for 10 minutes
+    return complex_analysis(symbol)
+```
+
 ### Advanced Order Types
 
 ```python
@@ -405,27 +572,36 @@ make lint
 ```
 py-alpaca-api/
 ├── src/py_alpaca_api/
-│   ├── __init__.py           # Main API client
-│   ├── exceptions.py         # Custom exceptions
-│   ├── trading/              # Trading operations
-│   │   ├── account.py        # Account management
-│   │   ├── orders.py         # Order management
-│   │   ├── positions.py      # Position tracking
-│   │   ├── watchlists.py     # Watchlist operations
-│   │   ├── market.py         # Market data
-│   │   ├── news.py           # Financial news
-│   │   └── recommendations.py # Stock analysis
-│   ├── stock/                # Stock market data
-│   │   ├── assets.py         # Asset information
-│   │   ├── history.py        # Historical data
-│   │   ├── screener.py       # Stock screening
-│   │   ├── predictor.py      # ML predictions
-│   │   └── latest_quote.py   # Real-time quotes
-│   ├── models/               # Data models
-│   └── http/                 # HTTP client
-├── tests/                    # Test suite
-├── docs/                     # Documentation
-└── pyproject.toml           # Project configuration
+│   ├── __init__.py              # Main API client
+│   ├── exceptions.py            # Custom exceptions
+│   ├── trading/                 # Trading operations
+│   │   ├── account.py           # Account management & configuration
+│   │   ├── orders.py            # Order management (enhanced)
+│   │   ├── positions.py         # Position tracking
+│   │   ├── watchlists.py        # Watchlist operations
+│   │   ├── market.py            # Market hours & calendar
+│   │   ├── news.py              # Financial news
+│   │   ├── recommendations.py   # Stock analysis
+│   │   └── corporate_actions.py # Corporate events (v3.0.0)
+│   ├── stock/                   # Stock market data
+│   │   ├── assets.py            # Asset information
+│   │   ├── history.py           # Historical data (batch support)
+│   │   ├── screener.py          # Stock screening
+│   │   ├── predictor.py         # ML predictions
+│   │   ├── latest_quote.py      # Real-time quotes (batch support)
+│   │   ├── trades.py            # Trade data API (v3.0.0)
+│   │   ├── snapshots.py         # Market snapshots (v3.0.0)
+│   │   └── metadata.py          # Market metadata (v3.0.0)
+│   ├── models/                  # Data models
+│   ├── cache/                   # Caching system (v3.0.0)
+│   │   ├── cache_manager.py    # Cache management
+│   │   └── cache_config.py     # Cache configuration
+│   └── http/                    # HTTP client
+│       ├── requests.py          # Request handling
+│       └── feed_manager.py      # Feed management (v3.0.0)
+├── tests/                       # Test suite (300+ tests)
+├── docs/                        # Documentation
+└── pyproject.toml              # Project configuration
 ```
 
 ## 📖 Documentation
@@ -484,13 +660,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
+### v3.0.0 (Current Release)
+- ✅ Complete Alpaca Stock API coverage
+- ✅ Market Snapshots API
+- ✅ Account Configuration API
+- ✅ Market Metadata API
+- ✅ Enhanced Order Management
+- ✅ Corporate Actions API
+- ✅ Trade Data API
+- ✅ Smart Feed Management System
+- ✅ Intelligent Caching System
+- ✅ Batch Operations for all data endpoints
+
+### v3.1.0 (Planned)
 - [ ] WebSocket support for real-time data streaming
+- [ ] Live market data subscriptions
+- [ ] Real-time order and trade updates
+
+### v3.2.0 (Planned)
+- [ ] Full async/await support
+- [ ] Concurrent API operations
+- [ ] Async context managers
+
+### Future Releases
 - [ ] Options trading support
 - [ ] Crypto trading integration
 - [ ] Advanced portfolio analytics
 - [ ] Backtesting framework
 - [ ] Strategy automation tools
-- [ ] Mobile app integration
 
 ## ⚠️ Disclaimer
 
