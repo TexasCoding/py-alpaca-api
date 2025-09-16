@@ -255,8 +255,14 @@ class TestTradesLive:
                 print(f"\nRetrieved {len(all_trades)} total trades across all pages")
 
                 # Check trades are in chronological order
-                timestamps = [trade.timestamp for trade in all_trades]
-                assert timestamps == sorted(timestamps)
+                # Parse timestamps to handle different precision levels
+                parsed_timestamps = [
+                    datetime.fromisoformat(trade.timestamp.replace("Z", "+00:00"))
+                    for trade in all_trades
+                ]
+                assert parsed_timestamps == sorted(
+                    parsed_timestamps
+                ), "Trades are not in chronological order"
                 print("  Trades are in chronological order ✓")
 
         except APIRequestError as e:
