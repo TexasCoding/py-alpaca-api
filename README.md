@@ -13,6 +13,7 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 
 - **🔐 Complete Alpaca API Coverage**: Trading, market data, account management, and more
 - **📊 Stock Market Analysis**: Built-in screeners for gainers/losers, historical data analysis
+- **🚀 Batch Operations**: Efficient multi-symbol data fetching with automatic batching (200+ symbols)
 - **🤖 ML-Powered Predictions**: Stock price predictions using Facebook Prophet
 - **📰 Financial News Integration**: Real-time news from Yahoo Finance and Benzinga
 - **📈 Technical Analysis**: Stock recommendations and sentiment analysis
@@ -99,16 +100,30 @@ api.trading.orders.cancel_all()
 ### Market Data & Analysis
 
 ```python
-# Get historical stock data
+# Get historical stock data for a single symbol
 history = api.stock.history.get(
     symbol="TSLA",
     start="2024-01-01",
     end="2024-12-31"
 )
 
-# Get real-time quote
+# NEW: Get historical data for multiple symbols (batch operation)
+symbols = ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN"]
+multi_history = api.stock.history.get(
+    symbol=symbols,  # Pass a list for batch operation
+    start="2024-01-01",
+    end="2024-12-31"
+)
+# Returns DataFrame with all symbols' data, automatically handles batching for 200+ symbols
+
+# Get real-time quote for a single symbol
 quote = api.stock.latest_quote.get("MSFT")
-print(f"MSFT Price: ${quote.ask_price}")
+print(f"MSFT Price: ${quote.ask}")
+
+# NEW: Get real-time quotes for multiple symbols (batch operation)
+quotes = api.stock.latest_quote.get(["AAPL", "GOOGL", "MSFT"])
+for quote in quotes:
+    print(f"{quote.symbol}: ${quote.ask}")
 
 # Screen for top gainers
 gainers = api.stock.screener.gainers(
