@@ -35,6 +35,7 @@ def alpaca_create_order(alpaca):
 ################################################
 # Test cases for PyAlpacaAPI.cancel_all #
 ################################################
+@pytest.mark.rate_limited
 def test_cancel_all_orders(alpaca):
     alpaca.trading.orders.cancel_all()
     test_count = 5
@@ -179,6 +180,7 @@ def test_limit_order_with_no_money(alpaca):
 ###########################################
 # Test cases for PyAlpacaAPI.stop #
 ###########################################
+@pytest.mark.rate_limited
 def test_stop_order_with_qty(alpaca):
     alpaca.trading.orders.cancel_all()
     order = alpaca.trading.orders.stop(

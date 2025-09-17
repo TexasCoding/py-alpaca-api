@@ -221,6 +221,7 @@ class TestOrderEnhancementsIntegration:
         # Cancel the order
         alpaca.trading.orders.cancel_by_id(order.id)
 
+    @pytest.mark.rate_limited  # Add delays to avoid rate limiting
     def test_multiple_orders_with_client_ids(self, alpaca):
         """Test managing multiple orders with client IDs."""
         client_ids = [f"test-multi-{i}-{int(time.time())}" for i in range(3)]

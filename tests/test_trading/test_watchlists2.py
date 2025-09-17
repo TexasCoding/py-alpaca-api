@@ -91,6 +91,7 @@ def test_watchlist_update_with_list(alpaca):
     delete_all_watchlists(alpaca)
 
 
+@pytest.mark.rate_limited
 def test_watchlist_add_asset(alpaca):
     delete_all_watchlists(alpaca)
     watchlist = alpaca.trading.watchlists.create(
@@ -102,6 +103,7 @@ def test_watchlist_add_asset(alpaca):
     delete_all_watchlists(alpaca)
 
 
+@pytest.mark.rate_limited
 def test_watchlist_remove_asset(alpaca):
     delete_all_watchlists(alpaca)
     watchlist = alpaca.trading.watchlists.create(

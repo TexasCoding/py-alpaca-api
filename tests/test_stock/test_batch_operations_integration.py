@@ -14,6 +14,7 @@ from py_alpaca_api.models.quote_model import QuoteModel
     not os.environ.get("ALPACA_API_KEY"),
     reason="ALPACA_API_KEY not set in environment",
 )
+@pytest.mark.rate_limited  # Add delays to avoid rate limiting
 class TestBatchOperationsIntegration:
     """Integration tests for batch operations with real API."""
 
@@ -38,6 +39,7 @@ class TestBatchOperationsIntegration:
         start_date = end_date - timedelta(days=5)
         return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
 
+    @pytest.mark.ci_skip  # Skip in CI due to rate limiting with multiple symbols
     def test_multi_symbol_history_real_data(self, alpaca, test_symbols, date_range):
         """Test fetching real historical data for multiple symbols."""
         start, end = date_range
@@ -92,6 +94,7 @@ class TestBatchOperationsIntegration:
             assert quote.bid_size >= 0
             assert quote.timestamp is not None
 
+    @pytest.mark.ci_skip  # Skip in CI due to rate limiting
     def test_single_symbol_history_backward_compatibility(self, alpaca, date_range):
         """Test that single symbol requests still work as before."""
         start, end = date_range
@@ -169,6 +172,7 @@ class TestBatchOperationsIntegration:
         assert "GOOGL" in returned_symbols
         assert "MSFT" in returned_symbols
 
+    @pytest.mark.ci_skip  # Skip in CI due to rate limiting
     def test_different_timeframes(self, alpaca, date_range):
         """Test multi-symbol history with different timeframes."""
         start, end = date_range
@@ -205,6 +209,7 @@ class TestBatchOperationsIntegration:
             # SIP feed might not be available for all accounts
             pass
 
+    @pytest.mark.ci_skip  # Skip in CI due to rate limiting
     def test_pagination_handling(self, alpaca):
         """Test that pagination works correctly for large data requests."""
         # Request a large amount of historical data that will paginate

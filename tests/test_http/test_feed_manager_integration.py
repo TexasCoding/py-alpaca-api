@@ -37,6 +37,7 @@ def feed_manager():
     return FeedManager()
 
 
+@pytest.mark.rate_limited
 class TestFeedManagerIntegration:
     """Integration tests for feed manager with live API."""
 
@@ -83,6 +84,7 @@ class TestFeedManagerIntegration:
         # At least one feed should work
         assert successful_feed is not None, f"No feeds worked: {feeds_tested}"
 
+    @pytest.mark.ci_skip  # Skip in CI due to heavy rate limiting
     def test_feed_manager_with_bars_endpoint(self, alpaca):
         """Test feed manager with bars endpoint."""
         manager = FeedManager()
@@ -171,6 +173,7 @@ class TestFeedManagerIntegration:
         # Test validation for non-feed endpoint
         assert manager.validate_feed("account", "iex") is False
 
+    @pytest.mark.ci_skip  # Skip in CI due to heavy rate limiting
     def test_feed_manager_caching_behavior(self, alpaca):
         """Test that feed manager caches failed feeds appropriately."""
         manager = FeedManager(
