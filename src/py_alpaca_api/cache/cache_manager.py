@@ -123,7 +123,7 @@ class RedisCache:
             config: Cache configuration
         """
         self.config = config
-        self._client = None
+        self._client: Any = None
 
     def _get_client(self):
         """Get or create Redis client."""
@@ -143,7 +143,7 @@ class RedisCache:
                     decode_responses=True,
                 )
                 # Test connection
-                self._client.ping()  # type: ignore[attr-defined]
+                self._client.ping()
                 logger.info("Redis cache connected successfully")
             except Exception:
                 logger.exception("Failed to connect to Redis")
