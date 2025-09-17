@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import json
 import logging
@@ -9,9 +10,12 @@ import time
 from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import asdict, is_dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from py_alpaca_api.cache.cache_config import CacheConfig, CacheType
+
+if TYPE_CHECKING:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -125,8 +129,12 @@ class RedisCache:
         """Get or create Redis client."""
         if self._client is None:
             try:
-                import redis
+                import redis  # type: ignore[import-untyped]
+            except ImportError:
+                logger.warning("Redis not installed, falling back to memory cache")
+                raise
 
+            try:
                 self._client = redis.Redis(
                     host=self.config.redis_host,
                     port=self.config.redis_port,
@@ -135,11 +143,8 @@ class RedisCache:
                     decode_responses=True,
                 )
                 # Test connection
-                self._client.ping()
+                self._client.ping()  # type: ignore[attr-defined]
                 logger.info("Redis cache connected successfully")
-            except ImportError:
-                logger.warning("Redis not installed, falling back to memory cache")
-                raise
             except Exception:
                 logger.exception("Failed to connect to Redis")
                 raise
@@ -160,10 +165,9 @@ class RedisCache:
             value = client.get(key)
             if value:
                 return json.loads(value)
-            return None
         except Exception as e:
             logger.warning(f"Redis get failed: {e}")
-            return None
+        return None
 
     def set(self, key: str, value: Any, ttl: int) -> None:
         """Set item in cache.
@@ -247,12 +251,13 @@ class CacheManager:
                 cache = RedisCache(self.config)
                 # Test the connection
                 cache._get_client()
-                return cache
             except Exception as e:
                 logger.warning(
                     f"Failed to create Redis cache: {e}, falling back to memory cache"
                 )
                 return LRUCache(self.config.max_size)
+            else:
+                return cache
 
         return LRUCache(self.config.max_size)
 
@@ -318,9 +323,15 @@ class CacheManager:
 
         # Convert dataclass to dict for JSON serialization
         if is_dataclass(value):
-            value = asdict(value)
-        elif isinstance(value, list) and value and is_dataclass(value[0]):
-            value = [asdict(item) for item in value]
+            if not isinstance(value, type):
+                value = asdict(value)  # type: ignore[unreachable]
+        elif (
+            isinstance(value, list)
+            and value
+            and is_dataclass(value[0])
+            and not isinstance(value[0], type)
+        ):
+            value = [asdict(item) for item in value]  # type: ignore[unreachable]
 
         self._cache.set(key, value, ttl)
         logger.debug(f"Cached {key} with TTL {ttl}s")
@@ -387,8 +398,6 @@ class CacheManager:
 
         count = 0
         if isinstance(self._cache, LRUCache):
-            import fnmatch
-
             keys_to_delete = [
                 key for key in self._cache.cache if fnmatch.fnmatch(key, pattern)
             ]

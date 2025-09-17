@@ -11,6 +11,20 @@ from py_alpaca_api.models.trade_model import (
 )
 
 
+def _validate_datetime_format(start: str, end: str) -> None:
+    """Validate that datetime strings include time component.
+
+    Args:
+        start: Start datetime string
+        end: End datetime string
+
+    Raises:
+        ValueError: If dates don't include time component
+    """
+    if "T" not in start or "T" not in end:
+        raise ValueError("Date must include time (RFC-3339 format)")
+
+
 class Trades:
     def __init__(self, headers: dict[str, str]) -> None:
         self.headers = headers
@@ -53,8 +67,7 @@ class Trades:
 
         # Validate date formats (must include time)
         try:
-            if "T" not in start or "T" not in end:
-                raise ValueError("Date must include time (RFC-3339 format)")
+            _validate_datetime_format(start, end)
             datetime.fromisoformat(start.replace("Z", "+00:00"))
             datetime.fromisoformat(end.replace("Z", "+00:00"))
         except (ValueError, AttributeError) as e:
@@ -198,8 +211,7 @@ class Trades:
 
         # Validate date formats (must include time)
         try:
-            if "T" not in start or "T" not in end:
-                raise ValueError("Date must include time (RFC-3339 format)")
+            _validate_datetime_format(start, end)
             datetime.fromisoformat(start.replace("Z", "+00:00"))
             datetime.fromisoformat(end.replace("Z", "+00:00"))
         except (ValueError, AttributeError) as e:

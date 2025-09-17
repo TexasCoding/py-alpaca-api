@@ -79,14 +79,14 @@ class CorporateActions:
             "page_limit": min(page_limit, 500),
         }
 
-        if symbol:
-            params["symbol"] = symbol
-        if cusip:
-            params["cusip"] = cusip
-        if date_type:
-            params["date_type"] = date_type
-        if page_token:
-            params["page_token"] = page_token
+        # Add optional parameters
+        optional_params = {
+            "symbol": symbol,
+            "cusip": cusip,
+            "date_type": date_type,
+            "page_token": page_token,
+        }
+        params.update({k: v for k, v in optional_params.items() if v is not None})
 
         # Make request
         url = f"{self.base_url}/corporate_actions/announcements"

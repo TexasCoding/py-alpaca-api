@@ -313,11 +313,11 @@ class History:
         Returns:
             dict[str, list[defaultdict]]: A dictionary mapping symbols to their historical data.
         """
-        page_token = None
+        page_token: str | None = None
         symbols_data = defaultdict(list)
 
         while True:
-            if page_token:
+            if page_token is not None:
                 params["page_token"] = page_token
 
             response = json.loads(
