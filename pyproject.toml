@@ -137,8 +137,14 @@ module = [
     "requests_cache.*",
     "requests_ratelimiter.*",
     "pendulum.*",
+    "redis.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "py_alpaca_api.cache.cache_manager"
+warn_unused_ignores = false
+warn_unreachable = false
 
 # Pytest configuration
 [tool.pytest.ini_options]
