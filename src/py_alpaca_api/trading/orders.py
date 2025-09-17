@@ -88,6 +88,126 @@ class Orders:
         )
         return f"{len(response)} orders have been cancelled"
 
+    ########################################################
+    # \\\\\\\\\  Replace Order /////////////////////#
+    ########################################################
+    def replace_order(
+        self,
+        order_id: str,
+        qty: float | None = None,
+        limit_price: float | None = None,
+        stop_price: float | None = None,
+        trail: float | None = None,
+        time_in_force: str | None = None,
+        client_order_id: str | None = None,
+    ) -> OrderModel:
+        """Replace an existing order with updated parameters.
+
+        Args:
+            order_id: The ID of the order to replace.
+            qty: The new quantity for the order.
+            limit_price: The new limit price for limit orders.
+            stop_price: The new stop price for stop orders.
+            trail: The new trail amount for trailing stop orders (percent or price).
+            time_in_force: The new time in force for the order.
+            client_order_id: Optional client-assigned ID for the replacement order.
+
+        Returns:
+            OrderModel: The replaced order.
+
+        Raises:
+            ValidationError: If no parameters are provided to update.
+            APIRequestError: If the API request fails.
+        """
+        # At least one parameter must be provided
+        if not any([qty, limit_price, stop_price, trail, time_in_force]):
+            raise ValidationError(
+                "At least one parameter must be provided to replace the order"
+            )
+
+        body: dict[str, str | float | None] = {}
+        if qty is not None:
+            body["qty"] = qty
+        if limit_price is not None:
+            body["limit_price"] = limit_price
+        if stop_price is not None:
+            body["stop_price"] = stop_price
+        if trail is not None:
+            body["trail"] = trail
+        if time_in_force is not None:
+            body["time_in_force"] = time_in_force
+        if client_order_id is not None:
+            body["client_order_id"] = client_order_id
+
+        url = f"{self.base_url}/orders/{order_id}"
+
+        response = json.loads(
+            Requests()
+            .request(method="PATCH", url=url, headers=self.headers, json=body)
+            .text
+        )
+        return order_class_from_dict(response)
+
+    ########################################################
+    # \\\\\\\  Get Order By Client ID ////////////////#
+    ########################################################
+    def get_by_client_order_id(self, client_order_id: str) -> OrderModel:
+        """Retrieves order information by client order ID.
+
+        Note: This queries all orders and filters by client_order_id.
+        The Alpaca API doesn't have a direct endpoint for this.
+
+        Args:
+            client_order_id: The client-assigned ID of the order to retrieve.
+
+        Returns:
+            OrderModel: An object representing the order information.
+
+        Raises:
+            APIRequestError: If the request fails or order not found.
+            ValidationError: If no order with given client_order_id is found.
+        """
+        # Get all orders and filter by client_order_id
+        params: dict[str, str | bool | float | int] = {"status": "all", "limit": 500}
+        url = f"{self.base_url}/orders"
+
+        response = json.loads(
+            Requests()
+            .request(method="GET", url=url, headers=self.headers, params=params)
+            .text
+        )
+
+        # Find the order with matching client_order_id
+        for order_data in response:
+            if order_data.get("client_order_id") == client_order_id:
+                return order_class_from_dict(order_data)
+
+        raise ValidationError(f"No order found with client_order_id: {client_order_id}")
+
+    ########################################################
+    # \\\\\\  Cancel Order By Client ID ///////////////#
+    ########################################################
+    def cancel_by_client_order_id(self, client_order_id: str) -> str:
+        """Cancel an order by its client order ID.
+
+        Note: This first retrieves the order by client_order_id, then cancels by ID.
+
+        Args:
+            client_order_id: The client-assigned ID of the order to be cancelled.
+
+        Returns:
+            str: A message indicating the status of the cancellation.
+
+        Raises:
+            APIRequestError: If the cancellation request fails.
+            ValidationError: If no order with given client_order_id is found.
+        """
+        # First get the order by client_order_id to get its ID
+        order = self.get_by_client_order_id(client_order_id)
+
+        # Then cancel by the actual order ID
+        return self.cancel_by_id(order.id)
+
     @staticmethod
     def check_for_order_errors(
         symbol: str,
@@ -125,8 +245,11 @@ class Orders:
         if not (qty or notional) or (qty and notional):
             raise ValueError()
 
-        if (take_profit and not stop_loss) or (stop_loss and not take_profit):
-            raise ValueError()
+        # Note: This validation was removed because different order classes have different requirements:
+        # - Bracket orders need both take_profit and stop_loss
+        # - OTO orders need EITHER take_profit OR stop_loss
+        # - OCO orders have other specific requirements
+        # The API will validate based on order_class
 
         if (
             take_profit
@@ -148,6 +271,8 @@ class Orders:
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Submits a market order for a specified symbol.
 
@@ -164,6 +289,8 @@ class Orders:
                 (day/gtc/opg/ioc/fok). Defaults to "day".
             extended_hours (bool, optional): Whether to trade during extended hours.
                 Defaults to False.
+            client_order_id (str, optional): Client-assigned ID for the order. Defaults to None.
+            order_class (str, optional): Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             OrderModel: An instance of the OrderModel representing the submitted order.
@@ -190,6 +317,8 @@ class Orders:
             entry_type="market",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
+            client_order_id=client_order_id,
+            order_class=order_class,
         )
 
     ########################################################
@@ -206,6 +335,8 @@ class Orders:
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Limit order function that submits an order to buy or sell a specified symbol
         at a specified limit price.
@@ -226,6 +357,8 @@ class Orders:
                 or "gtc" (good till canceled). Default is "day".
             extended_hours (bool, optional): Whether to allow trading during extended
                 hours. Default is False.
+            client_order_id (str, optional): Client-assigned ID for the order. Defaults to None.
+            order_class (str, optional): Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             OrderModel: The submitted order.
@@ -253,6 +386,8 @@ class Orders:
             entry_type="limit",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
+            client_order_id=client_order_id,
+            order_class=order_class,
         )
 
     ########################################################
@@ -268,6 +403,8 @@ class Orders:
         stop_loss: float | None = None,
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Args:
 
@@ -283,6 +420,8 @@ class Orders:
                 Defaults to 'day'.
             extended_hours: A boolean value indicating whether to place the order during
                 extended hours. Defaults to False.
+            client_order_id: Client-assigned ID for the order. Defaults to None.
+            order_class: Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             An instance of the OrderModel representing the submitted order.
@@ -311,6 +450,8 @@ class Orders:
             entry_type="stop",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
+            client_order_id=client_order_id,
+            order_class=order_class,
         )
 
     ########################################################
@@ -325,6 +466,8 @@ class Orders:
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Submits a stop-limit order for trading.
 
@@ -339,6 +482,8 @@ class Orders:
                 Defaults to 'day'.
             extended_hours (bool, optional): Whether to allow trading during extended hours.
                 Defaults to False.
+            client_order_id (str, optional): Client-assigned ID for the order. Defaults to None.
+            order_class (str, optional): Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             OrderModel: The submitted stop-limit order.
@@ -366,6 +511,8 @@ class Orders:
             entry_type="stop_limit",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
+            client_order_id=client_order_id,
+            order_class=order_class,
         )
 
     ########################################################
@@ -380,6 +527,8 @@ class Orders:
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Submits a trailing stop order for the specified symbol.
 
@@ -392,7 +541,10 @@ class Orders:
                 `trail_percent` or `trail_price` must be provided, not both. Defaults to None.
             side (str, optional): The side of the order, either 'buy' or 'sell'. Defaults to 'buy'.
             time_in_force (str, optional): The time in force for the order. Defaults to 'day'.
-            extended_hours (bool, optional): Whether to allow trading during extended hours.\n                Defaults to False.
+            extended_hours (bool, optional): Whether to allow trading during extended hours.
+                Defaults to False.
+            client_order_id (str, optional): Client-assigned ID for the order. Defaults to None.
+            order_class (str, optional): Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             OrderModel: The submitted trailing stop order.
@@ -426,6 +578,8 @@ class Orders:
             entry_type="trailing_stop",
             time_in_force=time_in_force,
             extended_hours=extended_hours,
+            client_order_id=client_order_id,
+            order_class=order_class,
         )
 
     ########################################################
@@ -446,6 +600,8 @@ class Orders:
         side: str = "buy",
         time_in_force: str = "day",
         extended_hours: bool = False,
+        client_order_id: str | None = None,
+        order_class: str | None = None,
     ) -> OrderModel:
         """Submits an order to the Alpaca API.
 
@@ -470,7 +626,10 @@ class Orders:
             side (str, optional): The side of the trade (buy or sell). Defaults to "buy".
             time_in_force (str, optional): The time in force for the order.
                 Defaults to "day".
-            extended_hours (bool, optional): Whether to allow trading during extended hours.\n                Defaults to False.
+            extended_hours (bool, optional): Whether to allow trading during extended hours.
+                Defaults to False.
+            client_order_id (str, optional): Client-assigned ID for the order. Defaults to None.
+            order_class (str, optional): Order class (simple/bracket/oco/oto). Defaults to None.
 
         Returns:
             OrderModel: The submitted order.
@@ -478,6 +637,17 @@ class Orders:
         Raises:
             Exception: If the order submission fails.
         """
+        # Determine order class
+        if order_class:
+            # Use explicitly provided order class
+            final_order_class = order_class
+        elif take_profit or stop_loss:
+            # Bracket order if take profit or stop loss is specified
+            final_order_class = "bracket"
+        else:
+            # Default to simple
+            final_order_class = "simple"
+
         payload = {
             "symbol": symbol,
             "qty": qty if qty else None,
@@ -486,13 +656,14 @@ class Orders:
             "limit_price": limit_price if limit_price else None,
             "trail_percent": trail_percent if trail_percent else None,
             "trail_price": trail_price if trail_price else None,
-            "order_class": "bracket" if take_profit or stop_loss else "simple",
+            "order_class": final_order_class,
             "take_profit": take_profit,
             "stop_loss": stop_loss,
             "side": side if side == "buy" else "sell",
             "type": entry_type,
             "time_in_force": time_in_force,
             "extended_hours": extended_hours,
+            "client_order_id": client_order_id if client_order_id else None,
         }
 
         url = f"{self.base_url}/orders"

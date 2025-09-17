@@ -8,6 +8,10 @@ from py_alpaca_api.models.account_activity_model import (
     AccountActivityModel,
     account_activity_class_from_dict,
 )
+from py_alpaca_api.models.account_config_model import (
+    AccountConfigModel,
+    account_config_class_from_dict,
+)
 from py_alpaca_api.models.account_model import AccountModel, account_class_from_dict
 
 
@@ -183,3 +187,110 @@ class Account:
         # Ensure we always return a DataFrame
         assert isinstance(portfolio_df, pd.DataFrame)
         return portfolio_df
+
+    ############################################
+    # Get Account Configuration
+    ############################################
+    def get_configuration(self) -> AccountConfigModel:
+        """Retrieves the current account configuration settings.
+
+        Returns:
+            AccountConfigModel: The current account configuration.
+
+        Raises:
+            APIRequestError: If the request to retrieve configuration fails.
+        """
+        url = f"{self.base_url}/account/configurations"
+        http_response = Requests().request("GET", url, headers=self.headers)
+
+        if http_response.status_code != 200:
+            raise APIRequestError(
+                http_response.status_code,
+                f"Failed to retrieve account configuration: {http_response.status_code}",
+            )
+
+        response = json.loads(http_response.text)
+        return account_config_class_from_dict(response)
+
+    ############################################
+    # Update Account Configuration
+    ############################################
+    def update_configuration(
+        self,
+        dtbp_check: str | None = None,
+        fractional_trading: bool | None = None,
+        max_margin_multiplier: str | None = None,
+        no_shorting: bool | None = None,
+        pdt_check: str | None = None,
+        ptp_no_exception_entry: bool | None = None,
+        suspend_trade: bool | None = None,
+        trade_confirm_email: str | None = None,
+    ) -> AccountConfigModel:
+        """Updates the account configuration settings.
+
+        Args:
+            dtbp_check: Day trade buying power check ("entry", "exit", "both")
+            fractional_trading: Whether to enable fractional trading
+            max_margin_multiplier: Maximum margin multiplier ("1", "2", "4")
+            no_shorting: Whether to disable short selling
+            pdt_check: Pattern day trader check ("entry", "exit", "both")
+            ptp_no_exception_entry: Whether to enable PTP no exception entry
+            suspend_trade: Whether to suspend trading
+            trade_confirm_email: Trade confirmation emails ("all", "none")
+
+        Returns:
+            AccountConfigModel: The updated account configuration.
+
+        Raises:
+            APIRequestError: If the request to update configuration fails.
+            ValueError: If invalid parameter values are provided.
+        """
+        # Validate parameters using a validation map
+        validations = {
+            "dtbp_check": (dtbp_check, ["entry", "exit", "both"]),
+            "pdt_check": (pdt_check, ["entry", "exit", "both"]),
+            "max_margin_multiplier": (max_margin_multiplier, ["1", "2", "4"]),
+            "trade_confirm_email": (trade_confirm_email, ["all", "none"]),
+        }
+
+        for param_name, (value, valid_values) in validations.items():
+            if value and value not in valid_values:
+                raise ValueError(
+                    f"{param_name} must be one of: {', '.join(valid_values)}"
+                )
+
+        # Build request body with only provided parameters
+        body: dict[str, str | bool] = {}
+        if dtbp_check is not None:
+            body["dtbp_check"] = dtbp_check
+        if fractional_trading is not None:
+            body["fractional_trading"] = fractional_trading
+        if max_margin_multiplier is not None:
+            body["max_margin_multiplier"] = max_margin_multiplier
+        if no_shorting is not None:
+            body["no_shorting"] = no_shorting
+        if pdt_check is not None:
+            body["pdt_check"] = pdt_check
+        if ptp_no_exception_entry is not None:
+            body["ptp_no_exception_entry"] = ptp_no_exception_entry
+        if suspend_trade is not None:
+            body["suspend_trade"] = suspend_trade
+        if trade_confirm_email is not None:
+            body["trade_confirm_email"] = trade_confirm_email
+
+        if not body:
+            raise ValueError("At least one configuration parameter must be provided")
+
+        url = f"{self.base_url}/account/configurations"
+        http_response = Requests().request(
+            "PATCH", url, headers=self.headers, json=body
+        )
+
+        if http_response.status_code != 200:
+            raise APIRequestError(
+                http_response.status_code,
+                f"Failed to update account configuration: {http_response.status_code}",
+            )
+
+        response = json.loads(http_response.text)
+        return account_config_class_from_dict(response)

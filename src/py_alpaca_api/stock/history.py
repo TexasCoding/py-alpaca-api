@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
@@ -9,6 +10,8 @@ from py_alpaca_api.stock.assets import Assets
 
 
 class History:
+    BATCH_SIZE = 200  # Alpaca API limit for multi-symbol requests
+
     def __init__(self, data_url: str, headers: dict[str, str], asset: Assets) -> None:
         """Initializes an instance of the History class.
 
@@ -51,7 +54,7 @@ class History:
     ###########################################
     def get_stock_data(
         self,
-        symbol: str,
+        symbol: str | list[str],
         start: str,
         end: str,
         timeframe: str = "1d",
@@ -61,28 +64,59 @@ class History:
         sort: str = "asc",
         adjustment: str = "raw",
     ) -> pd.DataFrame:
-        """Retrieves historical stock data for a given symbol within a specified date range and timeframe.
+        """Retrieves historical stock data for one or more symbols within a specified date range and timeframe.
 
         Args:
-            symbol: The stock symbol to fetch data for.
+            symbol: The stock symbol(s) to fetch data for. Can be a single symbol string or list of symbols.
             start: The start date for historical data in the format "YYYY-MM-DD".
             end: The end date for historical data in the format "YYYY-MM-DD".
             timeframe: The timeframe for the historical data. Default is "1d".
             feed: The data feed source. Default is "sip".
             currency: The currency for historical data. Default is "USD".
-            limit: The number of data points to fetch. Default is 1000.
+            limit: The number of data points to fetch per symbol. Default is 1000.
             sort: The sort order for the data. Default is "asc".
             adjustment: The adjustment for historical data. Default is "raw".
 
         Returns:
-            A pandas DataFrame containing the historical stock data for the given symbol and time range.
+            A pandas DataFrame containing the historical stock data for the given symbol(s) and time range.
 
         Raises:
             ValueError: If the given timeframe is not one of the allowed values.
         """
-        self.check_if_stock(symbol)
+        # Handle single symbol or list of symbols
+        is_single = isinstance(symbol, str)
+        if is_single:
+            assert isinstance(symbol, str)  # Type guard for mypy
+            symbols_list: list[str] = [symbol]
+            single_symbol: str = symbol
+        else:
+            assert isinstance(symbol, list)  # Type guard for mypy
+            symbols_list = symbol
+            single_symbol = ""  # Won't be used in multi-symbol case
 
-        url = f"{self.data_url}/stocks/{symbol}/bars"
+        # Validate symbols are stocks
+        for sym in symbols_list:
+            self.check_if_stock(sym)
+
+        # If more than BATCH_SIZE symbols, need to batch the requests
+        if not is_single and len(symbols_list) > self.BATCH_SIZE:
+            return self._get_batched_stock_data(
+                symbols_list,
+                start,
+                end,
+                timeframe,
+                feed,
+                currency,
+                limit,
+                sort,
+                adjustment,
+            )
+
+        # Determine if using single or multi-symbol endpoint
+        if is_single:
+            url = f"{self.data_url}/stocks/{single_symbol}/bars"
+        else:
+            url = f"{self.data_url}/stocks/bars"
 
         timeframe_mapping: dict = {
             "1m": "1Min",
@@ -111,8 +145,105 @@ class History:
             "feed": feed,
             "sort": sort,
         }
-        symbol_data = self.get_historical_data(symbol, url, params)
-        return self.preprocess_data(symbol_data, symbol)
+
+        # Add symbols parameter for multi-symbol request
+        if not is_single:
+            params["symbols"] = ",".join(symbols_list)
+
+        symbol_data = self.get_historical_data(symbols_list, url, params, is_single)
+
+        # Process data based on single or multi-symbol
+        if is_single:
+            return self.preprocess_data(symbol_data[single_symbol], single_symbol)
+        return self.preprocess_multi_data(symbol_data)
+
+    def _get_batched_stock_data(
+        self,
+        symbols: list[str],
+        start: str,
+        end: str,
+        timeframe: str,
+        feed: str,
+        currency: str,
+        limit: int,
+        sort: str,
+        adjustment: str,
+    ) -> pd.DataFrame:
+        """Handle large symbol lists by batching requests.
+
+        Args:
+            symbols: List of symbols to fetch data for.
+            start: The start date for historical data.
+            end: The end date for historical data.
+            timeframe: The timeframe for the historical data.
+            feed: The data feed source.
+            currency: The currency for historical data.
+            limit: The number of data points to fetch per symbol.
+            sort: The sort order for the data.
+            adjustment: The adjustment for historical data.
+
+        Returns:
+            A pandas DataFrame containing the historical stock data for all symbols.
+        """
+        # Split symbols into batches
+        batches = [
+            symbols[i : i + self.BATCH_SIZE]
+            for i in range(0, len(symbols), self.BATCH_SIZE)
+        ]
+
+        # Use ThreadPoolExecutor for concurrent batch requests
+        all_dfs = []
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = []
+            for batch in batches:
+                future = executor.submit(
+                    self.get_stock_data,
+                    batch,
+                    start,
+                    end,
+                    timeframe,
+                    feed,
+                    currency,
+                    limit,
+                    sort,
+                    adjustment,
+                )
+                futures.append(future)
+
+            for future in as_completed(futures):
+                try:
+                    df = future.result()
+                    if not df.empty:
+                        all_dfs.append(df)
+                except Exception as e:
+                    # Log error but continue with other batches
+                    print(f"Error fetching batch: {e}")
+
+        if all_dfs:
+            return pd.concat(all_dfs, ignore_index=True).sort_values(["symbol", "date"])
+        return pd.DataFrame()
+
+    @staticmethod
+    def preprocess_multi_data(
+        symbols_data: dict[str, list[defaultdict]],
+    ) -> pd.DataFrame:
+        """Preprocess data for multiple symbols.
+
+        Args:
+            symbols_data: A dictionary mapping symbols to their bar data.
+
+        Returns:
+            A pandas DataFrame containing the preprocessed historical stock data for all symbols.
+        """
+        all_dfs = []
+        for symbol, data in symbols_data.items():
+            if data:  # Only process if data exists
+                df = History.preprocess_data(data, symbol)
+                all_dfs.append(df)
+
+        if all_dfs:
+            return pd.concat(all_dfs, ignore_index=True).sort_values(["symbol", "date"])
+        return pd.DataFrame()
 
     ###########################################
     # /////////// PreProcess Data \\\\\\\\\\\ #
@@ -169,35 +300,51 @@ class History:
     # ///////// Get Historical Data \\\\\\\\\ #
     ###########################################
     def get_historical_data(
-        self, symbol: str, url: str, params: dict
-    ) -> list[defaultdict]:
-        """Retrieves historical data for a given symbol.
+        self, symbols: list[str], url: str, params: dict, is_single: bool
+    ) -> dict[str, list[defaultdict]]:
+        """Retrieves historical data for given symbol(s).
 
         Args:
-            symbol (str): The symbol for which to retrieve historical data.
-            url (str): The URL to send the request to.
-            params (dict): Additional parameters to include in the request.
+            symbols: List of symbols for which to retrieve historical data.
+            url: The URL to send the request to.
+            params: Additional parameters to include in the request.
+            is_single: Whether this is a single-symbol request.
 
         Returns:
-            list[defaultdict]: A list of historical data for the given symbol.
+            dict[str, list[defaultdict]]: A dictionary mapping symbols to their historical data.
         """
         page_token = None
         symbols_data = defaultdict(list)
+
         while True:
-            params["page_token"] = page_token
+            if page_token:
+                params["page_token"] = page_token
+
             response = json.loads(
                 Requests()
                 .request(method="GET", url=url, headers=self.headers, params=params)
                 .text
             )
 
-            if not response.get("bars"):
-                raise Exception(
-                    f"No historical data found for {symbol}, with the given parameters."
-                )
+            # Handle single vs multi-symbol response format
+            if is_single:
+                if not response.get("bars"):
+                    raise Exception(
+                        f"No historical data found for {symbols[0]}, with the given parameters."
+                    )
+                symbols_data[symbols[0]].extend(response.get("bars", []))
+            else:
+                # Multi-symbol response has bars nested under symbol keys
+                bars = response.get("bars", {})
+                if not bars:
+                    raise Exception(
+                        f"No historical data found for symbols: {', '.join(symbols)}, with the given parameters."
+                    )
+                for symbol, symbol_bars in bars.items():
+                    symbols_data[symbol].extend(symbol_bars)
 
-            symbols_data[symbol].extend(response.get("bars", []))
-            page_token = response.get("next_page_token", "")
+            page_token = response.get("next_page_token")
             if not page_token:
                 break
-        return symbols_data[symbol]
+
+        return symbols_data
