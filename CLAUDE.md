@@ -9,9 +9,12 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) and ot
 - Market data access (historical, real-time quotes, news)
 - Stock analysis tools (screeners, ML predictions, sentiment)
 - Full type safety with mypy strict mode
-- Comprehensive test coverage (109+ tests)
+- Comprehensive test coverage (350+ tests)
+- Caching system with LRU and Redis support
+- Feed management with automatic subscription detection
+- Batch operations for multi-symbol data fetching
 
-**Current Version**: 2.2.0
+**Current Version**: 3.0.0
 **Python Support**: 3.10+
 **License**: MIT
 
@@ -21,6 +24,7 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) and ot
 - Python 3.10 or higher
 - uv package manager (recommended) or pip
 - Alpaca API credentials (paper trading credentials for testing)
+- Optional: Redis server for caching (falls back to memory cache if not available)
 
 ### Initial Setup
 ```bash
@@ -64,7 +68,7 @@ uv tree
 
 ### Testing
 ```bash
-# Run all tests with API credentials
+# Run all tests with API credentials (recommended)
 ./test.sh
 
 # Run specific test file
@@ -81,7 +85,16 @@ uv run pytest -q tests
 
 # Run tests with markers
 uv run pytest -m "not slow"
+
+# Skip CI-specific tests locally
+uv run pytest -m "not ci_skip"
 ```
+
+#### CI Test Configuration
+Tests are configured to handle rate limiting in CI environments:
+- Tests marked with `@pytest.mark.ci_skip` are skipped in CI
+- Tests marked with `@pytest.mark.rate_limited` have automatic delays in CI
+- See `tests/conftest.py` for CI detection and rate limit handling
 
 ### Code Quality
 ```bash
@@ -124,20 +137,24 @@ py-alpaca-api/
 │   ├── exceptions.py            # Custom exception hierarchy
 │   ├── trading/                 # Trading operations
 │   │   ├── __init__.py         # Trading module exports
-│   │   ├── account.py          # Account management
+│   │   ├── account.py          # Account management & configuration
 │   │   ├── orders.py           # Order execution & management
 │   │   ├── positions.py        # Position tracking
 │   │   ├── watchlists.py       # Watchlist CRUD
 │   │   ├── market.py           # Market hours & calendar
 │   │   ├── news.py             # Financial news aggregation
-│   │   └── recommendations.py  # Stock sentiment analysis
+│   │   ├── recommendations.py  # Stock sentiment analysis
+│   │   └── corporate_actions.py # Dividends, splits, mergers
 │   ├── stock/                   # Market data & analysis
 │   │   ├── __init__.py         # Stock module exports
 │   │   ├── assets.py           # Asset information
-│   │   ├── history.py          # Historical data retrieval
+│   │   ├── history.py          # Historical data retrieval (with batch support)
 │   │   ├── screener.py         # Gainers/losers screening
 │   │   ├── predictor.py        # ML predictions (Prophet)
-│   │   └── latest_quote.py     # Real-time quotes
+│   │   ├── latest_quote.py     # Real-time quotes (with batch support)
+│   │   ├── trades.py           # Trade data access
+│   │   ├── snapshots.py        # Market snapshots
+│   │   └── metadata.py         # Market metadata (conditions, exchanges)
 │   ├── models/                  # Data models
 │   │   ├── account_model.py    # Account dataclass
 │   │   ├── order_model.py      # Order dataclass
@@ -147,8 +164,13 @@ py-alpaca-api/
 │   │   ├── quote_model.py      # Quote dataclass
 │   │   ├── clock_model.py      # Market clock dataclass
 │   │   └── model_utils.py      # Conversion utilities
+│   ├── cache/                   # Caching system
+│   │   ├── __init__.py         # Cache exports
+│   │   ├── cache_config.py     # Cache configuration
+│   │   └── cache_manager.py    # LRU & Redis cache implementation
 │   └── http/                    # HTTP layer
-│       └── requests.py          # Request handling with retries
+│       ├── requests.py          # Request handling with retries
+│       └── feed_manager.py      # Feed management & auto-fallback
 ├── tests/                       # Test suite
 │   ├── test_trading/           # Trading tests
 │   ├── test_stock/             # Stock tests
@@ -264,6 +286,26 @@ def test_feature_scenario_expected_result(alpaca):
 - Clean up test data after each test (cancel orders, etc.)
 - Use small quantities/notional values to avoid account limits
 
+## ⚙️ Type Checking Configuration
+
+### Special Configurations
+The project uses specific mypy configurations for certain modules:
+
+```toml
+# pyproject.toml
+[[tool.mypy.overrides]]
+module = "py_alpaca_api.cache.cache_manager"
+warn_unused_ignores = false
+warn_unreachable = false
+
+[tool.ruff.lint.per-file-ignores]
+"src/py_alpaca_api/cache/cache_manager.py" = ["PLC0415"]  # Allow local import for optional redis
+```
+
+These are needed because:
+- Redis is an optional dependency (local import required)
+- Mypy has limitations with dataclass type checking
+
 ## 🐛 Common Issues & Solutions
 
 ### Issue: ValidationError instead of ValueError
@@ -372,13 +414,70 @@ df = df[df["column"] > value]
 - `ruff-format`: Format Python code
 - `mypy`: Type check Python code
 
+## 💾 Caching System
+
+### Overview
+The caching system reduces API calls and improves performance:
+- **LRU Memory Cache**: Default, no setup required
+- **Redis Cache**: Optional, falls back to memory if unavailable
+- **Configurable TTLs**: Different cache durations per data type
+
+### Configuration
+```python
+from py_alpaca_api.cache import CacheConfig, CacheType
+
+# Memory cache (default)
+config = CacheConfig(
+    cache_type=CacheType.MEMORY,
+    max_size=1000,
+    default_ttl=300  # 5 minutes
+)
+
+# Redis cache
+config = CacheConfig(
+    cache_type=CacheType.REDIS,
+    redis_host="localhost",
+    redis_port=6379,
+    redis_password="optional_password"
+)
+```
+
+### Default TTLs
+- Market hours/calendar: 1 day
+- Assets: 1 hour
+- Account data: 1 minute
+- Positions: 10 seconds
+- Orders: 5 seconds
+- Quotes: 1 second
+- Market metadata: 1 day
+
+## 🔄 Feed Management
+
+### Automatic Feed Detection
+The feed manager automatically detects your subscription level and falls back gracefully:
+- **SIP** → **IEX** → **OTC** (automatic fallback chain)
+- Caches failed feeds to avoid repeated attempts
+- Per-endpoint feed configuration
+
+### Usage
+```python
+# Automatic feed selection
+quotes = alpaca.stock.latest_quote.get("AAPL")  # Uses best available feed
+
+# Manual feed selection
+quotes = alpaca.stock.latest_quote.get("AAPL", feed="iex")
+```
+
 ## 📈 Performance Considerations
 
 1. **Rate Limiting**: Alpaca API has rate limits, use caching when possible
 2. **Batch Operations**: Combine multiple requests when feasible
+   - Automatic batching for 200+ symbols
+   - Concurrent request processing
 3. **DataFrame Operations**: Use vectorized operations over loops
 4. **Prophet Models**: Cache trained models for repeated predictions
 5. **News Fetching**: Implement caching to avoid repeated scraping
+6. **CI Testing**: Tests marked with `@pytest.mark.ci_skip` or `@pytest.mark.rate_limited`
 
 ## 🔒 Security
 
@@ -408,16 +507,35 @@ For new contributors:
 
 ## 💡 Tips for AI Assistants
 
-1. **Always run tests** after making changes
+1. **Always run tests** after making changes using `./test.sh`
 2. **Use type hints** in all new code
 3. **Follow existing patterns** in the codebase
-4. **Check pre-commit hooks** before committing
+4. **Run `make check`** before committing - this runs all quality checks
 5. **Update tests** when changing functionality
 6. **Document breaking changes** clearly
 7. **Preserve backward compatibility** when possible
-8. **Use descriptive commit messages**
+8. **Use descriptive commit messages** with conventional format (feat:, fix:, docs:, etc.)
+9. **Handle rate limiting** in tests with appropriate markers
+10. **Use caching** for frequently accessed data
+11. **Check CI status** after pushing changes
+12. **Update DEVELOPMENT_PLAN.md** when completing tasks
+
+### Important Commands
+```bash
+# Before committing
+make check          # Run all quality checks
+./test.sh          # Run tests with API keys
+
+# Fix issues
+make format        # Auto-format code
+make lint          # Fix linting issues
+
+# Development
+uv sync --all-extras --dev  # Install dependencies
+git checkout -b feature/name  # Create feature branch
+```
 
 ---
 
-*Last Updated: Version 2.2.0*
+*Last Updated: Version 3.0.0*
 *Maintained by: py-alpaca-api team*
