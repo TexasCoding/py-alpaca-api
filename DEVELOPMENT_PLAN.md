@@ -1,267 +1,43 @@
-# py-alpaca-api v3.0.0 Development Plan
+# py-alpaca-api Development Plan
 
 ## 📋 Overview
 
-This document outlines the comprehensive development plan for py-alpaca-api v3.0.0, focusing on achieving complete coverage of Alpaca's stock trading API while maintaining backward compatibility and improving code quality.
+This document outlines the future development plan for py-alpaca-api, focusing on advanced features and continuous improvements.
 
-**Target Version**: 3.0.0
-**Start Date**: 2025-01-14
-**Estimated Completion**: Q2 2025
-**Backwards Compatibility**: ✅ Maintained (deprecation warnings for changed APIs)
+**Current Version**: 3.0.0 (Released)
+**Next Version**: 3.1.0 (WebSocket Streaming)
+**Future Version**: 3.2.0 (Async Support)
 
-## 🎯 Goals
+## 🎯 Completed in v3.0.0
 
-1. **Complete API Coverage**: Implement all Alpaca stock-related endpoints
-2. **Performance**: Improve response times and reduce API calls through batching and caching
-3. **Reliability**: Enhanced error handling and retry mechanisms
-4. **Developer Experience**: Better documentation, type hints, and examples
-5. **Real-time Support**: Add WebSocket streaming capabilities
+### ✅ Phase 1: Critical Missing Features
+- Corporate Actions API
+- Trade Data Support
+- Market Snapshots
 
-## 🌳 Branching Strategy
+### ✅ Phase 2: Important Enhancements
+- Account Configuration
+- Market Metadata
+- Enhanced Order Management
 
-```
-main
-  └── v3.0.0 (long-lived feature branch)
-       ├── feature/corporate-actions-api
-       ├── feature/trade-data-api
-       ├── feature/market-snapshots
-       ├── feature/account-config
-       ├── feature/market-metadata
-       ├── feature/batch-operations
-       ├── feature/feed-management
-       ├── feature/caching-system
-       └── feature/websocket-streaming
-```
+### ✅ Phase 3: Performance & Quality
+- Batch Operations for multi-symbol data
+- Feed Management System with automatic fallback
+- Caching System with LRU and Redis support
 
-### Workflow
-1. Create feature branches from `v3.0.0`
-2. Implement features with tests
-3. Create PR to merge into `v3.0.0`
-4. Code review and testing
-5. Merge to `v3.0.0`
-6. When all features complete, PR from `v3.0.0` to `main`
+## 🚀 Future Development
 
-## 📊 Development Phases
-
-### Phase 1: Critical Missing Features (Weeks 1-3)
-**Goal**: Implement essential missing API endpoints
-
-#### 1.1 Corporate Actions API ✅
-**Branch**: `feature/corporate-actions-api`
-**Priority**: 🔴 Critical
-**Estimated Time**: 3 days
-**Actual Time**: 1 day
-**Completed**: 2025-01-14
-
-**Tasks**:
-- [x] Create `trading/corporate_actions.py` module
-- [x] Implement `get_announcements()` method
-- [x] Implement `get_announcement_by_id()` method
-- [x] Create `CorporateActionModel` dataclass
-- [x] Create `DividendModel` dataclass
-- [x] Create `SplitModel` dataclass
-- [x] Create `MergerModel` dataclass
-- [x] Add comprehensive tests (13 test cases)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Can retrieve corporate actions by symbol, type, and date range
-- Proper handling of dividends, splits, mergers, spinoffs
-- All models have proper type hints
-- 100% test coverage
-
-#### 1.2 Trade Data Support ✅
-**Branch**: `feature/trade-data-api`
-**Priority**: 🔴 Critical
-**Estimated Time**: 2 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-14
-
-**Tasks**:
-- [x] Create `stock/trades.py` module
-- [x] Implement `get_trades()` method with pagination
-- [x] Implement `get_latest_trade()` method
-- [x] Implement `get_trades_multi()` for multiple symbols
-- [x] Create `TradeModel` dataclass
-- [x] Add feed parameter support (iex, sip, otc)
-- [x] Add comprehensive tests (12 unit tests, 10 integration tests)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Can retrieve historical trades with proper pagination
-- Feed selection works correctly
-- Handles large datasets efficiently
-- Proper error handling for invalid symbols
-
-#### 1.3 Market Snapshots ✅
-**Branch**: `feature/market-snapshots`
-**Priority**: 🔴 Critical
-**Estimated Time**: 2 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-15
-
-**Tasks**:
-- [x] Create `stock/snapshots.py` module
-- [x] Implement `get_snapshots()` for multiple symbols
-- [x] Implement `get_snapshot()` for single symbol
-- [x] Create `SnapshotModel` dataclass
-- [x] Create `BarModel` dataclass
-- [x] Add latest trade, quote, bar, daily bar, prev daily bar
-- [x] Add comprehensive tests (15 unit tests, 10 integration tests)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Returns complete market snapshot data
-- Handles multiple symbols efficiently
-- Proper null handling for pre/post market
-- All nested data properly typed
-
-### Phase 2: Important Enhancements (Weeks 4-5)
-
-#### 2.1 Account Configuration ✅
-**Branch**: `feature/account-config`
-**Priority**: 🟡 High
-**Estimated Time**: 1 day
-**Actual Time**: < 1 day
-**Completed**: 2025-01-15
-
-**Tasks**:
-- [x] Update `trading/account.py` module
-- [x] Implement `get_configuration()` method
-- [x] Implement `update_configuration()` method
-- [x] Create `AccountConfigModel` dataclass
-- [x] Add PDT, trade confirmation, margin, and all configuration settings
-- [x] Add comprehensive tests (14 unit tests, 8 integration tests)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Can read and update account configurations
-- Proper validation of configuration values
-- Clear error messages for invalid configs
-
-#### 2.2 Market Metadata ✅
-**Branch**: `feature/market-metadata`
-**Priority**: 🟡 High
-**Estimated Time**: 1 day
-**Actual Time**: < 1 day
-**Completed**: 2025-01-15
-
-**Tasks**:
-- [x] Create `stock/metadata.py` module
-- [x] Implement `get_condition_codes()` method with tape/ticktype support
-- [x] Implement `get_exchange_codes()` method
-- [x] Implement `get_all_condition_codes()` for bulk retrieval
-- [x] Add lookup methods for easy code resolution
-- [x] Add caching for metadata with cache management
-- [x] Add comprehensive tests (16 unit tests, 11 integration tests)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Returns all condition and exchange codes
-- Implements caching with 24-hour TTL
-- Proper documentation of code meanings
-
-#### 2.3 Enhanced Order Management ✅
-**Branch**: `feature/order-enhancements`
-**Priority**: 🟡 High
-**Estimated Time**: 2 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-15
-
-**Tasks**:
-- [x] Update `trading/orders.py` module
-- [x] Implement `replace_order()` method
-- [x] Add `client_order_id` support to all order methods
-- [x] Add `extended_hours` parameter (already existed)
-- [x] Add `order_class` for OTO/OCO orders
-- [x] Improve order validation
-- [x] Add comprehensive tests (13 unit tests, 10 integration tests)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Can replace existing orders
-- Client order ID tracking works (using order list filtering)
-- Extended hours orders properly flagged
-- OTO/OCO order classes supported
-
-### Phase 3: Performance & Quality (Weeks 6-7)
-
-#### 3.1 Batch Operations ✅
-**Branch**: `feature/batch-operations`
-**Priority**: 🟢 Medium
-**Estimated Time**: 3 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-16
-
-**Tasks**:
-- [x] Update `stock/history.py` for multi-symbol bars
-- [x] Update `stock/latest_quote.py` for batch quotes
-- [x] Implement concurrent request handling
-- [x] Add request batching logic (max 200 symbols)
-- [x] Optimize DataFrame operations
-- [x] Add comprehensive tests (20 test cases)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Handles 200+ symbols efficiently
-- Automatic batching for large requests
-- Concurrent execution where applicable
-- Memory-efficient DataFrame operations
-
-#### 3.2 Feed Management System ✅
-**Branch**: `feature/feed-management`
-**Priority**: 🟢 Medium
-**Estimated Time**: 2 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-16
-
-**Tasks**:
-- [x] Create `http/feed_manager.py` module
-- [x] Implement subscription level detection
-- [x] Add automatic feed fallback (SIP → IEX)
-- [x] Add feed validation per endpoint
-- [x] Create `FeedConfig` dataclass
-- [x] Add comprehensive tests (47 test cases: 36 unit, 11 integration)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Auto-detects user's subscription level
-- Falls back gracefully on permission errors
-- Clear error messages for feed issues
-- Configuration for preferred feeds
-
-#### 3.3 Caching System ✅
-**Branch**: `feature/caching-system`
-**Priority**: 🟢 Medium
-**Estimated Time**: 3 days
-**Actual Time**: < 1 day
-**Completed**: 2025-01-16
-
-**Tasks**:
-- [x] Create `cache/` module structure
-- [x] Implement `CacheManager` class
-- [x] Add LRU in-memory cache
-- [x] Add optional Redis support
-- [x] Implement cache invalidation logic
-- [x] Configure TTL per data type
-- [x] Add comprehensive tests (40 test cases: 29 unit, 11 integration)
-- [x] Update documentation
-
-**Acceptance Criteria**:
-- Configurable caching per data type
-- Market hours/calendar cached (1 day TTL)
-- Asset info cached (1 hour TTL)
-- Cache size limits enforced
-- Easy cache clearing mechanism
-
-### Phase 4: Advanced Features (Weeks 8-10)
-
-#### 4.1 WebSocket Streaming ⬜
+### Version 3.1.0: WebSocket Streaming
+**Target Release**: Q2 2025
 **Branch**: `feature/websocket-streaming`
-**Priority**: 🔵 Future
-**Estimated Time**: 5 days
 
-**Tasks**:
+#### Goals
+- Real-time market data streaming
+- Reduced latency for live trading
+- Efficient connection management
+- Comprehensive error handling
+
+#### Tasks
 - [ ] Create `streaming/` module structure
 - [ ] Implement `StreamClient` class
 - [ ] Add real-time quote streaming
@@ -272,58 +48,76 @@ main
 - [ ] Add comprehensive tests (15+ test cases)
 - [ ] Update documentation with examples
 
-**Acceptance Criteria**:
-- Stable WebSocket connection
-- Automatic reconnection on disconnect
-- Efficient message parsing
-- Proper error handling
+#### Acceptance Criteria
+- Stable WebSocket connection with automatic reconnection
+- Efficient message parsing and handling
+- Support for multiple symbol subscriptions
 - Clean shutdown mechanism
+- Comprehensive error handling and recovery
 
-#### 4.2 Async Support ⬜
+### Version 3.2.0: Async Support
+**Target Release**: Q3 2025
 **Branch**: `feature/async-support`
-**Priority**: 🔵 Future
-**Estimated Time**: 5 days
 
-**Tasks**:
+#### Goals
+- Full async/await support for all API methods
+- Improved performance for concurrent operations
+- Better resource utilization
+- Backwards compatibility maintained
+
+#### Tasks
 - [ ] Create `AsyncPyAlpacaAPI` class
 - [ ] Implement async versions of all methods
-- [ ] Add connection pooling
-- [ ] Implement rate limiting for async
+- [ ] Add connection pooling with aiohttp
+- [ ] Implement async rate limiting
+- [ ] Add async cache support
+- [ ] Create async streaming client
 - [ ] Add comprehensive tests (20+ test cases)
 - [ ] Update documentation with async examples
 
-**Acceptance Criteria**:
+#### Acceptance Criteria
 - All methods have async equivalents
-- Proper connection pooling
+- Proper connection pooling and reuse
 - Efficient concurrent execution
-- Backwards compatible
+- Backwards compatible (sync API still works)
+- Performance improvements documented
 
-## 📈 Progress Tracking
+## 🌳 Branching Strategy
 
-### Overall Progress: 🟦 75% Complete
+```
+main
+  └── v3.1.0 (for WebSocket features)
+       └── feature/websocket-streaming
+  └── v3.2.0 (for Async support)
+       └── feature/async-support
+```
 
-| Phase | Status | Progress | Estimated Completion |
-|-------|--------|----------|---------------------|
-| Phase 1: Critical Features | ✅ Complete | 100% | Week 1 |
-| Phase 2: Important Enhancements | ✅ Complete | 100% | Week 2 |
-| Phase 3: Performance & Quality | ✅ Complete | 100% | Week 2 |
-| Phase 4: Advanced Features | ⬜ Not Started | 0% | Week 10 |
+### Workflow
+1. Create version branch from `main`
+2. Create feature branches from version branch
+3. Implement features with tests
+4. Create PR to merge into version branch
+5. Code review and testing
+6. When complete, PR from version branch to `main`
 
-### Feature Status Legend
-- ⬜ Not Started
-- 🟦 In Progress
-- ✅ Complete
-- ⚠️ Blocked
-- ❌ Cancelled
+## 📊 Roadmap
+
+| Version | Features | Status | Target Date |
+|---------|----------|---------|-------------|
+| 3.0.0 | Core API Coverage, Performance, Caching | ✅ Released | January 2025 |
+| 3.1.0 | WebSocket Streaming | ⬜ Planned | Q2 2025 |
+| 3.2.0 | Async Support | ⬜ Planned | Q3 2025 |
+| 3.3.0 | Advanced Analytics | ⬜ Future | Q4 2025 |
+| 4.0.0 | Options Trading Support | ⬜ Future | 2026 |
 
 ## 🧪 Testing Strategy
 
-### Test Coverage Requirements
+### Requirements
 - Minimum 90% code coverage for new features
 - All public methods must have tests
 - Integration tests for API endpoints
 - Mock tests for development without API keys
-- Performance tests for batch operations
+- Performance benchmarks for async operations
 
 ### Test Categories
 1. **Unit Tests**: Individual function testing
@@ -335,48 +129,40 @@ main
 ## 📝 Documentation Requirements
 
 ### For Each Feature
-1. **API Documentation**: Docstrings for all public methods
+1. **API Documentation**: Comprehensive docstrings
 2. **Usage Examples**: Practical code examples
 3. **Migration Guide**: For any breaking changes
-4. **README Updates**: Feature announcements
-5. **CHANGELOG Updates**: Version history
+4. **Performance Guide**: For optimization tips
+5. **Troubleshooting**: Common issues and solutions
 
-### Documentation Standards
-- Google-style docstrings
-- Type hints for all parameters
-- Return type annotations
-- Example usage in docstrings
-- Error handling documentation
-
-## 🚀 Release Plan
+## 🚀 Release Process
 
 ### Version Strategy
-- **3.0.0-alpha.1**: Phase 1 complete
-- **3.0.0-beta.1**: Phase 1-2 complete
-- **3.0.0-beta.2**: Phase 1-3 complete
-- **3.0.0-rc.1**: All phases complete, testing
-- **3.0.0**: Final release
+- **x.x.0-alpha.x**: Early development releases
+- **x.x.0-beta.x**: Feature complete, testing phase
+- **x.x.0-rc.x**: Release candidates
+- **x.x.0**: Stable release
 
 ### Release Checklist
 - [ ] All tests passing
 - [ ] Documentation complete
 - [ ] CHANGELOG updated
-- [ ] Migration guide written
+- [ ] Migration guide written (if needed)
 - [ ] Performance benchmarks documented
 - [ ] Security audit completed
 - [ ] Package version bumped
 - [ ] GitHub release created
 - [ ] PyPI package published
 
-## 🔍 Code Review Checklist
+## 🔍 Code Review Standards
 
-For each PR into v3.0.0:
+For each PR:
 - [ ] Code follows project style guide
 - [ ] All tests passing
 - [ ] Test coverage ≥ 90%
 - [ ] Documentation updated
 - [ ] Type hints complete
-- [ ] No breaking changes (or documented)
+- [ ] No breaking changes (or properly documented)
 - [ ] Performance impact assessed
 - [ ] Security implications reviewed
 
@@ -385,84 +171,76 @@ For each PR into v3.0.0:
 ### Technical Metrics
 - API coverage: 100% of stock endpoints
 - Test coverage: >90%
-- Performance: <100ms average response time
-- Reliability: <0.1% error rate
+- Performance: <50ms average response time (async)
+- WebSocket stability: >99.9% uptime
 - Memory usage: <100MB for typical operations
 
 ### User Metrics
-- GitHub stars increase
+- GitHub stars growth
 - PyPI downloads increase
 - Issue resolution time <48 hours
-- User satisfaction (surveys/feedback)
+- Community engagement metrics
 
-## 🤝 Contributors
-
-### Core Team
-- Lead Developer: @TexasCoding
-- Contributors: [Open for contributions]
+## 🤝 Contributing
 
 ### How to Contribute
-1. Pick an unclaimed feature from the plan
-2. Create feature branch from v3.0.0
-3. Implement with tests
-4. Submit PR with checklist complete
-5. Respond to code review feedback
+1. Check the roadmap for planned features
+2. Open an issue to discuss your contribution
+3. Fork the repository
+4. Create a feature branch
+5. Implement with tests and documentation
+6. Submit a PR with all checks passing
 
-## 📅 Meeting Schedule
+### Contribution Guidelines
+- Follow the existing code style
+- Include comprehensive tests
+- Update documentation
+- Add examples where appropriate
+- Ensure backward compatibility
 
-### Weekly Sync (Optional)
-- **When**: Every Monday
-- **Topics**: Progress review, blockers, next week planning
-- **Duration**: 30 minutes
+## 🚨 Known Challenges
 
-### Sprint Reviews
-- **When**: End of each phase
-- **Topics**: Demo, retrospective, planning
-- **Duration**: 1 hour
+### WebSocket Implementation
+- **Challenge**: Maintaining stable connections
+- **Solution**: Implement robust reconnection logic with exponential backoff
 
-## 🚨 Risk Management
+### Async Migration
+- **Challenge**: Maintaining backward compatibility
+- **Solution**: Separate async classes while keeping sync API intact
 
-### Identified Risks
-1. **API Changes**: Alpaca may change their API
-   - Mitigation: Version pinning, adaptation layer
-2. **Backward Compatibility**: Breaking existing users
-   - Mitigation: Deprecation warnings, migration guide
-3. **Performance Degradation**: New features slow down
-   - Mitigation: Performance testing, benchmarks
-4. **Scope Creep**: Features beyond plan
-   - Mitigation: Strict PR review, feature freeze
+### Performance at Scale
+- **Challenge**: Handling thousands of concurrent connections
+- **Solution**: Connection pooling and efficient resource management
 
-## 📞 Communication
+## 📅 Maintenance Schedule
 
-### Channels
-- **GitHub Issues**: Bug reports, feature requests
-- **GitHub Discussions**: General questions, ideas
-- **Pull Requests**: Code reviews, implementation
+### Regular Tasks
+- **Weekly**: Review and triage new issues
+- **Monthly**: Update dependencies
+- **Quarterly**: Performance audit
+- **Yearly**: Major version planning
 
-### Response Times
-- Critical bugs: <24 hours
-- Feature requests: <72 hours
-- General questions: <1 week
-
-## 🎯 Definition of Done
-
-A feature is considered complete when:
-1. ✅ All code implemented
-2. ✅ All tests passing (>90% coverage)
-3. ✅ Documentation complete
-4. ✅ Code reviewed and approved
-5. ✅ Merged into v3.0.0 branch
-6. ✅ No critical bugs reported
-
-## 📌 Quick Links
+## 📌 Resources
 
 - [Alpaca API Documentation](https://docs.alpaca.markets/reference)
 - [Project Repository](https://github.com/TexasCoding/py-alpaca-api)
 - [Issue Tracker](https://github.com/TexasCoding/py-alpaca-api/issues)
 - [PyPI Package](https://pypi.org/project/py-alpaca-api/)
+- [WebSocket API Docs](https://docs.alpaca.markets/docs/real-time-market-data)
+- [Python Async Best Practices](https://docs.python.org/3/library/asyncio.html)
+
+## 🎯 Definition of Done
+
+A feature is considered complete when:
+1. ✅ All code implemented and reviewed
+2. ✅ All tests passing (>90% coverage)
+3. ✅ Documentation complete
+4. ✅ Performance benchmarks met
+5. ✅ No critical bugs reported in testing
+6. ✅ Migration guide provided (if needed)
 
 ---
 
-**Last Updated**: 2025-01-14
-**Document Version**: 1.0.0
+**Last Updated**: 2025-01-16
+**Document Version**: 2.0.0
 **Maintained By**: py-alpaca-api Development Team
