@@ -22,6 +22,12 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 - **🧪 Battle-Tested**: 300+ tests with comprehensive coverage
 - **⚡ Modern Python**: Python 3.10+ with latest best practices
 
+### New in v3.1.0-alpha
+- **📡 WebSocket Streaming**: Real-time market data streaming for quotes, trades, and bars
+- **🔄 Auto-Reconnection**: Built-in exponential backoff for stable connections
+- **📊 Multiple Handlers**: Support for multiple concurrent data handlers
+- **🎯 Dynamic Subscriptions**: Subscribe and unsubscribe symbols on the fly
+
 ### New in v3.0.0
 - **📸 Market Snapshots**: Get complete market snapshots with latest trade, quote, and bar data
 - **⚙️ Account Configuration**: Manage PDT settings, trade confirmations, and margin configurations
@@ -167,6 +173,32 @@ predictions = api.stock.predictor.predict(
 # Get prediction for specific date
 future_price = predictions[predictions['ds'] == '2024-12-31']['yhat'].values[0]
 print(f"Predicted AAPL price on 2024-12-31: ${future_price:.2f}")
+```
+
+### Real-time Streaming (v3.1.0+)
+
+```python
+# Create streaming client
+stream = api.create_stream_client(feed="iex")
+
+# Define handlers
+def on_quote(quote):
+    print(f"{quote.symbol}: Bid ${quote.bid_price} Ask ${quote.ask_price}")
+
+def on_trade(trade):
+    print(f"{trade.symbol}: ${trade.price} x {trade.size}")
+
+# Connect and subscribe
+stream.connect()
+stream.subscribe_quotes(["AAPL", "GOOGL"], on_quote)
+stream.subscribe_trades(["MSFT"], on_trade)
+
+# Stream runs in background - do other work or sleep
+import time
+time.sleep(60)
+
+# Disconnect when done
+stream.disconnect()
 ```
 
 ### Financial News & Sentiment

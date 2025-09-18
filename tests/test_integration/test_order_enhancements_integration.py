@@ -211,7 +211,7 @@ class TestOrderEnhancementsIntegration:
             symbol="AAPL",
             qty=1,
             trail_percent=10.0,  # 10% trailing stop
-            side="sell",
+            side="buy",  # Changed to buy to avoid short selling restriction
             client_order_id=client_id,
         )
 
