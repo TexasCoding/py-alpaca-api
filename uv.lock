@@ -1332,7 +1332,7 @@ wheels = [
 
 [[package]]
 name = "py-alpaca-api"
-version = "3.0.0"
+version = "3.1.0a1"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1345,6 +1345,7 @@ dependencies = [
     { name = "requests" },
     { name = "requests-cache" },
     { name = "requests-ratelimiter" },
+    { name = "websocket-client" },
     { name = "yfinance" },
 ]
 
@@ -1372,6 +1373,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "requests-cache", specifier = ">=1.2.1" },
     { name = "requests-ratelimiter", specifier = ">=0.7.0" },
+    { name = "websocket-client", specifier = ">=1.8.0" },
     { name = "yfinance", specifier = ">=0.2.43" },
 ]
 
@@ -1790,6 +1792,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8b/60/4f20960df6c7b363a18a55ab034c8f2bcd5d9770d1f94f9370ec104c1855/virtualenv-20.33.1.tar.gz", hash = "sha256:1b44478d9e261b3fb8baa5e74a0ca3bc0e05f21aa36167bf9cbf850e542765b8", size = 6082160 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ca/ff/ded57ac5ff40a09e6e198550bab075d780941e0b0f83cbeabd087c59383a/virtualenv-20.33.1-py3-none-any.whl", hash = "sha256:07c19bc66c11acab6a5958b815cbcee30891cd1c2ccf53785a28651a0d8d8a67", size = 6060362 },
+]
+
+[[package]]
+name = "websocket-client"
+version = "1.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e6/30/fba0d96b4b5fbf5948ed3f4681f7da2f9f64512e1d303f94b4cc174c24a5/websocket_client-1.8.0.tar.gz", hash = "sha256:3239df9f44da632f96012472805d40a23281a991027ce11d2f45a6f24ac4c3da", size = 54648 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl", hash = "sha256:17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526", size = 58826 },
 ]
 
 [[package]]
