@@ -32,6 +32,11 @@ dev-dependencies = [
     "mypy>=1.11.0",
     "types-requests>=2.32.0",
     "types-beautifulsoup4>=4.12.0",
+    "sphinx>=8.1.3",
+    "sphinx-rtd-theme>=3.0.2",
+    "myst-parser>=4.0.1",
+    "sphinx-autoapi>=3.6.0",
+    "nbsphinx>=0.9.7",
 ]
 
 # Ruff configuration - Modern Python linter and formatter
@@ -80,7 +85,8 @@ ignore = [
     "TRY002",
     "D415",
     "D301",
-    "RET504"
+    "RET504",
+    "PTH100"
 ]
 
 [tool.ruff.lint.per-file-ignores]
