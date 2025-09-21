@@ -5,6 +5,37 @@ All notable changes to py-alpaca-api will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.1] - 2025-09-20
+
+### Overview
+Complete implementation of all Alpaca Market Data API endpoints, achieving 100% API coverage for both Trading and Market Data APIs.
+
+### Added
+- ✅ **Complete Market Data API Coverage** - All 11 endpoints now implemented
+  - Historical Quotes API (`quotes.get_historical_quotes()`) - Bid/ask quotes with spread calculations
+  - Historical Auctions API (`auctions.get_auctions()`, `auctions.get_daily_auctions()`) - Opening and closing auction data
+  - Company Logos API (`logos.get_logo()`, `logos.save_logo()`, `logos.get_logo_url()`) - Company logo retrieval
+  - Latest Bars API (`history.get_latest_bars()`) - Get the most recent bar for symbols
+- ✅ **Complete Trading API Coverage** - All 28 endpoints fully implemented
+  - `get_all_orders()` method for comprehensive order retrieval with filtering
+- 📚 **Enhanced Documentation**
+  - Complete documentation for all new modules
+  - Code examples for quotes, auctions, and logos
+  - Updated README with all new features
+- 🧪 **Comprehensive Testing** - 350+ tests with full coverage
+  - 18 tests for logos functionality
+  - 11 tests for historical quotes
+  - 14 tests for historical auctions
+  - 8 tests for latest bars
+
+### Changed
+- Extended `Requests` class to support raw binary responses for logo retrieval
+- Updated documentation structure to include all new modules
+
+### Fixed
+- Type checking issues in auctions module with DataFrame aggregation
+- Control flow in logos module for better error handling
+
 ## [3.0.0] - Unreleased
 
 ### Overview

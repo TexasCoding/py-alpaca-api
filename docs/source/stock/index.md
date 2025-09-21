@@ -7,6 +7,9 @@ The stock module provides market data access and analysis tools for stocks.
 
 assets
 history
+quotes
+auctions
+logos
 screener
 predictor
 latest_quote
@@ -21,6 +24,9 @@ The stock module includes:
 
 - **Assets**: Stock asset information and metadata
 - **History**: Historical price data and bars
+- **Quotes**: Historical bid/ask quote data
+- **Auctions**: Opening and closing auction data
+- **Logos**: Company logo retrieval
 - **Screener**: Screen for top gainers and losers
 - **Predictor**: ML-based price predictions using Prophet
 - **Latest Quote**: Real-time quote data
@@ -75,6 +81,24 @@ bars = api.stock.history.get_bars(
     end=pendulum.now(),
     timeframe="1Day"
 )
+
+# Get historical quotes with bid/ask spread
+quotes = api.stock.quotes.get_historical_quotes(
+    "AAPL",
+    start="2024-01-01",
+    end="2024-01-31"
+)
+
+# Get auction data
+auctions = api.stock.auctions.get_auctions(
+    "AAPL",
+    start="2024-01-01",
+    end="2024-01-31"
+)
+
+# Get company logo
+logo_url = api.stock.logos.get_logo_url("AAPL")
+logo_data = api.stock.logos.get_logo("AAPL")
 
 # Get top gainers
 gainers = api.stock.screener.get_gainers(top=10)

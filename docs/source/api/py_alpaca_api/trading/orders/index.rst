@@ -23,6 +23,28 @@ Module Contents
    .. py:attribute:: headers
 
 
+   .. py:method:: get_all_orders(status: str = 'open', limit: int = 50, after: str | None = None, until: str | None = None, direction: str = 'desc', nested: bool = False, symbols: str | None = None) -> list[py_alpaca_api.models.order_model.OrderModel]
+
+      Retrieves a list of orders for the account, filtered by the supplied parameters.
+
+      :param status: Order status to be queried. Options are 'open', 'closed', or 'all'.
+                     Defaults to 'open'.
+      :param limit: Maximum number of orders to return. Max is 500. Defaults to 50.
+      :param after: Filter for orders submitted after this timestamp (ISO 8601 format).
+      :param until: Filter for orders submitted until this timestamp (ISO 8601 format).
+      :param direction: Chronological order of response based on submission time.
+                        Options are 'asc' or 'desc'. Defaults to 'desc'.
+      :param nested: If True, multi-leg orders will be rolled up under the legs field
+                     of primary order. Defaults to False.
+      :param symbols: Comma-separated list of symbols to filter by (e.g., "AAPL,TSLA,MSFT").
+
+      :returns: List of OrderModel objects matching the query parameters.
+
+      :raises ValidationError: If invalid parameters are provided.
+      :raises APIRequestError: If the API request fails.
+
+
+
    .. py:method:: get_by_id(order_id: str, nested: bool = False) -> py_alpaca_api.models.order_model.OrderModel
 
       Retrieves order information by its ID.

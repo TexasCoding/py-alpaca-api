@@ -1,8 +1,42 @@
 [project]
 name = "py-alpaca-api"
-version = "3.0.0"
-description = "Add your description here"
+version = "3.0.1"
+description = "A modern Python wrapper for the Alpaca Trading API with 100% coverage of Trading and Market Data endpoints"
 readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "TexasCoding", email = "jeff@texascoding.com" }
+]
+maintainers = [
+    { name = "TexasCoding", email = "jeff@texascoding.com" }
+]
+keywords = [
+    "alpaca",
+    "trading",
+    "stocks",
+    "finance",
+    "api",
+    "market-data",
+    "algorithmic-trading",
+    "quantitative-finance",
+    "backtesting",
+    "paper-trading",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 requires-python = ">=3.10"
 dependencies = [
     "beautifulsoup4>=4.12.3",
@@ -15,6 +49,33 @@ dependencies = [
     "requests-cache>=1.2.1",
     "requests-ratelimiter>=0.7.0",
     "yfinance>=0.2.43",
+]
+
+[project.urls]
+Homepage = "https://github.com/TexasCoding/py-alpaca-api"
+Documentation = "https://py-alpaca-api.readthedocs.io"
+Repository = "https://github.com/TexasCoding/py-alpaca-api"
+Issues = "https://github.com/TexasCoding/py-alpaca-api/issues"
+Changelog = "https://github.com/TexasCoding/py-alpaca-api/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = [
+    "hypothesis>=6.112.1",
+    "pre-commit>=3.8.0",
+    "pytest>=8.3.3",
+    "pytest-mock>=3.14.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.8",
+    "mypy>=1.11.0",
+    "types-requests>=2.32.0",
+    "types-beautifulsoup4>=4.12.0",
+]
+docs = [
+    "sphinx>=8.1.3",
+    "sphinx-rtd-theme>=3.0.2",
+    "myst-parser>=4.0.1",
+    "sphinx-autoapi>=3.6.0",
+    "nbsphinx>=0.9.7",
 ]
 
 [build-system]

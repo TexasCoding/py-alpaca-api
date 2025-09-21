@@ -11,10 +11,13 @@ Submodules
    :maxdepth: 1
 
    /api/py_alpaca_api/stock/assets/index
+   /api/py_alpaca_api/stock/auctions/index
    /api/py_alpaca_api/stock/history/index
    /api/py_alpaca_api/stock/latest_quote/index
+   /api/py_alpaca_api/stock/logos/index
    /api/py_alpaca_api/stock/metadata/index
    /api/py_alpaca_api/stock/predictor/index
+   /api/py_alpaca_api/stock/quotes/index
    /api/py_alpaca_api/stock/screener/index
    /api/py_alpaca_api/stock/snapshots/index
    /api/py_alpaca_api/stock/trades/index
@@ -26,10 +29,13 @@ Classes
 .. autoapisummary::
 
    py_alpaca_api.stock.Assets
+   py_alpaca_api.stock.Auctions
    py_alpaca_api.stock.History
    py_alpaca_api.stock.LatestQuote
+   py_alpaca_api.stock.Logos
    py_alpaca_api.stock.Metadata
    py_alpaca_api.stock.Predictor
+   py_alpaca_api.stock.Quotes
    py_alpaca_api.stock.Screener
    py_alpaca_api.stock.Snapshots
    py_alpaca_api.stock.Trades
@@ -81,6 +87,59 @@ Package Contents
 
       :returns: A DataFrame containing the retrieved assets.
       :rtype: pd.DataFrame
+
+
+
+.. py:class:: Auctions(headers: dict[str, str])
+
+   Handles historical auction data retrieval from Alpaca API.
+
+
+   .. py:attribute:: headers
+
+
+   .. py:attribute:: base_url
+      :value: 'https://data.alpaca.markets/v2/stocks'
+
+
+
+   .. py:method:: get_auctions(symbols: str | list[str], start: str, end: str, limit: int = 10000, asof: str | None = None, feed: str = 'iex', page_token: str | None = None, sort: str = 'asc') -> pandas.DataFrame | dict[str, pandas.DataFrame]
+
+      Get historical auction data for one or more symbols.
+
+      Retrieves auction prices (opening and closing auctions) between specified dates.
+
+      :param symbols: Symbol(s) to get auction data for. Can be a string for single symbol
+                      or list of strings for multiple symbols.
+      :param start: Start date/time in ISO 8601 format (e.g., "2021-01-01" or "2021-01-01T00:00:00Z").
+      :param end: End date/time in ISO 8601 format.
+      :param limit: Maximum number of auctions to return per symbol. Defaults to 10000.
+      :param asof: As-of date for corporate actions adjustments in YYYY-MM-DD format.
+      :param feed: The data feed to use ("iex", "sip", or "otc"). Defaults to "iex".
+      :param page_token: Pagination token from previous request.
+      :param sort: Sort order for results ("asc" or "desc"). Defaults to "asc".
+
+      :returns: pd.DataFrame with auction data.
+                For multiple symbols: dict mapping symbols to DataFrames with auction data.
+      :rtype: For single symbol
+
+      :raises ValidationError: If parameters are invalid.
+      :raises Exception: If the API request fails or returns no data.
+
+
+
+   .. py:method:: get_daily_auctions(symbols: str | list[str], start: str, end: str, feed: str = 'iex') -> pandas.DataFrame | dict[str, pandas.DataFrame]
+
+      Get daily auction summary for one or more symbols.
+
+      Retrieves opening and closing auction prices aggregated by day.
+
+      :param symbols: Symbol(s) to get auction data for.
+      :param start: Start date in YYYY-MM-DD format.
+      :param end: End date in YYYY-MM-DD format.
+      :param feed: The data feed to use. Defaults to "iex".
+
+      :returns: DataFrame or dict of DataFrames with daily auction summaries.
 
 
 
@@ -175,6 +234,26 @@ Package Contents
 
 
 
+   .. py:method:: get_latest_bars(symbols: str | list[str], feed: str = 'iex', currency: str = 'USD') -> pandas.DataFrame | dict[str, pandas.DataFrame]
+
+      Get the latest bars for one or more symbols.
+
+      The latest bars endpoint returns the most recent minute bar for each requested symbol.
+
+      :param symbols: Symbol(s) to get latest bars for. Can be a string for single symbol
+                      or list of strings for multiple symbols.
+      :param feed: The data feed to use ("iex", "sip", or "otc"). Defaults to "iex".
+      :param currency: The currency for the returned prices. Defaults to "USD".
+
+      :returns: pd.DataFrame with the latest bar data.
+                For multiple symbols: dict mapping symbols to DataFrames with latest bar data.
+      :rtype: For single symbol
+
+      :raises ValueError: If feed is invalid or symbols is empty.
+      :raises Exception: If the API request fails or returns no data.
+
+
+
 .. py:class:: LatestQuote(headers: dict[str, str])
 
    .. py:attribute:: BATCH_SIZE
@@ -196,6 +275,109 @@ Package Contents
       :returns: A single QuoteModel or list of QuoteModel objects.
 
       :raises ValueError: If symbol is None/empty or if feed is invalid.
+
+
+
+.. py:class:: Logos(headers: dict[str, str])
+
+   Handles company logo retrieval from Alpaca API.
+
+
+   .. py:attribute:: headers
+
+
+   .. py:attribute:: base_url
+      :value: 'https://data.alpaca.markets/v1beta1/logos'
+
+
+
+   .. py:method:: get_logo(symbol: str, placeholder: bool = False) -> bytes
+
+      Get the logo for a specific symbol.
+
+      Retrieves the company logo as binary image data.
+
+      :param symbol: The stock symbol to get the logo for.
+      :param placeholder: If True, returns a placeholder image when logo is not available.
+                          Defaults to False.
+
+      :returns: The logo image as binary data.
+      :rtype: bytes
+
+      :raises ValidationError: If the symbol is invalid.
+      :raises Exception: If the API request fails.
+
+
+
+   .. py:method:: get_logo_url(symbol: str, placeholder: bool = False) -> str
+
+      Get the URL for a symbol's logo.
+
+      This method returns the direct URL to fetch the logo, which can be used
+      in HTML img tags or for direct browser access.
+
+      :param symbol: The stock symbol to get the logo URL for.
+      :param placeholder: If True, includes placeholder parameter in URL.
+                          Defaults to False.
+
+      :returns: The URL to the logo image.
+      :rtype: str
+
+      :raises ValidationError: If the symbol is invalid.
+
+
+
+   .. py:method:: save_logo(symbol: str, filepath: str, placeholder: bool = False) -> None
+
+      Save a symbol's logo to a file.
+
+      Downloads the logo and saves it to the specified file path.
+
+      :param symbol: The stock symbol to get the logo for.
+      :param filepath: The path where the logo should be saved.
+      :param placeholder: If True, saves a placeholder image when logo is not available.
+                          Defaults to False.
+
+      :raises ValidationError: If the symbol or filepath is invalid.
+      :raises Exception: If the API request fails or file cannot be written.
+
+
+
+   .. py:method:: get_logo_base64(symbol: str, placeholder: bool = False) -> str
+
+      Get the logo as a base64 encoded string.
+
+      Useful for embedding logos directly in HTML or JSON responses.
+
+      :param symbol: The stock symbol to get the logo for.
+      :param placeholder: If True, returns a placeholder image when logo is not available.
+                          Defaults to False.
+
+      :returns: The logo image as a base64 encoded string.
+      :rtype: str
+
+      :raises ValidationError: If the symbol is invalid.
+      :raises Exception: If the API request fails.
+
+
+
+   .. py:method:: get_multiple_logos(symbols: list[str], placeholder: bool = False) -> dict[str, bytes | None]
+
+      Get logos for multiple symbols.
+
+      Retrieves logos for multiple symbols in a single batch operation.
+
+      :param symbols: List of stock symbols to get logos for.
+      :param placeholder: If True, returns placeholder images when logos are not available.
+                          Defaults to False.
+
+      :returns:
+
+                Dictionary mapping symbols to their logo binary data.
+                    Symbols without logos will have None as value unless placeholder is True.
+      :rtype: dict
+
+      :raises ValidationError: If symbols list is invalid.
 
 
 
@@ -347,6 +529,44 @@ Package Contents
 
 
    .. py:method:: get_losers_to_gainers(gain_ratio: float = 10.0, losers_to_scan: int = 200, future_periods: int = 5) -> list
+
+
+.. py:class:: Quotes(headers: dict[str, str])
+
+   Handles historical quote data retrieval from Alpaca API.
+
+
+   .. py:attribute:: headers
+
+
+   .. py:attribute:: base_url
+      :value: 'https://data.alpaca.markets/v2/stocks'
+
+
+
+   .. py:method:: get_historical_quotes(symbols: str | list[str], start: str, end: str, limit: int = 10000, asof: str | None = None, feed: str = 'iex', page_token: str | None = None, sort: str = 'asc') -> pandas.DataFrame | dict[str, pandas.DataFrame]
+
+      Get historical quote data for one or more symbols.
+
+      Retrieves historical quote (bid/ask) data between specified dates.
+
+      :param symbols: Symbol(s) to get quote data for. Can be a string for single symbol
+                      or list of strings for multiple symbols.
+      :param start: Start date/time in ISO 8601 format (e.g., "2021-01-01" or "2021-01-01T00:00:00Z").
+      :param end: End date/time in ISO 8601 format.
+      :param limit: Maximum number of quotes to return per symbol. Defaults to 10000.
+      :param asof: As-of date for corporate actions adjustments in YYYY-MM-DD format.
+      :param feed: The data feed to use ("iex", "sip", or "otc"). Defaults to "iex".
+      :param page_token: Pagination token from previous request.
+      :param sort: Sort order for results ("asc" or "desc"). Defaults to "asc".
+
+      :returns: pd.DataFrame with quote data.
+                For multiple symbols: dict mapping symbols to DataFrames with quote data.
+      :rtype: For single symbol
+
+      :raises ValidationError: If parameters are invalid.
+      :raises Exception: If the API request fails or returns no data.
+
 
 
 .. py:class:: Screener(data_url: str, headers: dict[str, str], asset: py_alpaca_api.stock.assets.Assets, market: py_alpaca_api.trading.market.Market)

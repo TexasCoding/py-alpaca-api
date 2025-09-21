@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath("../../src/py_alpaca_api"))
 project = "PyAlpacaAPI"
 copyright = "MIT 2024, TexasCoding"
 author = "TexasCoding"
-release = "3.0.0"
+release = "3.0.1"
 
 extensions = [
     "myst_parser",
