@@ -25,6 +25,7 @@ class Requests:
         headers: dict[str, str] | None = None,
         params: dict[str, str | bool | float | int] | None = None,
         json: dict[str, Any] | None = None,
+        raw_response: bool = False,
     ):
         """Execute HTTP request with retry logic.
 
@@ -35,13 +36,15 @@ class Requests:
             params: An optional dictionary containing the query parameters for the
                 request.
             json: An optional dictionary containing the JSON payload for the request.
+            raw_response: If True, return the raw response object without status checks.
+                Defaults to False.
 
         Returns:
             The response object returned by the server.
 
         Raises:
             APIRequestError: If the response status code is not one of the
-                acceptable statuses (200, 204, 207).
+                acceptable statuses (200, 204, 207) and raw_response is False.
         """
         response = self.session.request(
             method=method,
@@ -50,6 +53,11 @@ class Requests:
             params=params,
             json=json,
         )
+
+        # If raw_response is requested, return the response as-is
+        if raw_response:
+            return response
+
         acceptable_statuses = [200, 204, 207]
         if response.status_code not in acceptable_statuses:
             raise APIRequestError(

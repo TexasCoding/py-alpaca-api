@@ -26,7 +26,7 @@ Module Contents
    .. py:attribute:: session
 
 
-   .. py:method:: request(method: str, url: str, headers: dict[str, str] | None = None, params: dict[str, str | bool | float | int] | None = None, json: dict[str, Any] | None = None)
+   .. py:method:: request(method: str, url: str, headers: dict[str, str] | None = None, params: dict[str, str | bool | float | int] | None = None, json: dict[str, Any] | None = None, raw_response: bool = False)
 
       Execute HTTP request with retry logic.
 
@@ -36,8 +36,10 @@ Module Contents
       :param params: An optional dictionary containing the query parameters for the
                      request.
       :param json: An optional dictionary containing the JSON payload for the request.
+      :param raw_response: If True, return the raw response object without status checks.
+                           Defaults to False.
 
       :returns: The response object returned by the server.
 
       :raises APIRequestError: If the response status code is not one of the
-          acceptable statuses (200, 204, 207).
+          acceptable statuses (200, 204, 207) and raw_response is False.

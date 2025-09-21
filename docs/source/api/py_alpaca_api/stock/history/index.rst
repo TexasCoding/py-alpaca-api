@@ -103,3 +103,23 @@ Module Contents
 
       :returns: A dictionary mapping symbols to their historical data.
       :rtype: dict[str, list[defaultdict]]
+
+
+
+   .. py:method:: get_latest_bars(symbols: str | list[str], feed: str = 'iex', currency: str = 'USD') -> pandas.DataFrame | dict[str, pandas.DataFrame]
+
+      Get the latest bars for one or more symbols.
+
+      The latest bars endpoint returns the most recent minute bar for each requested symbol.
+
+      :param symbols: Symbol(s) to get latest bars for. Can be a string for single symbol
+                      or list of strings for multiple symbols.
+      :param feed: The data feed to use ("iex", "sip", or "otc"). Defaults to "iex".
+      :param currency: The currency for the returned prices. Defaults to "USD".
+
+      :returns: pd.DataFrame with the latest bar data.
+                For multiple symbols: dict mapping symbols to DataFrames with latest bar data.
+      :rtype: For single symbol
+
+      :raises ValueError: If feed is invalid or symbols is empty.
+      :raises Exception: If the API request fails or returns no data.

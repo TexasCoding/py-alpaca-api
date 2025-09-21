@@ -18,8 +18,11 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 - **🤖 ML-Powered Predictions**: Stock price predictions using Facebook Prophet
 - **📰 Financial News Integration**: Real-time news from Yahoo Finance and Benzinga
 - **📈 Technical Analysis**: Stock recommendations and sentiment analysis
+- **📉 Bid/Ask Quotes**: Historical quote data with spread analysis
+- **🔔 Auction Data**: Opening and closing auction prices and volumes
+- **🖼️ Company Logos**: Retrieve company logos for display
 - **🎯 Type Safety**: Full type annotations with mypy strict mode
-- **🧪 Battle-Tested**: 300+ tests with comprehensive coverage
+- **🧪 Battle-Tested**: 350+ tests with comprehensive coverage
 - **⚡ Modern Python**: Python 3.10+ with latest best practices
 
 ### New in v3.0.0
@@ -31,6 +34,9 @@ A modern Python wrapper for the Alpaca Trading API, providing easy access to tra
 - **💾 Intelligent Caching**: Built-in caching system with configurable TTLs for optimal performance
 - **🏢 Corporate Actions**: Track dividends, splits, mergers, and other corporate events
 - **📊 Trade Data API**: Access historical and real-time trade data with pagination
+- **📉 Historical Quotes API**: Bid/ask quotes with spread calculations
+- **🔔 Auction Data API**: Opening and closing auction prices and volumes
+- **🖼️ Company Logos API**: Retrieve company logo images
 
 ## 📦 Installation
 
@@ -204,6 +210,53 @@ print(f"Monthly Return: {returns:.2f}%")
 activities = api.trading.account.get_activities()
 for activity in activities:
     print(f"{activity.created_at}: {activity.activity_type} - {activity.symbol}")
+```
+
+### Market Data - Quotes, Auctions & Logos
+
+```python
+# Get historical quotes with bid/ask spreads
+quotes = api.stock.quotes.get_historical_quotes(
+    "AAPL",
+    start="2024-01-01T09:30:00Z",
+    end="2024-01-01T16:00:00Z"
+)
+print(f"Average spread: ${quotes['spread'].mean():.4f}")
+print(f"Spread percentage: {quotes['spread_pct'].mean():.4f}%")
+
+# Get auction data (opening and closing auctions)
+auctions = api.stock.auctions.get_auctions(
+    ["AAPL", "MSFT"],
+    start="2024-01-01",
+    end="2024-01-31"
+)
+for symbol, df in auctions.items():
+    print(f"{symbol} average intraday return: {df['intraday_return'].mean():.2f}%")
+
+# Get daily aggregated auction data
+daily_auctions = api.stock.auctions.get_daily_auctions(
+    "AAPL",
+    start="2024-01-01",
+    end="2024-01-31"
+)
+print(f"Days with positive returns: {len(daily_auctions[daily_auctions['daily_return'] > 0])}")
+
+# Get company logos
+logo_url = api.stock.logos.get_logo_url("AAPL")
+print(f"Apple logo URL: {logo_url}")
+
+# Save logo to file
+api.stock.logos.save_logo("MSFT", "msft_logo.png")
+
+# Get logo as base64 for embedding
+logo_base64 = api.stock.logos.get_logo_base64("GOOGL")
+html = f'<img src="data:image/png;base64,{logo_base64}" alt="Google logo">'
+
+# Get logos for multiple companies
+logos = api.stock.logos.get_multiple_logos(
+    ["AAPL", "MSFT", "GOOGL"],
+    placeholder=True  # Use placeholder if logo not found
+)
 ```
 
 ## 📊 Advanced Features
@@ -586,6 +639,9 @@ py-alpaca-api/
 │   ├── stock/                   # Stock market data
 │   │   ├── assets.py            # Asset information
 │   │   ├── history.py           # Historical data (batch support)
+│   │   ├── quotes.py            # Historical quotes with bid/ask (v3.0.0)
+│   │   ├── auctions.py          # Opening/closing auctions (v3.0.0)
+│   │   ├── logos.py             # Company logos (v3.0.0)
 │   │   ├── screener.py          # Stock screening
 │   │   ├── predictor.py         # ML predictions
 │   │   ├── latest_quote.py      # Real-time quotes (batch support)

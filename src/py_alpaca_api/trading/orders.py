@@ -20,6 +20,84 @@ class Orders:
         self.headers = headers
 
     #########################################################
+    # \\\\\\\\\/////////  Get All Orders \\\\\\\\\///////////#
+    #########################################################
+    def get_all_orders(
+        self,
+        status: str = "open",
+        limit: int = 50,
+        after: str | None = None,
+        until: str | None = None,
+        direction: str = "desc",
+        nested: bool = False,
+        symbols: str | None = None,
+    ) -> list[OrderModel]:
+        """Retrieves a list of orders for the account, filtered by the supplied parameters.
+
+        Args:
+            status: Order status to be queried. Options are 'open', 'closed', or 'all'.
+                Defaults to 'open'.
+            limit: Maximum number of orders to return. Max is 500. Defaults to 50.
+            after: Filter for orders submitted after this timestamp (ISO 8601 format).
+            until: Filter for orders submitted until this timestamp (ISO 8601 format).
+            direction: Chronological order of response based on submission time.
+                Options are 'asc' or 'desc'. Defaults to 'desc'.
+            nested: If True, multi-leg orders will be rolled up under the legs field
+                of primary order. Defaults to False.
+            symbols: Comma-separated list of symbols to filter by (e.g., "AAPL,TSLA,MSFT").
+
+        Returns:
+            List of OrderModel objects matching the query parameters.
+
+        Raises:
+            ValidationError: If invalid parameters are provided.
+            APIRequestError: If the API request fails.
+        """
+        # Validate status parameter
+        valid_statuses = ["open", "closed", "all"]
+        if status not in valid_statuses:
+            raise ValidationError(
+                f"Invalid status '{status}'. Must be one of: {', '.join(valid_statuses)}"
+            )
+
+        # Validate direction parameter
+        valid_directions = ["asc", "desc"]
+        if direction not in valid_directions:
+            raise ValidationError(
+                f"Invalid direction '{direction}'. Must be one of: {', '.join(valid_directions)}"
+            )
+
+        # Validate limit parameter
+        if limit < 1 or limit > 500:
+            raise ValidationError("Limit must be between 1 and 500")
+
+        # Build parameters
+        params: dict[str, str | bool | float | int] = {
+            "status": status,
+            "limit": limit,
+            "direction": direction,
+            "nested": nested,
+        }
+
+        if after:
+            params["after"] = after
+        if until:
+            params["until"] = until
+        if symbols:
+            params["symbols"] = symbols
+
+        url = f"{self.base_url}/orders"
+
+        response = json.loads(
+            Requests()
+            .request(method="GET", url=url, headers=self.headers, params=params)
+            .text
+        )
+
+        # Convert each order dict to OrderModel
+        return [order_class_from_dict(order_data) for order_data in response]
+
+    #########################################################
     # \\\\\\\\\/////////  Get Order BY id \\\\\\\///////////#
     #########################################################
     def get_by_id(self, order_id: str, nested: bool = False) -> OrderModel:

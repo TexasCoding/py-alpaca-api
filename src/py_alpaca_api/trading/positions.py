@@ -275,3 +275,52 @@ class Positions:
                 "asset_marginable": [False],
             }
         )
+
+    ########################################################
+    # /////////////// Exercise Options Position ///////////#
+    ########################################################
+    def exercise(self, symbol_or_contract_id: str) -> dict:
+        """Exercise a held option contract.
+
+        All available held shares of this option contract will be exercised.
+        By default, Alpaca will automatically exercise in-the-money (ITM)
+        contracts at expiry.
+
+        Args:
+            symbol_or_contract_id: The symbol or contract ID of the option
+                position to exercise.
+
+        Returns:
+            dict: Response from the API confirming the exercise request.
+
+        Raises:
+            APIRequestError: If the exercise request fails.
+            ValueError: If symbol_or_contract_id is not provided.
+
+        Note:
+            - Exercise requests will be processed immediately once received.
+            - Exercise requests submitted between market close and midnight
+              will be rejected.
+            - To cancel an exercise request or submit a Do-not-exercise (DNE)
+              instruction, contact Alpaca support.
+        """
+        if not symbol_or_contract_id:
+            raise ValueError("Symbol or contract ID is required")
+
+        url = f"{self.base_url}/positions/{symbol_or_contract_id}/exercise"
+
+        response = Requests().request(
+            method="POST",
+            url=url,
+            headers=self.headers,
+        )
+
+        # The API typically returns 200 OK with a JSON response
+        # or 204 No Content for successful exercise
+        if response.status_code == 204:
+            return {
+                "status": "success",
+                "message": f"Option {symbol_or_contract_id} exercise request submitted",
+            }
+
+        return json.loads(response.text)

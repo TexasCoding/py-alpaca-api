@@ -128,3 +128,30 @@ Module Contents
 
       :returns: A DataFrame containing the user's cash position data.
       :rtype: pd.DataFrame
+
+
+
+   .. py:method:: exercise(symbol_or_contract_id: str) -> dict
+
+      Exercise a held option contract.
+
+      All available held shares of this option contract will be exercised.
+      By default, Alpaca will automatically exercise in-the-money (ITM)
+      contracts at expiry.
+
+      :param symbol_or_contract_id: The symbol or contract ID of the option
+                                    position to exercise.
+
+      :returns: Response from the API confirming the exercise request.
+      :rtype: dict
+
+      :raises APIRequestError: If the exercise request fails.
+      :raises ValueError: If symbol_or_contract_id is not provided.
+
+      .. note::
+
+         - Exercise requests will be processed immediately once received.
+         - Exercise requests submitted between market close and midnight
+           will be rejected.
+         - To cancel an exercise request or submit a Do-not-exercise (DNE)
+           instruction, contact Alpaca support.
