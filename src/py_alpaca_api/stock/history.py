@@ -348,3 +348,107 @@ class History:
                 break
 
         return symbols_data
+
+    ###########################################
+    # ///////// Get Latest Bars \\\\\\\\\ #
+    ###########################################
+    def get_latest_bars(
+        self,
+        symbols: str | list[str],
+        feed: str = "iex",
+        currency: str = "USD",
+    ) -> pd.DataFrame | dict[str, pd.DataFrame]:
+        """Get the latest bars for one or more symbols.
+
+        The latest bars endpoint returns the most recent minute bar for each requested symbol.
+
+        Args:
+            symbols: Symbol(s) to get latest bars for. Can be a string for single symbol
+                or list of strings for multiple symbols.
+            feed: The data feed to use ("iex", "sip", or "otc"). Defaults to "iex".
+            currency: The currency for the returned prices. Defaults to "USD".
+
+        Returns:
+            For single symbol: pd.DataFrame with the latest bar data.
+            For multiple symbols: dict mapping symbols to DataFrames with latest bar data.
+
+        Raises:
+            ValueError: If feed is invalid or symbols is empty.
+            Exception: If the API request fails or returns no data.
+        """
+        # Validate feed
+        valid_feeds = ["iex", "sip", "otc"]
+        if feed not in valid_feeds:
+            raise ValueError(f"Invalid feed. Must be one of: {', '.join(valid_feeds)}")
+
+        # Normalize symbols to list
+        is_single = isinstance(symbols, str)
+        symbols_list: list[str]
+        if is_single:
+            assert isinstance(symbols, str)  # Type narrowing for mypy
+            symbols_list = [symbols.upper()]
+        else:
+            assert isinstance(symbols, list)  # Type narrowing for mypy
+            symbols_list = [s.upper() for s in symbols]
+
+        if not symbols_list:
+            raise ValueError("At least one symbol is required")
+
+        # Check if all symbols are valid stocks
+        for symbol in symbols_list:
+            self.check_if_stock(symbol)
+
+        # Build URL
+        url = f"{self.data_url}/stocks/bars/latest"
+
+        # Build parameters
+        params: dict = {
+            "symbols": ",".join(symbols_list),
+            "feed": feed,
+            "currency": currency,
+        }
+
+        # Make request
+        response = json.loads(
+            Requests()
+            .request(method="GET", url=url, headers=self.headers, params=params)
+            .text
+        )
+
+        # Process response
+        bars_data = response.get("bars", {})
+        if not bars_data:
+            raise Exception(
+                f"No latest bar data found for symbols: {', '.join(symbols_list)}"
+            )
+
+        # Convert to DataFrames
+        result = {}
+        for symbol, bar_data in bars_data.items():
+            if bar_data:
+                # Convert single bar to list for DataFrame
+                df = pd.DataFrame([bar_data])
+                # Convert timestamp
+                if "t" in df.columns:
+                    df["t"] = pd.to_datetime(df["t"])
+                    df.rename(columns={"t": "timestamp"}, inplace=True)
+                # Set timestamp as index
+                if "timestamp" in df.columns:
+                    df.set_index("timestamp", inplace=True)
+                # Rename columns to match existing pattern
+                column_mapping = {
+                    "o": "open",
+                    "h": "high",
+                    "l": "low",
+                    "c": "close",
+                    "v": "volume",
+                    "n": "trade_count",
+                    "vw": "vwap",
+                }
+                df.rename(columns=column_mapping, inplace=True)
+                result[symbol] = df
+
+        # Return single DataFrame for single symbol, dict for multiple
+        if is_single and symbols_list[0] in result:
+            return result[symbols_list[0]]
+        return result

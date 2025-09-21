@@ -1,8 +1,10 @@
 from py_alpaca_api.stock.assets import Assets
+from py_alpaca_api.stock.auctions import Auctions
 from py_alpaca_api.stock.history import History
 from py_alpaca_api.stock.latest_quote import LatestQuote
 from py_alpaca_api.stock.metadata import Metadata
 from py_alpaca_api.stock.predictor import Predictor
+from py_alpaca_api.stock.quotes import Quotes
 from py_alpaca_api.stock.screener import Screener
 from py_alpaca_api.stock.snapshots import Snapshots
 from py_alpaca_api.stock.trades import Trades
@@ -36,7 +38,9 @@ class Stock:
         market: Market,
     ):
         self.assets = Assets(headers=headers, base_url=base_url)
+        self.auctions = Auctions(headers=headers)
         self.history = History(headers=headers, data_url=data_url, asset=self.assets)
+        self.quotes = Quotes(headers=headers)
         self.screener = Screener(
             data_url=data_url, headers=headers, market=market, asset=self.assets
         )
