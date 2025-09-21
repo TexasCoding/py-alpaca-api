@@ -309,3 +309,93 @@ def test_trailing_stop_order_with_no_money(alpaca):
             symbol="AAPL", qty=2000, side="buy", trail_price=10.00
         )
     alpaca.trading.orders.cancel_all()
+
+
+#################################################
+# Test cases for PyAlpacaAPI.get_all_orders #
+#################################################
+def test_get_all_orders_default(alpaca):
+    alpaca.trading.orders.cancel_all()
+    # Create a few test orders
+    alpaca.trading.orders.market(symbol="AAPL", notional=2.00, side="buy")
+    alpaca.trading.orders.market(symbol="MSFT", notional=2.00, side="buy")
+
+    # Get all open orders (default)
+    orders = alpaca.trading.orders.get_all_orders()
+    assert isinstance(orders, list)
+    assert len(orders) >= 2
+    assert all(isinstance(order, OrderModel) for order in orders)
+
+    alpaca.trading.orders.cancel_all()
+
+
+def test_get_all_orders_with_status(alpaca):
+    alpaca.trading.orders.cancel_all()
+    # Create a test order
+    order = alpaca.trading.orders.market(symbol="AAPL", notional=2.00, side="buy")
+
+    # Get open orders
+    open_orders = alpaca.trading.orders.get_all_orders(status="open")
+    assert isinstance(open_orders, list)
+    assert len(open_orders) >= 1
+
+    # Cancel the order
+    alpaca.trading.orders.cancel_by_id(order.id)
+
+    # Get all orders including closed
+    all_orders = alpaca.trading.orders.get_all_orders(status="all", limit=100)
+    assert isinstance(all_orders, list)
+    assert any(o.id == order.id for o in all_orders)
+
+    alpaca.trading.orders.cancel_all()
+
+
+def test_get_all_orders_with_symbols(alpaca):
+    alpaca.trading.orders.cancel_all()
+    # Create orders for different symbols
+    alpaca.trading.orders.market(symbol="AAPL", notional=2.00, side="buy")
+    alpaca.trading.orders.market(symbol="MSFT", notional=2.00, side="buy")
+    alpaca.trading.orders.market(symbol="GOOGL", notional=2.00, side="buy")
+
+    # Get orders for specific symbols
+    filtered_orders = alpaca.trading.orders.get_all_orders(symbols="AAPL,MSFT")
+    assert isinstance(filtered_orders, list)
+    symbols_in_response = [order.symbol for order in filtered_orders]
+    assert all(symbol in ["AAPL", "MSFT"] for symbol in symbols_in_response)
+
+    alpaca.trading.orders.cancel_all()
+
+
+def test_get_all_orders_with_limit_and_direction(alpaca):
+    alpaca.trading.orders.cancel_all()
+    # Create multiple orders
+    for _i in range(5):
+        alpaca.trading.orders.market(symbol="AAPL", notional=2.00, side="buy")
+
+    # Test with limit
+    limited_orders = alpaca.trading.orders.get_all_orders(limit=3)
+    assert isinstance(limited_orders, list)
+    assert len(limited_orders) <= 3
+
+    # Test with ascending direction
+    asc_orders = alpaca.trading.orders.get_all_orders(direction="asc")
+    assert isinstance(asc_orders, list)
+
+    alpaca.trading.orders.cancel_all()
+
+
+def test_get_all_orders_invalid_params(alpaca):
+    # Test invalid status
+    with pytest.raises(ValidationError):
+        alpaca.trading.orders.get_all_orders(status="invalid")
+
+    # Test invalid direction
+    with pytest.raises(ValidationError):
+        alpaca.trading.orders.get_all_orders(direction="invalid")
+
+    # Test invalid limit
+    with pytest.raises(ValidationError):
+        alpaca.trading.orders.get_all_orders(limit=501)
+
+    with pytest.raises(ValidationError):
+        alpaca.trading.orders.get_all_orders(limit=0)
