@@ -14,6 +14,7 @@
 | **Latest Quotes** | GET `/v2/stocks/quotes/latest` | ✅ Implemented | `latest_quote.get()` |
 | **Snapshots** | GET `/v2/stocks/{symbol}/snapshot` | ✅ Implemented | `snapshots.get_snapshot()`, `snapshots.get_snapshots()` |
 | **Historical Auctions** | GET `/v2/stocks/auctions` | ✅ Implemented | `auctions.get_auctions()`, `auctions.get_daily_auctions()` |
+| **Company Logos** | GET `/v1beta1/logos/{symbol}` | ✅ Implemented | `logos.get_logo()`, `logos.get_logo_url()`, `logos.save_logo()` |
 | **Exchange Codes** | GET `/v2/stocks/meta/exchanges` | ✅ Implemented | `metadata.get_exchange_codes()` |
 | **Condition Codes** | GET `/v2/stocks/meta/conditions` | ✅ Implemented | `metadata.get_condition_codes()` |
 
@@ -23,6 +24,7 @@ As of this latest update, **ALL** market data endpoints have been implemented:
 - ✅ **Latest Bars** - Added `history.get_latest_bars()` method
 - ✅ **Historical Quotes** - Added complete `quotes.py` module with `get_historical_quotes()`
 - ✅ **Historical Auctions** - Added complete `auctions.py` module with `get_auctions()` and `get_daily_auctions()`
+- ✅ **Company Logos** - Added complete `logos.py` module with multiple retrieval methods
 
 ## ✅ Implemented Features
 
@@ -56,14 +58,22 @@ As of this latest update, **ALL** market data endpoints have been implemented:
 - ✅ Support for opening and closing auction prices
 - ✅ Intraday return calculations
 
-### 6. Metadata
+### 6. Company Logos (Complete)
+- ✅ `logos.get_logo()` - Get logo as binary image data
+- ✅ `logos.get_logo_url()` - Get direct URL to logo
+- ✅ `logos.save_logo()` - Save logo to file
+- ✅ `logos.get_logo_base64()` - Get logo as base64 string
+- ✅ `logos.get_multiple_logos()` - Batch retrieval for multiple symbols
+- ✅ Support for placeholder images
+
+### 7. Metadata
 - ✅ `metadata.get_exchange_codes()` - Get exchange code mappings
 - ✅ `metadata.get_condition_codes()` - Get condition code mappings
 - ✅ `metadata.lookup_exchange()` - Look up exchange by code
 - ✅ `metadata.lookup_condition()` - Look up condition by code
 - ✅ Caching support for metadata
 
-### 7. Additional Features (Not in standard API)
+### 8. Additional Features (Not in standard API)
 - ✅ `assets.get()` - Get asset information
 - ✅ `assets.get_all()` - Get all assets
 - ✅ `screener.gainers()` - Find top gaining stocks
@@ -72,8 +82,8 @@ As of this latest update, **ALL** market data endpoints have been implemented:
 
 ## 📊 Summary
 
-- **Total Market Data Endpoints**: 10
-- **Implemented**: 10 (100%)
+- **Total Market Data Endpoints**: 11
+- **Implemented**: 11 (100%)
 - **Missing**: 0 (0%)
 
 ## 🎉 Complete Implementation Achieved!
