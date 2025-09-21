@@ -99,6 +99,78 @@ def test_raises_value_error_when_symbol_not_provided_with_mock_account():
         positions.get("")
 
 
+def test_exercise_option_successfully(mocker):
+    # Test successful exercise with 204 response
+    mock_response = mocker.Mock()
+    mock_response.status_code = 204
+    mock_response.text = ""
+
+    mocker.patch(
+        "py_alpaca_api.http.requests.Requests.request",
+        return_value=mock_response,
+    )
+
+    mock_account = mocker.Mock()
+    mock_account.get.return_value.cash = 1000.0
+
+    positions = Positions(
+        "https://api.alpaca.markets",
+        {"Authorization": "Bearer YOUR_API_KEY"},
+        mock_account,
+    )
+
+    result = positions.exercise("AAPL240119C00150000")
+    assert result["status"] == "success"
+    assert "AAPL240119C00150000" in result["message"]
+
+
+def test_exercise_option_with_json_response(mocker):
+    # Test successful exercise with JSON response
+    mock_response_data = {
+        "id": "exercise_123",
+        "status": "submitted",
+        "symbol": "AAPL240119C00150000",
+    }
+
+    mock_response = mocker.Mock()
+    mock_response.status_code = 200
+    mock_response.text = json.dumps(mock_response_data)
+
+    mocker.patch(
+        "py_alpaca_api.http.requests.Requests.request",
+        return_value=mock_response,
+    )
+
+    mock_account = mocker.Mock()
+    mock_account.get.return_value.cash = 1000.0
+
+    positions = Positions(
+        "https://api.alpaca.markets",
+        {"Authorization": "Bearer YOUR_API_KEY"},
+        mock_account,
+    )
+
+    result = positions.exercise("AAPL240119C00150000")
+    assert result["id"] == "exercise_123"
+    assert result["status"] == "submitted"
+
+
+def test_exercise_option_raises_error_when_symbol_empty(mocker):
+    import pytest
+
+    mock_account = mocker.Mock()
+    mock_account.get.return_value.cash = 1000.0
+
+    positions = Positions(
+        "https://api.alpaca.markets",
+        {"Authorization": "Bearer YOUR_API_KEY"},
+        mock_account,
+    )
+
+    with pytest.raises(ValueError, match="Symbol or contract ID is required"):
+        positions.exercise("")
+
+
 def test_retrieves_all_positions_successfully_with_correct_sorting(mocker):
     mock_response = [
         {
